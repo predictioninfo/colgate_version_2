@@ -1,0 +1,17 @@
+{
+    "name": "aizhar777/numbers-to-words",
+    "description": "Laravel package for the translation of numbers to words",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aizhar777",
+            "email": "aizharolexin@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-0": {
+            "Aizhar777\\NumToWord\\": "src/"
+        }
+    }
+}
