@@ -44,9 +44,11 @@ class AppointmentTemplateController extends Controller
         $appointment->appointment_template_subject = $req->subject;
         $appointment->appointment_template_header = $req->appoinment_header;
         $appointment->appointment_template_footer = $req->appoinment_footer;
-        $description = nl2br($req->description);
+        $description =$req->description;
+        // $description = nl2br($req->description);
         $appointment->appointment_template_description = $description;
-        $general_terms = nl2br($req->general_terms);
+        $general_terms = $req->general_terms;
+        // $general_terms = nl2br($req->general_terms);
         $appointment->appointment_template_general_terms = $general_terms;
 
         if ($req->file('signature_img')) {
@@ -88,9 +90,11 @@ class AppointmentTemplateController extends Controller
         $appointment->appointment_template_subject = $req->subject;
         $appointment->appointment_template_header = $req->appoinment_header;
         $appointment->appointment_template_footer = $req->appoinment_footer;
-        $description = nl2br($req->description);
+        $description = $req->description;
+        // $description = nl2br($req->description);
         $appointment->appointment_template_description = $description;
-        $general_terms = nl2br($req->general_terms);
+        $general_terms = $req->general_terms;
+        // $general_terms = nl2br($req->general_terms);
         $appointment->appointment_template_general_terms = $general_terms;
 
         if ($req->file('signature_img')) {
@@ -207,7 +211,7 @@ class AppointmentTemplateController extends Controller
         ]);
 
         $employee = User::where('com_id', Auth::user()->com_id)->where('id', Session::get('employee_setup_id'))->first();
-         $appointment = User::with([
+        return $appointment = User::with([
             'userdesignation', 'userdepartment', 'userarea', 'appointmentLetter',
             'educationdetail',
             'emoloyeedetail' => function ($query) {

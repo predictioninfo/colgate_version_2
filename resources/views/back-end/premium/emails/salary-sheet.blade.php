@@ -95,6 +95,7 @@
             @php($total_net_salary=0)
             @php($total_payroll_charge=0)
             @php($total_payable_amount=0)
+
             @foreach($payment_histories as $payment_histories_value)
             <tr>
                 <td>{{$i++}}</td>
@@ -105,16 +106,16 @@
                 <td>{{$payment_histories_value->joining_date}}</td>
                 <td>{{$payment_histories_value->department_name}}</td>
                 <td>{{$payment_histories_value->designation_name}}</td>
-                <td>{{$payment_histories_value->pay_slip_payment_type}}</td>
-                <td>{{$payment_histories_value->pay_slip_gross_salary}}</td>
+                <td>{{$payment_histories_value->customize_pay_slip_payment_type}}</td>
+                <td>{{$payment_histories_value->customize_pay_slip_gross_salary}}</td>
+                <td>{{$payment_histories_value->customize_pay_slip_basic_salary}}</td>
+                <td>{{$payment_histories_value->customize_pay_slip_total_working_hour}}</td>
+                <td>{{$payment_histories_value->customize_pay_slip_net_salary}}</td>
 
-                <td>@php ($basic_salary = ($payment_histories_value->pay_slip_basic_salary))
+                <td>{{$payment_histories_value->customize_pay_slip_house_rent}}</td>
+                <td>@php ($basic_salary = ($payment_histories_value->customize_pay_slip_medical_allowance))
                     {{number_format((float)$basic_salary, 2, '.', '')}}</td>
-                <td>{{$payment_histories_value->pay_slip_working_days}}</td>
-                <td>{{number_format((float)$payment_histories_value->pay_slip_per_hour_rate),2, '.', ''}}</td>
-                <td>{{$payment_histories_value->pay_slip_house_rent}}</td>
-                <td>{{$payment_histories_value->pay_slip_medical_allowance}}</td>
-                <td>{{$payment_histories_value->pay_slip_conveyance_allowance}}</td>
+                <td>{{$payment_histories_value->customize_pay_slip_conveyance_allowance}}</td>
                 <td>{{$payment_histories_value->pay_slip_festival_bonus}}</td>
                 <td>{{$payment_histories_value->pay_slip_overtimes}}</td>
                 <td>{{$payment_histories_value->pay_slip_commissions}}</td>

@@ -147,7 +147,7 @@
 
 
                             <div class="col-md-3 form-group">
-                                <label>{{__('Month')}} </label>
+                                <label>{{__('Month ')}} </label>
                                 <select name="month" class="form-control " title='Month' required>
                                     <option value="">Select Month</option>
                                     @foreach($customize_months as $customize_month)
@@ -218,8 +218,8 @@
 
                             <div class="col-md-3 ">
                                 <div class="form-group pt-4 mt-1">
-                                    {{-- <input type="submit" name="download_pdf" class="btn btn-grad"
-                                        value="{{__('Download PDF')}}" /> --}}
+                                    <input type="submit" name="download_pdf" class="btn btn-grad"
+                                        value="{{__('Download PDF')}}" />
                                     <input type="submit" name="download_excel" class="btn btn-grad"
                                         value="{{__('Download Excel')}}" />
                                 </div>
@@ -398,7 +398,7 @@
                         <td style="text-align:center;border: 1px solid black;">
                             {{$payment_histories_value->customize_pay_slip_snacks_allowance}}</td>
                         <td style="text-align:center;border: 1px solid black;">
-                            {{$payment_histories_value->customize_pay_slip_net_salary}}</td>
+                            {{$payment_histories_value->customize_pay_slip_net_salary}} </td>
                         <td style="text-align:center;border: 1px solid black;">
                             {{$payment_histories_value->pay_slip_deduction_for_unauthorised_leave}}</td>
                         <td style="text-align:center;border: 1px solid black;">

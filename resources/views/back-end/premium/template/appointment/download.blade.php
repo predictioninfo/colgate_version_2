@@ -70,11 +70,11 @@
                             <tr>
 
                                 <td style="width: 50%;">
-                                    {!! $appointment->appointmentLetter->parmanent_address ?? '' !!}
+                                    {!! $appointment->emoloyeedetail->village_en ?? '' !!}
 
                                 </td>
                                 <td style="width: 50%; text-align: start;">
-                                    {!! $appointment->appointmentLetter->present_address ?? '' !!}</td>
+                                    {!! $appointment->emoloyeedetail->present_village ?? '' !!}</td>
 
 
                             </tr>

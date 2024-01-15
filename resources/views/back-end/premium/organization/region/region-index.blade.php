@@ -220,7 +220,7 @@
                                                                 value="{{ $regionsValue->id }}">
                                                             <div class="col-md-12">
                                                                 <div class="input-group mb-3">
-                                                                    <label>{{ $location1 }} *</label>
+                                                                    {{-- <label>{{ Location1 }} *</label> --}}
                                                                     <div class="input-group-prepend">
                                                                         <span class="input-group-text"> <i
                                                                                 class="fa fa-location-arrow"

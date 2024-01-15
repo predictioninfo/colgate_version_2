@@ -64,6 +64,8 @@
                             </div>
                         </div>
 
+
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="company_name">
@@ -75,78 +77,27 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-md-12">
-                            <label for="email">
-                                <span style="color:black;font-weight:bold;">General terms </span><span
-                                    class="text-danger">*</span> </label>
-                            <textarea name="general_terms" id="description"
+                                <label for="general_terms">
+                                    <span style="color:black;font-weight:bold;">General terms </span><span
+                                        class="text-danger">*</span> </label>
+                                <div class="">
+                                    <textarea name="general_terms" id="description" cols="30" rows="5"
                                         placeholder="Writing Somthing...."></textarea>
+                                </div>
+
 
                         </div>
-                        {{-- <div class="col-md-12">
-                            <span style="font-weight:bold;"> Remuneration and benefits: <br></span><br><br>
-                            <table style="width:70%; padding-right:50%;">
-                                <tbody>
-                                    <tr>
-                                        <th width="60px; float:right;text-align: left;">Basic Salary</th>
-                                        <th width="5px">:</th>
-                                        <th width="60px; text-align: right;"> BDT</th>
-                                    </tr>
-                                    <tr>
-                                        <th width="60px;float:right;text-align: left;">Medical allowance
-                                        </th>
-                                        <th width="5px">:</th>
-                                        <th width="60px;text-align: right;"> BDT
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th width="60px;text-align: left;">House Rent</th>
-                                        <th width="5px">:</th>
-                                        <th width="60px;text-align: right;"> BDT
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th width="60px;text-align: left;">Mobile Allowance</th>
-                                        <th width="5px">:</th>
-                                        <th width="100px;text-align: right;">
-                                            BDT</th>
-                                    </tr>
-                                    <tr>
-                                        <th width="60px;text-align: left;">Convence Allowance</th>
-                                        <th width="5px">:</th>
-                                        <th width="60px;text-align: right;"> BDT
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th width="60px;text-align: left;">Festival Bounus</th>
-                                        <th width="5px">:</th>
-                                        <th width="60px;text-align: right;">
-                                            BDT
-                                        </th>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <hr>
-                            <table style="width:70%">
-                                <tbody>
-                                    <tr>
-                                        <th width="32%;text-align: left;">Total</th>
-                                        <th width="6%;">:</th>
-                                        <th width="40%;text-align: right;"> BDT
-                                        </th>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> --}}
-                        <div class="col-md-12">
-                            <div class="form-group" style="margin: 15px 0;">
-                                <label for="email">
-                                    <span style="color:black;font-weight:bold;">Other terms</span>
-                                    <span class="text-danger">*</span> </label> <br>
-                                    <textarea name="description" id="description1" cols="30" rows="5"
-                                    placeholder="Writing Somthing...."></textarea>
 
-                                <span id="email_error"></span>
+                        <div class="col-md-12">
+                                <label for="description">
+                                    <span style="color:black;font-weight:bold;">Description</span>
+                                    <span class="text-danger">*</span> </label> <br>
+                                <div class="">
+                                    <textarea name="description" id="description1" cols="30" rows="5"
+                                        placeholder="Writing Somthing...."></textarea>
+
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -159,12 +110,12 @@
                                         placeholder="{{ __('Upload', ['key' => trans('file.Photo')]) }}">
                                 </div>
                             </div>
-
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="website">
-                                    Sginatory <span class="text-danger">*</span></label>
+                                    Signatory <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <select class="form-control" name="employee_id" id="employment_type">
                                         <option value="">{{ __('Select A Signatory ') }}</option>

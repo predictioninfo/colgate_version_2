@@ -3090,13 +3090,14 @@
                                                         value="{{ $employee_basic_infos_value->emoloyeedetail->present_postal_code }}" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label><strong>{{ __('Village Name/House No,Block No, Road No') }}
                                                         </strong></label>
-                                                    <input type="text" name="present_village" class="form-control"
+                                                    {{-- <input type="text" name="present_village" class="form-control"
                                                         placeholder="Village Name/House No,Block No, Road No"
-                                                        value="{{ $employee_basic_infos_value->emoloyeedetail->present_village }}" />
+                                                        value=" {!! $employee_basic_infos_value->emoloyeedetail->present_village !!}" /> --}}
+                                                        <textarea name="present_village" id="present_village" cols="30" rows="10">{!! html_entity_decode($employee_basic_infos_value->emoloyeedetail->present_village) !!}</textarea>
                                                 </div>
                                             </div>
 
@@ -3270,13 +3271,16 @@
                                                         value="{{ $employee_basic_infos_value->emoloyeedetail->postal_code }}" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label><strong>{{ __('Village Name/House No, Block No, Road No') }}
+                                                    <label><strong>{{ __('Village Name/House No, Block No, Road No ') }}
                                                         </strong></label>
-                                                    <input type="text" name="village" class="form-control"
+                                                    {{-- <input type="text" name="village" class="form-control"
                                                         placeholder="Village Name"
-                                                        value="{{ $employee_basic_infos_value->emoloyeedetail->village_en }}" />
+                                                        value="{{ $employee_basic_infos_value->emoloyeedetail->village_en }}" /> --}}
+                                                        <textarea name="village" id="village" cols="30" rows="10">
+                                                            {!! html_entity_decode($employee_basic_infos_value->emoloyeedetail->village_en) !!}
+                                                            </textarea>
                                                 </div>
                                             </div>
 

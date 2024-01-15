@@ -96,7 +96,7 @@ class EmployeeController extends Controller
         $locations = Locatoincustomize::where('location_com_id', '=', Auth::user()->com_id)->get();
         if (Role::where('id', Auth::user()->role_id)->where('roles_admin_status', 'Yes')->where('roles_is_active', 1)->exists()) {
 
-            $users = User::with(['userDivision','userdepartment','userdesignation', 'userDistrict', 'userUpazila', 'userUnion', 'emoloyeedetail' => function ($q) {
+            $users = User::with(['userDivision', 'userdepartment', 'userdesignation', 'userDistrict', 'userUpazila', 'userUnion', 'emoloyeedetail' => function ($q) {
                 $q->with('emploeeUnion');
             }])
                 ->where('com_id', '=', Auth::user()->com_id)
@@ -108,9 +108,9 @@ class EmployeeController extends Controller
         } else {
 
             $users = User::where('id', '=', Auth::user()->id)
-            ->where('is_active', 1)->where('users_bulk_deleted', 'No')
-            ->whereNull('company_profile')->orderBy('id', 'DESC')
-            ->get(['id', 'company_assigned_id', 'first_name', 'last_name', 'email', 'phone', 'username', 'profile_photo', 'salary_type', 'is_active', 'address', 'id_card_status']);
+                ->where('is_active', 1)->where('users_bulk_deleted', 'No')
+                ->whereNull('company_profile')->orderBy('id', 'DESC')
+                ->get(['id', 'company_assigned_id', 'first_name', 'last_name', 'email', 'phone', 'username', 'profile_photo', 'salary_type', 'is_active', 'address', 'id_card_status']);
             return view('back-end.premium.employees.employee-list-index', get_defined_vars());
         }
     }
@@ -369,8 +369,8 @@ class EmployeeController extends Controller
     }
     public function checkUserName(Request $request)
     {
-          $userName = User::where('first_name',$request->firstName)->where('last_name',$request->lastName)->get('username');
-          return response()->json($userName);
+        $userName = User::where('first_name', $request->firstName)->where('last_name', $request->lastName)->get('username');
+        return response()->json($userName);
     }
 
     public function employeeStore(Request $request)
@@ -1366,13 +1366,13 @@ class EmployeeController extends Controller
         $validated = $request->validate(
             [
                 'employee_id' => 'required',
-                'lat' => 'required',
-                'longt' => 'required',
+                // 'lat' => 'required',
+                // 'longt' => 'required',
             ],
-            [
-                'lat.required' => 'Please Allow your Device location',
-                'longt.required' => 'Otherwise attendance will be not count.'
-            ]
+            // [
+            //     'lat.required' => 'Please Allow your Device location',
+            //     'longt.required' => 'Otherwise attendance will be not count.'
+            // ]
         );
         // $browser = Agent::browser();
         // $version = Agent::version($browser);
@@ -1392,131 +1392,129 @@ class EmployeeController extends Controller
         //custom date start
 
 
-            $day = $date->format('d');
-            $month = $date->format('m');
-            $year = $date->format('Y');
+        $day = $date->format('d');
+        $month = $date->format('m');
+        $year = $date->format('Y');
 
-            $currentDate = Carbon::now();  // Get the current date and time
-            $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+        $currentDate = Carbon::now();  // Get the current date and time
+        $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
 
-            $previousYear =  $previousMonth->format('Y');
+        $previousYear =  $previousMonth->format('Y');
 
-            $previousMonth = $previousMonth->format('m');
+        $previousMonth = $previousMonth->format('m');
 
-            $date_setting =  DateSetting::where('date_settings_com_id',Auth::user()->com_id)->first();
+        $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
 
-            if($month == "1"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',12)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $previousYear;
-             $attendance_month = "12";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "01";
+        if ($month == "1") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $previousYear;
+                $attendance_month = "12";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "01";
             }
+        } elseif ($month == "2") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
 
-            }elseif($month == "2"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',1)->first();
-
-            if($customize_date->end_date >= $day){
-             $attendance_year = $previousYear;
-             $attendance_month = "01";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "02";
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $previousYear;
+                $attendance_month = "01";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "02";
             }
-
-            }elseif($month == "3"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',2)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $previousYear;
-             $attendance_month = "02";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "03";
+        } elseif ($month == "3") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $previousYear;
+                $attendance_month = "02";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "03";
             }
-            }elseif($month == "4"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',3)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "03";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "04";
+        } elseif ($month == "4") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "03";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "04";
             }
-            }elseif($month == "5"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',4)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "04";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "05";
+        } elseif ($month == "5") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "04";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "05";
             }
-            }elseif($month == "6"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',5)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "05";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "06";
+        } elseif ($month == "6") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "05";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "06";
             }
-            }elseif($month == "7"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',6)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "06";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "07";
+        } elseif ($month == "7") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "06";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "07";
             }
-            }elseif($month == "8"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',7)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "07";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "08";
+        } elseif ($month == "8") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "07";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "08";
             }
-            }elseif($month == "9"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',8)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "08";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "09";
+        } elseif ($month == "9") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "08";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "09";
             }
-            }elseif($month == "10"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',9)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "09";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "10";
+        } elseif ($month == "10") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "09";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "10";
             }
-            }elseif($month == "11"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',10)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "10";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "11";
+        } elseif ($month == "11") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "10";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "11";
             }
-            }elseif($month == "12"){
-            $customize_date = CustomizeMonthName::where('customize_month_names_com_id',Auth::user()->com_id)->where('start_month',11)->first();
-            if($customize_date->end_date >= $day){
-             $attendance_year = $year;
-             $attendance_month = "11";
-            }else{
-             $attendance_year = $year;
-             $attendance_month = "12";
+        } elseif ($month == "12") {
+            $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+            if ($customize_date->end_date >= $day) {
+                $attendance_year = $year;
+                $attendance_month = "11";
+            } else {
+                $attendance_year = $year;
+                $attendance_month = "12";
             }
-            }
+        }
 
         //custom date end
 
@@ -1622,6 +1620,7 @@ class EmployeeController extends Controller
             return back()->with('message', 'You Have Taken A Leave For This Day!!!');
         }
 
+
         if (Travel::where('travel_com_id', Auth::user()->com_id)->where('travel_employee_id', $request->employee_id)->where('travel_status', '=', 'Approved')->whereRaw('"' . $current_date . '" between `travel_start_date` and `travel_end_date`')->exists()) { //condition for travel aprovements
 
             return back()->with('message', 'You are not permitted to give attendance when you are on traveling!!!');
@@ -1637,7 +1636,7 @@ class EmployeeController extends Controller
             ////////// Attandance check-in code Starts...
 
 
-            if ($request->lat && $request->longt) {
+            // if ($request->lat && $request->longt) {
 
 
                 $users = User::where('id', $request->employee_id)->get();
@@ -1647,164 +1646,8 @@ class EmployeeController extends Controller
                 $employee_id = $request->employee_id;
 
                 foreach ($users as $usersValue) {
-                   $permission = "3.28";
-                    //echo $usersValue->attendance_status; exit;
+                    $permission = "3.28";
 
-                    // if (Package::where('id', '=',$usersValue->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission .'"]\')')->exists()){
-
-                    //     $current_month = $date->format('m');
-                    //     $current_year = $date->format('Y');
-                    //     $current_date_number = $date->format('d');
-
-                    //     $currentDate = Carbon::now();  // Get the current date and time
-                    //     $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
-
-                    //     $previousYear =  $previousMonth->format('Y');
-
-                    //     $previousMonth = $previousMonth->format('m');
-
-                    //     $date_setting =  DateSetting::where('date_settings_com_id',$usersValue->com_id)->first();
-
-                    //             if($current_month == "01"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',12)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $previousYear;
-                    //                 $attendance_month = "12";
-                    //                 $current_date = $previousYear.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "01";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-
-                    //             }elseif($current_month == "02"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',1)->first();
-
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $previousYear;
-                    //                 $attendance_month = "01";
-                    //                 $current_date = $previousYear.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "02";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-
-                    //             }elseif($current_month == "03"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',2)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $previousYear;
-                    //                 $attendance_month = "02";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "03";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-                    //             }elseif($current_month == "04"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',3)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "03";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "04";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-                    //             }elseif($current_month == "05"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',4)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "04";
-                    //                 $current_date = $current_year . '-' . $attendance_month . '-' . $current_date_number;
-
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "05";
-                    //                 $current_date = $current_year . '-' . $attendance_month . '-' . $current_date_number;
-
-                    //                 }
-                    //             }elseif($current_month == "06"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',5)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "05";
-                    //                 $current_date = $current_year . '-' . $attendance_month . '-' . $current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "06";
-                    //                 $current_date = $current_year . '-' . $attendance_month . '-' . $current_date_number;
-                    //                 }
-                    //             }elseif($current_month == "07"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',6)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "06";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "07";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-                    //             }elseif($current_month == "08"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',7)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "07";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "08";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-                    //             }elseif($current_month == "09"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',8)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "08";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "09";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-                    //             }elseif($current_month == "10"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',9)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "09";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "10";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-                    //             }elseif($current_month == "11"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',10)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "10";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "11";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-                    //             }elseif($current_month == "12"){
-                    //                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id',$usersValue->com_id)->where('start_month',11)->first();
-                    //                 if($customize_date->end_date < $customize_date->start_date){
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "11";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }else{
-                    //                 $attendance_year = $current_year;
-                    //                 $attendance_month = "12";
-                    //                 $current_date = $current_year.'-'.$attendance_month.'-'.$current_date_number;
-                    //                 }
-                    //             }
-
-                    // }
 
                     if ($usersValue->attendance_status == "" || $usersValue->attendance_status == NULL || $usersValue->attendance_status == 'No') {
                         // if($usersValue->attendance_status == NULL || $usersValue->attendance_status == 'No'){
@@ -1812,9 +1655,9 @@ class EmployeeController extends Controller
 
                         $user = User::find($request->employee_id);
                         $user->attendance_status = "Yes";
-                        $user->check_in_ip = $local_server_ip;
-                        $user->check_in_latitude = $request->lat;
-                        $user->check_in_longitude = $request->longt;
+                        // $user->check_in_ip = $local_server_ip;
+                        // $user->check_in_latitude = $request->lat;
+                        // $user->check_in_longitude = $request->longt;
                         $user->save();
 
 
@@ -1825,8 +1668,8 @@ class EmployeeController extends Controller
                         $attendance->customize_attendance_month = $attendance_month;
                         $attendance->customize_attendance_year = $attendance_year;
                         $attendance->clock_in = $current_time;
-                        $attendance->check_in_latitude = $request->lat;
-                        $attendance->check_in_longitude = $request->longt;
+                        // $attendance->check_in_latitude = $request->lat;
+                        // $attendance->check_in_longitude = $request->longt;
                         $attendance->check_in_ip = $local_server_ip;
                         if (date_create($current_time) >= date_create($shift_in)) {
                             if ($shift_in != 0 && $shift_out != 0) {
@@ -1892,1191 +1735,6 @@ class EmployeeController extends Controller
                         $permission = "3.28";
                         if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
 
-                                                    $year = date('Y');
-
-                                                    $month =  date('m');
-                                                    $day =  date('d');
-
-                                                    $currentDate = Carbon::now();  // Get the current date and time
-                                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
-
-                                                    $previousYear =  $previousMonth->format('Y');
-
-                                                    $previousMonth = $previousMonth->format('m');
-
-                                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
-
-                                                    if ($month == "01") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "12";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "01";
-                                                        }
-                                                    } elseif ($month == "02") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
-
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "01";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "02";
-                                                        }
-                                                    } elseif ($month == "03") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "02";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "03";
-                                                        }
-                                                    } elseif ($month == "04") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "3";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "4";
-                                                        }
-                                                    } elseif ($month == "05") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "04";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "05";
-                                                        }
-                                                    } elseif ($month == "06") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "05";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "06";
-                                                        }
-                                                    } elseif ($month == "07") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "06";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "07";
-                                                        }
-                                                    } elseif ($month == "08") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "07";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "08";
-                                                        }
-                                                    } elseif ($month == "09") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "08";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "09";
-                                                        }
-                                                    } elseif ($month == "10") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "09";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        }
-                                                    } elseif ($month == "11") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        }
-                                                    } elseif ($month == "12") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "12";
-                                                        }
-                                                    }
-
-
-                                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
-
-                                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
-
-                                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                                            if ($current_date_number == 1) {
-                                                                $monthly_attendance->day_one = "P";
-                                                            } elseif ($current_date_number == 2) {
-                                                                $monthly_attendance->day_two = "P";
-                                                            } elseif ($current_date_number == 3) {
-                                                                $monthly_attendance->day_three = "P";
-                                                            } elseif ($current_date_number == 4) {
-                                                                $monthly_attendance->day_four = "P";
-                                                            } elseif ($current_date_number == 5) {
-                                                                $monthly_attendance->day_five = "P";
-                                                            } elseif ($current_date_number == 6) {
-                                                                $monthly_attendance->day_six = "P";
-                                                            } elseif ($current_date_number == 7) {
-                                                                $monthly_attendance->day_seven = "P";
-                                                            } elseif ($current_date_number == 8) {
-                                                                $monthly_attendance->day_eight = "P";
-                                                            } elseif ($current_date_number == 9) {
-                                                                $monthly_attendance->day_nine = "P";
-                                                            } elseif ($current_date_number == 10) {
-                                                                $monthly_attendance->day_ten = "P";
-                                                            } elseif ($current_date_number == 11) {
-                                                                $monthly_attendance->day_eleven = "P";
-                                                            } elseif ($current_date_number == 12) {
-                                                                $monthly_attendance->day_twelve = "P";
-                                                            } elseif ($current_date_number == 13) {
-                                                                $monthly_attendance->day_thirteen = "P";
-                                                            } elseif ($current_date_number == 14) {
-                                                                $monthly_attendance->day_fourteen = "P";
-                                                            } elseif ($current_date_number == 15) {
-                                                                $monthly_attendance->day_fifteen = "P";
-                                                            } elseif ($current_date_number == 16) {
-                                                                $monthly_attendance->day_sixteen = "P";
-                                                            } elseif ($current_date_number == 17) {
-                                                                $monthly_attendance->day_seventeen = "P";
-                                                            } elseif ($current_date_number == 18) {
-                                                                $monthly_attendance->day_eighteen = "P";
-                                                            } elseif ($current_date_number == 19) {
-                                                                $monthly_attendance->day_nineteen = "P";
-                                                            } elseif ($current_date_number == 20) {
-                                                                $monthly_attendance->day_twenty = "P";
-                                                            } elseif ($current_date_number == 21) {
-                                                                $monthly_attendance->day_twenty_one = "P";
-                                                            } elseif ($current_date_number == 22) {
-                                                                $monthly_attendance->day_twenty_two = "P";
-                                                            } elseif ($current_date_number == 23) {
-                                                                $monthly_attendance->day_twenty_three = "P";
-                                                            } elseif ($current_date_number == 24) {
-                                                                $monthly_attendance->day_twenty_four = "P";
-                                                            } elseif ($current_date_number == 25) {
-                                                                $monthly_attendance->day_twenty_five = "P";
-                                                            } elseif ($current_date_number == 26) {
-                                                                $monthly_attendance->day_twenty_six = "P";
-                                                            } elseif ($current_date_number == 27) {
-                                                                $monthly_attendance->day_twenty_seven = "P";
-                                                            } elseif ($current_date_number == 28) {
-                                                                $monthly_attendance->day_twenty_eight = "P";
-                                                            } elseif ($current_date_number == 29) {
-                                                                $monthly_attendance->day_twenty_nine = "P";
-                                                            } elseif ($current_date_number == 30) {
-                                                                $monthly_attendance->day_thirty = "P";
-                                                            } elseif ($current_date_number == 31) {
-                                                                $monthly_attendance->day_thirty_one = "P";
-                                                            } else {
-                                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                            }
-
-                                                            $monthly_attendance->save();
-                                                        }
-                                                    } else {
-                                                        // return "ok";
-                                                        $monthly_attendance = new CustomizeMonthlyAttendance();
-                                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
-                                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
-                                                        $monthly_attendance->attendance_month = $attendance_month;
-                                                        $monthly_attendance->attendance_year = $attendance_year;
-                                                        if ($current_date_number == 1) {
-                                                            $monthly_attendance->day_one = "P";
-                                                        } elseif ($current_date_number == 2) {
-                                                            $monthly_attendance->day_two = "P";
-                                                        } elseif ($current_date_number == 3) {
-                                                            $monthly_attendance->day_three = "P";
-                                                        } elseif ($current_date_number == 4) {
-                                                            $monthly_attendance->day_four = "P";
-                                                        } elseif ($current_date_number == 5) {
-                                                            $monthly_attendance->day_five = "P";
-                                                        } elseif ($current_date_number == 6) {
-                                                            $monthly_attendance->day_six = "P";
-                                                        } elseif ($current_date_number == 7) {
-                                                            $monthly_attendance->day_seven = "P";
-                                                        } elseif ($current_date_number == 8) {
-                                                            $monthly_attendance->day_eight = "P";
-                                                        } elseif ($current_date_number == 9) {
-                                                            $monthly_attendance->day_nine = "P";
-                                                        } elseif ($current_date_number == 10) {
-                                                            $monthly_attendance->day_ten = "P";
-                                                        } elseif ($current_date_number == 11) {
-                                                            $monthly_attendance->day_eleven = "P";
-                                                        } elseif ($current_date_number == 12) {
-                                                            $monthly_attendance->day_twelve = "P";
-                                                        } elseif ($current_date_number == 13) {
-                                                            $monthly_attendance->day_thirteen = "P";
-                                                        } elseif ($current_date_number == 14) {
-                                                            $monthly_attendance->day_fourteen = "P";
-                                                        } elseif ($current_date_number == 15) {
-                                                            $monthly_attendance->day_fifteen = "P";
-                                                        } elseif ($current_date_number == 16) {
-                                                            $monthly_attendance->day_sixteen = "P";
-                                                        } elseif ($current_date_number == 17) {
-                                                            $monthly_attendance->day_seventeen = "P";
-                                                        } elseif ($current_date_number == 18) {
-                                                            $monthly_attendance->day_eighteen = "P";
-                                                        } elseif ($current_date_number == 19) {
-                                                            $monthly_attendance->day_nineteen = "P";
-                                                        } elseif ($current_date_number == 20) {
-                                                            $monthly_attendance->day_twenty = "P";
-                                                        } elseif ($current_date_number == 21) {
-                                                            $monthly_attendance->day_twenty_one = "P";
-                                                        } elseif ($current_date_number == 22) {
-                                                            $monthly_attendance->day_twenty_two = "P";
-                                                        } elseif ($current_date_number == 23) {
-                                                            $monthly_attendance->day_twenty_three = "P";
-                                                        } elseif ($current_date_number == 24) {
-                                                            $monthly_attendance->day_twenty_four = "P";
-                                                        } elseif ($current_date_number == 25) {
-                                                            $monthly_attendance->day_twenty_five = "P";
-                                                        } elseif ($current_date_number == 26) {
-                                                            $monthly_attendance->day_twenty_six = "P";
-                                                        } elseif ($current_date_number == 27) {
-                                                            $monthly_attendance->day_twenty_seven = "P";
-                                                        } elseif ($current_date_number == 28) {
-                                                            $monthly_attendance->day_twenty_eight = "P";
-                                                        } elseif ($current_date_number == 29) {
-                                                            $monthly_attendance->day_twenty_nine = "P";
-                                                        } elseif ($current_date_number == 30) {
-                                                            $monthly_attendance->day_thirty = "P";
-                                                        } elseif ($current_date_number == 31) {
-                                                            $monthly_attendance->day_thirty_one = "P";
-                                                        } else {
-                                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                        }
-
-                                                        $monthly_attendance->day_one = "P";
-
-                                                        $monthly_attendance->save();
-                                                    }
-                                                } else {
-
-                        if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
-
-                            $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
-
-                            foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                if ($current_date_number == 1) {
-                                    $monthly_attendance->day_one = "P";
-                                } elseif ($current_date_number == 2) {
-                                    $monthly_attendance->day_two = "P";
-                                } elseif ($current_date_number == 3) {
-                                    $monthly_attendance->day_three = "P";
-                                } elseif ($current_date_number == 4) {
-                                    $monthly_attendance->day_four = "P";
-                                } elseif ($current_date_number == 5) {
-                                    $monthly_attendance->day_five = "P";
-                                } elseif ($current_date_number == 6) {
-                                    $monthly_attendance->day_six = "P";
-                                } elseif ($current_date_number == 7) {
-                                    $monthly_attendance->day_seven = "P";
-                                } elseif ($current_date_number == 8) {
-                                    $monthly_attendance->day_eight = "P";
-                                } elseif ($current_date_number == 9) {
-                                    $monthly_attendance->day_nine = "P";
-                                } elseif ($current_date_number == 10) {
-                                    $monthly_attendance->day_ten = "P";
-                                } elseif ($current_date_number == 11) {
-                                    $monthly_attendance->day_eleven = "P";
-                                } elseif ($current_date_number == 12) {
-                                    $monthly_attendance->day_twelve = "P";
-                                } elseif ($current_date_number == 13) {
-                                    $monthly_attendance->day_thirteen = "P";
-                                } elseif ($current_date_number == 14) {
-                                    $monthly_attendance->day_fourteen = "P";
-                                } elseif ($current_date_number == 15) {
-                                    $monthly_attendance->day_fifteen = "P";
-                                } elseif ($current_date_number == 16) {
-                                    $monthly_attendance->day_sixteen = "P";
-                                } elseif ($current_date_number == 17) {
-                                    $monthly_attendance->day_seventeen = "P";
-                                } elseif ($current_date_number == 18) {
-                                    $monthly_attendance->day_eighteen = "P";
-                                } elseif ($current_date_number == 19) {
-                                    $monthly_attendance->day_nineteen = "P";
-                                } elseif ($current_date_number == 20) {
-                                    $monthly_attendance->day_twenty = "P";
-                                } elseif ($current_date_number == 21) {
-                                    $monthly_attendance->day_twenty_one = "P";
-                                } elseif ($current_date_number == 22) {
-                                    $monthly_attendance->day_twenty_two = "P";
-                                } elseif ($current_date_number == 23) {
-                                    $monthly_attendance->day_twenty_three = "P";
-                                } elseif ($current_date_number == 24) {
-                                    $monthly_attendance->day_twenty_four = "P";
-                                } elseif ($current_date_number == 25) {
-                                    $monthly_attendance->day_twenty_five = "P";
-                                } elseif ($current_date_number == 26) {
-                                    $monthly_attendance->day_twenty_six = "P";
-                                } elseif ($current_date_number == 27) {
-                                    $monthly_attendance->day_twenty_seven = "P";
-                                } elseif ($current_date_number == 28) {
-                                    $monthly_attendance->day_twenty_eight = "P";
-                                } elseif ($current_date_number == 29) {
-                                    $monthly_attendance->day_twenty_nine = "P";
-                                } elseif ($current_date_number == 30) {
-                                    $monthly_attendance->day_thirty = "P";
-                                } elseif ($current_date_number == 31) {
-                                    $monthly_attendance->day_thirty_one = "P";
-                                } else {
-                                    return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                }
-
-                                $monthly_attendance->save();
-                            }
-                        } else {
-
-                            $monthly_attendance = new MonthlyAttendance();
-                            $monthly_attendance->monthly_com_id = Auth::user()->com_id;
-                            $monthly_attendance->monthly_employee_id = $request->employee_id;
-                            $monthly_attendance->attendance_month = $current_date;
-                            $monthly_attendance->attendance_year = $current_date;
-                            if ($current_date_number == 1) {
-                                $monthly_attendance->day_one = "P";
-                            } elseif ($current_date_number == 2) {
-                                $monthly_attendance->day_two = "P";
-                            } elseif ($current_date_number == 3) {
-                                $monthly_attendance->day_three = "P";
-                            } elseif ($current_date_number == 4) {
-                                $monthly_attendance->day_four = "P";
-                            } elseif ($current_date_number == 5) {
-                                $monthly_attendance->day_five = "P";
-                            } elseif ($current_date_number == 6) {
-                                $monthly_attendance->day_six = "P";
-                            } elseif ($current_date_number == 7) {
-                                $monthly_attendance->day_seven = "P";
-                            } elseif ($current_date_number == 8) {
-                                $monthly_attendance->day_eight = "P";
-                            } elseif ($current_date_number == 9) {
-                                $monthly_attendance->day_nine = "P";
-                            } elseif ($current_date_number == 10) {
-                                $monthly_attendance->day_ten = "P";
-                            } elseif ($current_date_number == 11) {
-                                $monthly_attendance->day_eleven = "P";
-                            } elseif ($current_date_number == 12) {
-                                $monthly_attendance->day_twelve = "P";
-                            } elseif ($current_date_number == 13) {
-                                $monthly_attendance->day_thirteen = "P";
-                            } elseif ($current_date_number == 14) {
-                                $monthly_attendance->day_fourteen = "P";
-                            } elseif ($current_date_number == 15) {
-                                $monthly_attendance->day_fifteen = "P";
-                            } elseif ($current_date_number == 16) {
-                                $monthly_attendance->day_sixteen = "P";
-                            } elseif ($current_date_number == 17) {
-                                $monthly_attendance->day_seventeen = "P";
-                            } elseif ($current_date_number == 18) {
-                                $monthly_attendance->day_eighteen = "P";
-                            } elseif ($current_date_number == 19) {
-                                $monthly_attendance->day_nineteen = "P";
-                            } elseif ($current_date_number == 20) {
-                                $monthly_attendance->day_twenty = "P";
-                            } elseif ($current_date_number == 21) {
-                                $monthly_attendance->day_twenty_one = "P";
-                            } elseif ($current_date_number == 22) {
-                                $monthly_attendance->day_twenty_two = "P";
-                            } elseif ($current_date_number == 23) {
-                                $monthly_attendance->day_twenty_three = "P";
-                            } elseif ($current_date_number == 24) {
-                                $monthly_attendance->day_twenty_four = "P";
-                            } elseif ($current_date_number == 25) {
-                                $monthly_attendance->day_twenty_five = "P";
-                            } elseif ($current_date_number == 26) {
-                                $monthly_attendance->day_twenty_six = "P";
-                            } elseif ($current_date_number == 27) {
-                                $monthly_attendance->day_twenty_seven = "P";
-                            } elseif ($current_date_number == 28) {
-                                $monthly_attendance->day_twenty_eight = "P";
-                            } elseif ($current_date_number == 29) {
-                                $monthly_attendance->day_twenty_nine = "P";
-                            } elseif ($current_date_number == 30) {
-                                $monthly_attendance->day_thirty = "P";
-                            } elseif ($current_date_number == 31) {
-                                $monthly_attendance->day_thirty_one = "P";
-                            } else {
-                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                            }
-
-                            $monthly_attendance->day_one = "P";
-
-                            $monthly_attendance->save();
-                        }
-                    }
-                        ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
-
-                        return back()->with('message', 'Attendance Submitted Successfully ');
-                    } else {
-
-                        //echo 'not ok'; exit;
-
-                        $added_chackin_lat = $usersValue->check_in_latitude + .1;
-                        $deducted_checkin_lat = $usersValue->check_in_latitude - .1;
-                        $added_checkin_longi = $usersValue->check_in_longitude + .1;
-                        $deducted_checkin_longi = $usersValue->check_in_longitude - .1;
-
-                        $added_chackin_lat = $usersValue->check_in_latitude + 0.0002;
-                        $deducted_checkin_lat = $usersValue->check_in_latitude - 0.0002;
-                        $added_checkin_longi = $usersValue->check_in_longitude + 0.0002;
-                        $deducted_checkin_longi = $usersValue->check_in_longitude - 0.0002;
-
-                        $added_chackin_lat = $usersValue->check_in_latitude + 0.0112609293;
-                        $deducted_checkin_lat = $usersValue->check_in_latitude - 0.0112609293;
-                        $added_checkin_longi = $usersValue->check_in_longitude + 0.0112459999;
-                        $deducted_checkin_longi = $usersValue->check_in_longitude - 0.0112459999;
-
-                        ######################################################## Code for checkin existance starts ##############################################################################
-                        $requested_check_in_lat = number_format($request->lat, 2, '.', '');
-                        $first_check_in_lat = number_format($usersValue->check_in_latitude, 2, '.', '');
-
-                        if ($first_check_in_lat == $requested_check_in_lat) {
-                            //skip
-                        } else {
-
-                        if ($usersValue->check_in_latitude != "" || $usersValue->check_in_latitude != NULL) {
-
-                            } else {
-                                $user = User::find($request->employee_id);
-                                $user->check_in_latitude = $request->lat;
-                                $user->check_in_longitude = $request->longt;
-                                $user->save();
-                            }
-                        }
-                        ########################################################### Code for checkin existance ends ###########################################################################
-
-                        ############################################ Multiple checkin latitudes and longitudes code starts from here ###############################
-
-                        /////////////////////// checkin latitude portion starts/////////////////////////
-                        $requested_check_in_latitude = number_format($request->lat, 2, '.', '');
-
-                        if ($usersValue->check_in_latitude == "" || $usersValue->check_in_latitude == NULL) {
-                            $first_check_in_latitude = 0.00;
-                        } else {
-                            $first_check_in_latitude = number_format($usersValue->check_in_latitude, 2, '.', '');
-                        }
-
-                        if ($usersValue->check_in_latitude_two == "" || $usersValue->check_in_latitude_two == NULL) {
-                            $second_check_in_latitude = 0.00;
-                        } else {
-                            $second_check_in_latitude = number_format($usersValue->check_in_latitude_two, 2, '.', '');
-                        }
-
-                        if ($usersValue->check_in_latitude_three == "" || $usersValue->check_in_latitude_three == NULL) {
-                            $third_check_in_latitude = 0.00;
-                        } else {
-                            $third_check_in_latitude = number_format($usersValue->check_in_latitude_three, 2, '.', '');
-                        }
-
-                        if ($usersValue->check_in_latitude_four == "" || $usersValue->check_in_latitude_four == NULL) {
-                            $fourth_check_in_latitude = 0.00;
-                        } else {
-                            $fourth_check_in_latitude = number_format($usersValue->check_in_latitude_four, 2, '.', '');
-                        }
-                        if ($usersValue->check_in_latitude_five == "" || $usersValue->check_in_latitude_five == NULL) {
-                            $fifth_check_in_latitude = 0.00;
-                        } else {
-                            $fifth_check_in_latitude = number_format($usersValue->check_in_latitude_five, 2, '.', '');
-                        }
-                        if ($usersValue->check_in_latitude_six == "" || $usersValue->check_in_latitude_six == NULL) {
-                            $sixth_check_in_latitude = 0.00;
-                        } else {
-                            $sixth_check_in_latitude = number_format($usersValue->check_in_latitude_six, 2, '.', '');
-                        }
-                        if ($usersValue->check_in_latitude_seven == "" || $usersValue->check_in_latitude_seven == NULL) {
-                            $seventh_check_in_latitude = 0.00;
-                        } else {
-                            $seventh_check_in_latitude = number_format($usersValue->check_in_latitude_seven, 2, '.', '');
-                        }
-
-                        if ($first_check_in_latitude == $requested_check_in_latitude) {
-                            //echo "first checkin latitude matched";
-                            $added_chackin_lat = $usersValue->check_in_latitude + 0.0003;
-                            $deducted_checkin_lat = $usersValue->check_in_latitude - 0.0003;
-                        }elseif($usersValue->multi_attendance == 1){
-
-                            $attendance =  new Attendance();
-                            $attendance->attendance_com_id = Auth::user()->com_id;
-                            $attendance->employee_id = $request->employee_id;
-                            $attendance->attendance_date = $current_date;
-                            $attendance->customize_attendance_month = $attendance_month;
-                            $attendance->customize_attendance_year = $attendance_year;
-                            $attendance->clock_in = $current_time;
-                            $attendance->check_in_latitude = $request->lat;
-                            $attendance->check_in_longitude = $request->longt;
-                            $attendance->check_in_ip = $local_server_ip;
-                            if (date_create($current_time) >= date_create($shift_in)) {
-                                if ($shift_in != 0 && $shift_out != 0) {
-
-                                    $attendance->time_late = date_create($shift_in)->diff(date_create($current_time))->format('%H:%i:%s');
-
-                                    if ($current_time_in_seconds >= $office_late_time_config_in_seconds) {
-                                        $late_time = new LateTime();
-                                        $late_time->late_time_com_id = Auth::user()->com_id;
-                                        $late_time->late_time_employee_id = $request->employee_id;
-                                        $late_time->late_time_date = $current_date;
-
-                                        $late_time->customize_late_time_month = $attendance_month;
-                                        $late_time->customize_late_time_year = $attendance_year;
-                                        $late_time->save();
-                                    }
-                                }
-                            }
-
-                            $attendance->check_in_out = 1;
-                            $attendance->attendance_status = "Present";
-                            $attendance->save();
-
-                        $permission = "3.28";
-                        if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
-
-                                                    $year = date('Y');
-
-                                                    $month =  date('m');
-                                                    $day =  date('d');
-
-                                                    $currentDate = Carbon::now();  // Get the current date and time
-                                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
-
-                                                    $previousYear =  $previousMonth->format('Y');
-
-                                                    $previousMonth = $previousMonth->format('m');
-
-                                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
-
-                                                    if ($month == "01") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "12";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "01";
-                                                        }
-                                                    } elseif ($month == "02") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
-
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "01";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "02";
-                                                        }
-                                                    } elseif ($month == "03") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "02";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "03";
-                                                        }
-                                                    } elseif ($month == "04") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "03";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "04";
-                                                        }
-                                                    } elseif ($month == "05") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "04";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "05";
-                                                        }
-                                                    } elseif ($month == "06") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "05";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "06";
-                                                        }
-                                                    } elseif ($month == "07") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "06";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "07";
-                                                        }
-                                                    } elseif ($month == "08") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "07";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "08";
-                                                        }
-                                                    } elseif ($month == "09") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "08";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "09";
-                                                        }
-                                                    } elseif ($month == "10") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "09";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        }
-                                                    } elseif ($month == "11") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        }
-                                                    } elseif ($month == "12") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "12";
-                                                        }
-                                                    }
-
-
-                                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
-
-                                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
-
-                                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                                            if ($current_date_number == 1) {
-                                                                $monthly_attendance->day_one = "P";
-                                                            } elseif ($current_date_number == 2) {
-                                                                $monthly_attendance->day_two = "P";
-                                                            } elseif ($current_date_number == 3) {
-                                                                $monthly_attendance->day_three = "P";
-                                                            } elseif ($current_date_number == 4) {
-                                                                $monthly_attendance->day_four = "P";
-                                                            } elseif ($current_date_number == 5) {
-                                                                $monthly_attendance->day_five = "P";
-                                                            } elseif ($current_date_number == 6) {
-                                                                $monthly_attendance->day_six = "P";
-                                                            } elseif ($current_date_number == 7) {
-                                                                $monthly_attendance->day_seven = "P";
-                                                            } elseif ($current_date_number == 8) {
-                                                                $monthly_attendance->day_eight = "P";
-                                                            } elseif ($current_date_number == 9) {
-                                                                $monthly_attendance->day_nine = "P";
-                                                            } elseif ($current_date_number == 10) {
-                                                                $monthly_attendance->day_ten = "P";
-                                                            } elseif ($current_date_number == 11) {
-                                                                $monthly_attendance->day_eleven = "P";
-                                                            } elseif ($current_date_number == 12) {
-                                                                $monthly_attendance->day_twelve = "P";
-                                                            } elseif ($current_date_number == 13) {
-                                                                $monthly_attendance->day_thirteen = "P";
-                                                            } elseif ($current_date_number == 14) {
-                                                                $monthly_attendance->day_fourteen = "P";
-                                                            } elseif ($current_date_number == 15) {
-                                                                $monthly_attendance->day_fifteen = "P";
-                                                            } elseif ($current_date_number == 16) {
-                                                                $monthly_attendance->day_sixteen = "P";
-                                                            } elseif ($current_date_number == 17) {
-                                                                $monthly_attendance->day_seventeen = "P";
-                                                            } elseif ($current_date_number == 18) {
-                                                                $monthly_attendance->day_eighteen = "P";
-                                                            } elseif ($current_date_number == 19) {
-                                                                $monthly_attendance->day_nineteen = "P";
-                                                            } elseif ($current_date_number == 20) {
-                                                                $monthly_attendance->day_twenty = "P";
-                                                            } elseif ($current_date_number == 21) {
-                                                                $monthly_attendance->day_twenty_one = "P";
-                                                            } elseif ($current_date_number == 22) {
-                                                                $monthly_attendance->day_twenty_two = "P";
-                                                            } elseif ($current_date_number == 23) {
-                                                                $monthly_attendance->day_twenty_three = "P";
-                                                            } elseif ($current_date_number == 24) {
-                                                                $monthly_attendance->day_twenty_four = "P";
-                                                            } elseif ($current_date_number == 25) {
-                                                                $monthly_attendance->day_twenty_five = "P";
-                                                            } elseif ($current_date_number == 26) {
-                                                                $monthly_attendance->day_twenty_six = "P";
-                                                            } elseif ($current_date_number == 27) {
-                                                                $monthly_attendance->day_twenty_seven = "P";
-                                                            } elseif ($current_date_number == 28) {
-                                                                $monthly_attendance->day_twenty_eight = "P";
-                                                            } elseif ($current_date_number == 29) {
-                                                                $monthly_attendance->day_twenty_nine = "P";
-                                                            } elseif ($current_date_number == 30) {
-                                                                $monthly_attendance->day_thirty = "P";
-                                                            } elseif ($current_date_number == 31) {
-                                                                $monthly_attendance->day_thirty_one = "P";
-                                                            } else {
-                                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                            }
-
-                                                            $monthly_attendance->save();
-                                                        }
-                                                    } else {
-                                                        // return "ok";
-                                                        $monthly_attendance = new CustomizeMonthlyAttendance();
-                                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
-                                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
-                                                        $monthly_attendance->attendance_month = $attendance_month;
-                                                        $monthly_attendance->attendance_year = $attendance_year;
-                                                        if ($current_date_number == 1) {
-                                                            $monthly_attendance->day_one = "P";
-                                                        } elseif ($current_date_number == 2) {
-                                                            $monthly_attendance->day_two = "P";
-                                                        } elseif ($current_date_number == 3) {
-                                                            $monthly_attendance->day_three = "P";
-                                                        } elseif ($current_date_number == 4) {
-                                                            $monthly_attendance->day_four = "P";
-                                                        } elseif ($current_date_number == 5) {
-                                                            $monthly_attendance->day_five = "P";
-                                                        } elseif ($current_date_number == 6) {
-                                                            $monthly_attendance->day_six = "P";
-                                                        } elseif ($current_date_number == 7) {
-                                                            $monthly_attendance->day_seven = "P";
-                                                        } elseif ($current_date_number == 8) {
-                                                            $monthly_attendance->day_eight = "P";
-                                                        } elseif ($current_date_number == 9) {
-                                                            $monthly_attendance->day_nine = "P";
-                                                        } elseif ($current_date_number == 10) {
-                                                            $monthly_attendance->day_ten = "P";
-                                                        } elseif ($current_date_number == 11) {
-                                                            $monthly_attendance->day_eleven = "P";
-                                                        } elseif ($current_date_number == 12) {
-                                                            $monthly_attendance->day_twelve = "P";
-                                                        } elseif ($current_date_number == 13) {
-                                                            $monthly_attendance->day_thirteen = "P";
-                                                        } elseif ($current_date_number == 14) {
-                                                            $monthly_attendance->day_fourteen = "P";
-                                                        } elseif ($current_date_number == 15) {
-                                                            $monthly_attendance->day_fifteen = "P";
-                                                        } elseif ($current_date_number == 16) {
-                                                            $monthly_attendance->day_sixteen = "P";
-                                                        } elseif ($current_date_number == 17) {
-                                                            $monthly_attendance->day_seventeen = "P";
-                                                        } elseif ($current_date_number == 18) {
-                                                            $monthly_attendance->day_eighteen = "P";
-                                                        } elseif ($current_date_number == 19) {
-                                                            $monthly_attendance->day_nineteen = "P";
-                                                        } elseif ($current_date_number == 20) {
-                                                            $monthly_attendance->day_twenty = "P";
-                                                        } elseif ($current_date_number == 21) {
-                                                            $monthly_attendance->day_twenty_one = "P";
-                                                        } elseif ($current_date_number == 22) {
-                                                            $monthly_attendance->day_twenty_two = "P";
-                                                        } elseif ($current_date_number == 23) {
-                                                            $monthly_attendance->day_twenty_three = "P";
-                                                        } elseif ($current_date_number == 24) {
-                                                            $monthly_attendance->day_twenty_four = "P";
-                                                        } elseif ($current_date_number == 25) {
-                                                            $monthly_attendance->day_twenty_five = "P";
-                                                        } elseif ($current_date_number == 26) {
-                                                            $monthly_attendance->day_twenty_six = "P";
-                                                        } elseif ($current_date_number == 27) {
-                                                            $monthly_attendance->day_twenty_seven = "P";
-                                                        } elseif ($current_date_number == 28) {
-                                                            $monthly_attendance->day_twenty_eight = "P";
-                                                        } elseif ($current_date_number == 29) {
-                                                            $monthly_attendance->day_twenty_nine = "P";
-                                                        } elseif ($current_date_number == 30) {
-                                                            $monthly_attendance->day_thirty = "P";
-                                                        } elseif ($current_date_number == 31) {
-                                                            $monthly_attendance->day_thirty_one = "P";
-                                                        } else {
-                                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                        }
-
-                                                        $monthly_attendance->day_one = "P";
-
-                                                        $monthly_attendance->save();
-                                                    }
-                                                } else {
-
-                        if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
-
-                            $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
-
-                            foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                if ($current_date_number == 1) {
-                                    $monthly_attendance->day_one = "P";
-                                } elseif ($current_date_number == 2) {
-                                    $monthly_attendance->day_two = "P";
-                                } elseif ($current_date_number == 3) {
-                                    $monthly_attendance->day_three = "P";
-                                } elseif ($current_date_number == 4) {
-                                    $monthly_attendance->day_four = "P";
-                                } elseif ($current_date_number == 5) {
-                                    $monthly_attendance->day_five = "P";
-                                } elseif ($current_date_number == 6) {
-                                    $monthly_attendance->day_six = "P";
-                                } elseif ($current_date_number == 7) {
-                                    $monthly_attendance->day_seven = "P";
-                                } elseif ($current_date_number == 8) {
-                                    $monthly_attendance->day_eight = "P";
-                                } elseif ($current_date_number == 9) {
-                                    $monthly_attendance->day_nine = "P";
-                                } elseif ($current_date_number == 10) {
-                                    $monthly_attendance->day_ten = "P";
-                                } elseif ($current_date_number == 11) {
-                                    $monthly_attendance->day_eleven = "P";
-                                } elseif ($current_date_number == 12) {
-                                    $monthly_attendance->day_twelve = "P";
-                                } elseif ($current_date_number == 13) {
-                                    $monthly_attendance->day_thirteen = "P";
-                                } elseif ($current_date_number == 14) {
-                                    $monthly_attendance->day_fourteen = "P";
-                                } elseif ($current_date_number == 15) {
-                                    $monthly_attendance->day_fifteen = "P";
-                                } elseif ($current_date_number == 16) {
-                                    $monthly_attendance->day_sixteen = "P";
-                                } elseif ($current_date_number == 17) {
-                                    $monthly_attendance->day_seventeen = "P";
-                                } elseif ($current_date_number == 18) {
-                                    $monthly_attendance->day_eighteen = "P";
-                                } elseif ($current_date_number == 19) {
-                                    $monthly_attendance->day_nineteen = "P";
-                                } elseif ($current_date_number == 20) {
-                                    $monthly_attendance->day_twenty = "P";
-                                } elseif ($current_date_number == 21) {
-                                    $monthly_attendance->day_twenty_one = "P";
-                                } elseif ($current_date_number == 22) {
-                                    $monthly_attendance->day_twenty_two = "P";
-                                } elseif ($current_date_number == 23) {
-                                    $monthly_attendance->day_twenty_three = "P";
-                                } elseif ($current_date_number == 24) {
-                                    $monthly_attendance->day_twenty_four = "P";
-                                } elseif ($current_date_number == 25) {
-                                    $monthly_attendance->day_twenty_five = "P";
-                                } elseif ($current_date_number == 26) {
-                                    $monthly_attendance->day_twenty_six = "P";
-                                } elseif ($current_date_number == 27) {
-                                    $monthly_attendance->day_twenty_seven = "P";
-                                } elseif ($current_date_number == 28) {
-                                    $monthly_attendance->day_twenty_eight = "P";
-                                } elseif ($current_date_number == 29) {
-                                    $monthly_attendance->day_twenty_nine = "P";
-                                } elseif ($current_date_number == 30) {
-                                    $monthly_attendance->day_thirty = "P";
-                                } elseif ($current_date_number == 31) {
-                                    $monthly_attendance->day_thirty_one = "P";
-                                } else {
-                                    return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                }
-
-                                $monthly_attendance->save();
-                            }
-                        } else {
-
-                            $monthly_attendance = new MonthlyAttendance();
-                            $monthly_attendance->monthly_com_id = Auth::user()->com_id;
-                            $monthly_attendance->monthly_employee_id = $request->employee_id;
-                            $monthly_attendance->attendance_month = $current_date;
-                            $monthly_attendance->attendance_year = $current_date;
-                            if ($current_date_number == 1) {
-                                $monthly_attendance->day_one = "P";
-                            } elseif ($current_date_number == 2) {
-                                $monthly_attendance->day_two = "P";
-                            } elseif ($current_date_number == 3) {
-                                $monthly_attendance->day_three = "P";
-                            } elseif ($current_date_number == 4) {
-                                $monthly_attendance->day_four = "P";
-                            } elseif ($current_date_number == 5) {
-                                $monthly_attendance->day_five = "P";
-                            } elseif ($current_date_number == 6) {
-                                $monthly_attendance->day_six = "P";
-                            } elseif ($current_date_number == 7) {
-                                $monthly_attendance->day_seven = "P";
-                            } elseif ($current_date_number == 8) {
-                                $monthly_attendance->day_eight = "P";
-                            } elseif ($current_date_number == 9) {
-                                $monthly_attendance->day_nine = "P";
-                            } elseif ($current_date_number == 10) {
-                                $monthly_attendance->day_ten = "P";
-                            } elseif ($current_date_number == 11) {
-                                $monthly_attendance->day_eleven = "P";
-                            } elseif ($current_date_number == 12) {
-                                $monthly_attendance->day_twelve = "P";
-                            } elseif ($current_date_number == 13) {
-                                $monthly_attendance->day_thirteen = "P";
-                            } elseif ($current_date_number == 14) {
-                                $monthly_attendance->day_fourteen = "P";
-                            } elseif ($current_date_number == 15) {
-                                $monthly_attendance->day_fifteen = "P";
-                            } elseif ($current_date_number == 16) {
-                                $monthly_attendance->day_sixteen = "P";
-                            } elseif ($current_date_number == 17) {
-                                $monthly_attendance->day_seventeen = "P";
-                            } elseif ($current_date_number == 18) {
-                                $monthly_attendance->day_eighteen = "P";
-                            } elseif ($current_date_number == 19) {
-                                $monthly_attendance->day_nineteen = "P";
-                            } elseif ($current_date_number == 20) {
-                                $monthly_attendance->day_twenty = "P";
-                            } elseif ($current_date_number == 21) {
-                                $monthly_attendance->day_twenty_one = "P";
-                            } elseif ($current_date_number == 22) {
-                                $monthly_attendance->day_twenty_two = "P";
-                            } elseif ($current_date_number == 23) {
-                                $monthly_attendance->day_twenty_three = "P";
-                            } elseif ($current_date_number == 24) {
-                                $monthly_attendance->day_twenty_four = "P";
-                            } elseif ($current_date_number == 25) {
-                                $monthly_attendance->day_twenty_five = "P";
-                            } elseif ($current_date_number == 26) {
-                                $monthly_attendance->day_twenty_six = "P";
-                            } elseif ($current_date_number == 27) {
-                                $monthly_attendance->day_twenty_seven = "P";
-                            } elseif ($current_date_number == 28) {
-                                $monthly_attendance->day_twenty_eight = "P";
-                            } elseif ($current_date_number == 29) {
-                                $monthly_attendance->day_twenty_nine = "P";
-                            } elseif ($current_date_number == 30) {
-                                $monthly_attendance->day_thirty = "P";
-                            } elseif ($current_date_number == 31) {
-                                $monthly_attendance->day_thirty_one = "P";
-                            } else {
-                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                            }
-
-                            $monthly_attendance->day_one = "P";
-
-                            $monthly_attendance->save();
-                        }
-                    }
-
-
-
-                            return back()->with('message', 'Attendance Submitted Successfully');
-                        }  else {
-                            if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
-                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_in_attempt']);
-                                foreach ($attempt_counts as $attempt_counts_value) {
-                                    $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
-                                    $attendance_location->attendance_location_com_id = Auth::user()->com_id;
-                                    $attendance_location->attendance_location_employee_id = $request->employee_id;
-                                    $attendance_location->attendance_location_date = $current_date;
-                                    $attendance_location->attendance_location_check_in_latitude = $request->lat;
-                                    $attendance_location->attendance_location_check_in_longitude = $request->longt;
-                                    $attendance_location->attendance_location_check_in_attempt = $attempt_counts_value->attendance_location_check_in_attempt + 1;
-                                    // $attendance_location->browser = $browser;
-                                    $attendance_location->save();
-                                }
-                            } else {
-                                $attendance_location = new AttendanceLocation();
-                                $attendance_location->attendance_location_com_id = Auth::user()->com_id;
-                                $attendance_location->attendance_location_employee_id = $request->employee_id;
-                                $attendance_location->attendance_location_date = $current_date;
-                                $attendance_location->attendance_location_check_in_latitude = $request->lat;
-                                $attendance_location->attendance_location_check_in_longitude = $request->longt;
-                                $attendance_location->attendance_location_check_in_attempt = 1;
-                                // $attendance_location->browser = $browser;
-                                $attendance_location->save();
-                            }
-                            return back()->with('message', 'Checkin Latitude Not Matched!!! Try again after some time.');
-                        }
-                        /////////////////////// checkin latitude portion ends/////////////////////////
-                        /////////////////////// checkin longitude portion starts/////////////////////////
-
-                        $requested_check_in_longitude = number_format($request->longt, 2, '.', '');
-
-                        if ($usersValue->check_in_longitude == "" || $usersValue->check_in_longitude == NULL) {
-                            $first_check_in_longitude = 0.00;
-                        } else {
-                            $first_check_in_longitude = number_format($usersValue->check_in_longitude, 2, '.', '');
-                        }
-
-                        if ($usersValue->check_in_longitude_two == "" || $usersValue->check_in_longitude_two == NULL) {
-                            $second_check_in_longitude = 0.00;
-                        } else {
-                            $second_check_in_longitude = number_format($usersValue->check_in_longitude_two, 2, '.', '');
-                        }
-
-                        if ($usersValue->check_in_longitude_three == "" || $usersValue->check_in_longitude_three == NULL) {
-                            $third_check_in_longitude = 0.00;
-                        } else {
-                            $third_check_in_longitude = number_format($usersValue->check_in_longitude_three, 2, '.', '');
-                        }
-
-                        if ($usersValue->check_in_longitude_four == "" || $usersValue->check_in_longitude_four == NULL) {
-                            $fourth_check_in_longitude = 0.00;
-                        } else {
-                            $fourth_check_in_longitude = number_format($usersValue->check_in_longitude_four, 2, '.', '');
-                        }
-                        if ($usersValue->check_in_longitude_five == "" || $usersValue->check_in_longitude_five == NULL) {
-                            $fifth_check_in_longitude = 0.00;
-                        } else {
-                            $fifth_check_in_longitude = number_format($usersValue->check_in_longitude_five, 2, '.', '');
-                        }
-                        if ($usersValue->check_in_longitude_six == "" || $usersValue->check_in_longitude_six == NULL) {
-                            $sixth_check_in_longitude = 0.00;
-                        } else {
-                            $sixth_check_in_longitude = number_format($usersValue->check_in_longitude_six, 2, '.', '');
-                        }
-                        if ($usersValue->check_in_longitude_seven == "" || $usersValue->check_in_longitude_seven == NULL) {
-                            $seventh_check_in_longitude = 0.00;
-                        } else {
-                            $seventh_check_in_longitude = number_format($usersValue->check_in_longitude_seven, 2, '.', '');
-                        }
-                        //echo "ok"; exit;
-
-                       if ($first_check_in_longitude == $requested_check_in_longitude) {
-                            //echo "first checkin longitude matched";
-                            $added_checkin_longi = $usersValue->check_in_longitude + 0.0003;
-                            $deducted_checkin_longi = $usersValue->check_in_longitude - 0.0003;
-                        }  else {
-                            if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
-                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_in_attempt']);
-                                foreach ($attempt_counts as $attempt_counts_value) {
-                                    $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
-                                    $attendance_location->attendance_location_com_id = Auth::user()->com_id;
-                                    $attendance_location->attendance_location_employee_id = $request->employee_id;
-                                    $attendance_location->attendance_location_date = $current_date;
-                                    $attendance_location->attendance_location_check_in_latitude = $request->lat;
-                                    $attendance_location->attendance_location_check_in_longitude = $request->longt;
-                                    $attendance_location->attendance_location_check_in_attempt = $attempt_counts_value->attendance_location_check_in_attempt + 1;
-                                    // $attendance_location->browser = $browser;
-                                    $attendance_location->save();
-                                }
-                            } else {
-                                $attendance_location = new AttendanceLocation();
-                                $attendance_location->attendance_location_com_id = Auth::user()->com_id;
-                                $attendance_location->attendance_location_employee_id = $request->employee_id;
-                                $attendance_location->attendance_location_date = $current_date;
-                                $attendance_location->attendance_location_check_in_latitude = $request->lat;
-                                $attendance_location->attendance_location_check_in_longitude = $request->longt;
-                                $attendance_location->attendance_location_check_in_attempt = 1;
-                                // $attendance_location->browser = $browser;
-                                $attendance_location->save();
-                            }
-                            return back()->with('message', 'Checkin Longitude Not Matched!!! Try again after some time.');
-                        }
-                        /////////////////////// checkin longitude portion ends/////////////////////////
-                        ############################################ Multiple checkin latitudes and longitudes code ends here ###############################
-
-
-
-                        if (($added_chackin_lat >= $request->lat && $deducted_checkin_lat <= $request->lat) || ($added_checkin_longi >= $request->longt && $deducted_checkin_longi <= $request->longt)) {
-
-                            if (Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->exists()) {
-
-                                return back()->with('message', 'Already Checked In For Today!!! Please Contact With The System Administrator!!!');
-                            } else {
-
-                                $attendance = new Attendance();
-                                $attendance->attendance_com_id = Auth::user()->com_id;
-                                $attendance->employee_id = $request->employee_id;
-                                $attendance->attendance_date = $current_date;
-                                $attendance->customize_attendance_month = $attendance_month;
-                                $attendance->customize_attendance_year = $attendance_year;
-                                $attendance->clock_in = $current_time;
-                                $attendance->check_in_latitude = $request->lat;
-                                $attendance->check_in_longitude = $request->longt;
-                                $attendance->check_in_ip = $local_server_ip;
-                                if (date_create($current_time) >= date_create($shift_in)) {
-                                    if ($shift_in != 0 && $shift_out != 0) {
-
-                                        $attendance->time_late = date_create($shift_in)->diff(date_create($current_time))->format('%H:%i:%s');
-
-                                        if ($current_time_in_seconds >= $office_late_time_config_in_seconds) {
-
-                                            if (LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->exists()) {
-
-                                                $late_times = LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->get('id');
-
-                                                foreach ($late_times as $late_times_value) {
-
-                                                    $late_time = LateTime::find($late_times_value->id);
-                                                    $late_time->late_time_com_id = Auth::user()->com_id;
-                                                    $late_time->late_time_employee_id = $request->employee_id;
-                                                    $late_time->late_time_date = $current_date;
-                                                    $late_time->customize_late_time_month = $attendance_month;
-                                                    $late_time->customize_late_time_year = $attendance_year;
-                                                    $late_time->save();
-                                                }
-                                            } else {
-                                                $late_time = new LateTime();
-                                                $late_time->late_time_com_id = Auth::user()->com_id;
-                                                $late_time->late_time_employee_id = $request->employee_id;
-                                                $late_time->late_time_date = $current_date;
-                                                $late_time->customize_late_time_month = $attendance_month;
-                                                $late_time->customize_late_time_year = $attendance_year;
-                                                $late_time->save();
-                                            }
-                                        }
-                                    }
-                                }
-                                //$attendance->check_in_out = 0;
-                                $attendance->check_in_out = 1;
-                                $attendance->attendance_status = "Present";
-                                // $attendance->browser = $browser;
-                                $attendance->save();
-
-                                if (Holiday::where('holiday_com_id', Auth::user()->com_id)->where('holiday_type', '=', 'Weekly-Holiday')->where('holiday_name', $current_day_name)->exists()) { //condition for weekly holiday
-                                    //echo "yes";
-                                    $compensatory_leave = new CompensatoryLeave();
-                                    $compensatory_leave->compen_leave_com_id = Auth::user()->com_id;
-                                    $compensatory_leave->compen_leave_employee_id = $request->employee_id;
-                                    $compensatory_leave->compen_leave_duty_date = $current_date;
-                                    $compensatory_leave->compen_leave_status = 0;
-                                    $compensatory_leave->save();
-                                } else {
-
-                                    if (Holiday::where('holiday_com_id', Auth::user()->com_id)->where('holiday_type', '=', 'Other-Holiday')->whereRaw('"' . $current_date . '" between `start_date` and `end_date`')->exists()) { //condition for weekly holiday
-                                        //echo "yes";
-                                        $compensatory_leave = new CompensatoryLeave();
-                                        $compensatory_leave->compen_leave_com_id = Auth::user()->com_id;
-                                        $compensatory_leave->compen_leave_employee_id = $request->employee_id;
-                                        $compensatory_leave->compen_leave_duty_date = $current_date;
-                                        $compensatory_leave->compen_leave_status = 0;
-                                        $compensatory_leave->save();
-                                    }
-                                }
-
-                                ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
-                                $permission = "3.28";
-if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
-
                             $year = date('Y');
 
                             $month =  date('m');
@@ -3123,10 +1781,10 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
                                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
                                 if ($customize_date->end_date >= $day) {
                                     $attendance_year = $year;
-                                    $attendance_month = "03";
+                                    $attendance_month = "3";
                                 } else {
                                     $attendance_year = $year;
-                                    $attendance_month = "04";
+                                    $attendance_month = "4";
                                 }
                             } elseif ($month == "05") {
                                 $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
@@ -3356,558 +2014,7 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
                                 $monthly_attendance->save();
                             }
                         } else {
-                                if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
 
-                                    $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
-
-                                    foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                        $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                        if ($current_date_number == 1) {
-                                            $monthly_attendance->day_one = "P";
-                                        } elseif ($current_date_number == 2) {
-                                            $monthly_attendance->day_two = "P";
-                                        } elseif ($current_date_number == 3) {
-                                            $monthly_attendance->day_three = "P";
-                                        } elseif ($current_date_number == 4) {
-                                            $monthly_attendance->day_four = "P";
-                                        } elseif ($current_date_number == 5) {
-                                            $monthly_attendance->day_five = "P";
-                                        } elseif ($current_date_number == 6) {
-                                            $monthly_attendance->day_six = "P";
-                                        } elseif ($current_date_number == 7) {
-                                            $monthly_attendance->day_seven = "P";
-                                        } elseif ($current_date_number == 8) {
-                                            $monthly_attendance->day_eight = "P";
-                                        } elseif ($current_date_number == 9) {
-                                            $monthly_attendance->day_nine = "P";
-                                        } elseif ($current_date_number == 10) {
-                                            $monthly_attendance->day_ten = "P";
-                                        } elseif ($current_date_number == 11) {
-                                            $monthly_attendance->day_eleven = "P";
-                                        } elseif ($current_date_number == 12) {
-                                            $monthly_attendance->day_twelve = "P";
-                                        } elseif ($current_date_number == 13) {
-                                            $monthly_attendance->day_thirteen = "P";
-                                        } elseif ($current_date_number == 14) {
-                                            $monthly_attendance->day_fourteen = "P";
-                                        } elseif ($current_date_number == 15) {
-                                            $monthly_attendance->day_fifteen = "P";
-                                        } elseif ($current_date_number == 16) {
-                                            $monthly_attendance->day_sixteen = "P";
-                                        } elseif ($current_date_number == 17) {
-                                            $monthly_attendance->day_seventeen = "P";
-                                        } elseif ($current_date_number == 18) {
-                                            $monthly_attendance->day_eighteen = "P";
-                                        } elseif ($current_date_number == 19) {
-                                            $monthly_attendance->day_nineteen = "P";
-                                        } elseif ($current_date_number == 20) {
-                                            $monthly_attendance->day_twenty = "P";
-                                        } elseif ($current_date_number == 21) {
-                                            $monthly_attendance->day_twenty_one = "P";
-                                        } elseif ($current_date_number == 22) {
-                                            $monthly_attendance->day_twenty_two = "P";
-                                        } elseif ($current_date_number == 23) {
-                                            $monthly_attendance->day_twenty_three = "P";
-                                        } elseif ($current_date_number == 24) {
-                                            $monthly_attendance->day_twenty_four = "P";
-                                        } elseif ($current_date_number == 25) {
-                                            $monthly_attendance->day_twenty_five = "P";
-                                        } elseif ($current_date_number == 26) {
-                                            $monthly_attendance->day_twenty_six = "P";
-                                        } elseif ($current_date_number == 27) {
-                                            $monthly_attendance->day_twenty_seven = "P";
-                                        } elseif ($current_date_number == 28) {
-                                            $monthly_attendance->day_twenty_eight = "P";
-                                        } elseif ($current_date_number == 29) {
-                                            $monthly_attendance->day_twenty_nine = "P";
-                                        } elseif ($current_date_number == 30) {
-                                            $monthly_attendance->day_thirty = "P";
-                                        } elseif ($current_date_number == 31) {
-                                            $monthly_attendance->day_thirty_one = "P";
-                                        } else {
-                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                        }
-
-                                        $monthly_attendance->save();
-                                    }
-                                } else {
-
-                                    $monthly_attendance = new MonthlyAttendance();
-                                    $monthly_attendance->monthly_com_id = Auth::user()->com_id;
-                                    $monthly_attendance->monthly_employee_id = $request->employee_id;
-                                    $monthly_attendance->attendance_month = $current_date;
-                                    $monthly_attendance->attendance_year = $current_date;
-                                    if ($current_date_number == 1) {
-                                        $monthly_attendance->day_one = "P";
-                                    } elseif ($current_date_number == 2) {
-                                        $monthly_attendance->day_two = "P";
-                                    } elseif ($current_date_number == 3) {
-                                        $monthly_attendance->day_three = "P";
-                                    } elseif ($current_date_number == 4) {
-                                        $monthly_attendance->day_four = "P";
-                                    } elseif ($current_date_number == 5) {
-                                        $monthly_attendance->day_five = "P";
-                                    } elseif ($current_date_number == 6) {
-                                        $monthly_attendance->day_six = "P";
-                                    } elseif ($current_date_number == 7) {
-                                        $monthly_attendance->day_seven = "P";
-                                    } elseif ($current_date_number == 8) {
-                                        $monthly_attendance->day_eight = "P";
-                                    } elseif ($current_date_number == 9) {
-                                        $monthly_attendance->day_nine = "P";
-                                    } elseif ($current_date_number == 10) {
-                                        $monthly_attendance->day_ten = "P";
-                                    } elseif ($current_date_number == 11) {
-                                        $monthly_attendance->day_eleven = "P";
-                                    } elseif ($current_date_number == 12) {
-                                        $monthly_attendance->day_twelve = "P";
-                                    } elseif ($current_date_number == 13) {
-                                        $monthly_attendance->day_thirteen = "P";
-                                    } elseif ($current_date_number == 14) {
-                                        $monthly_attendance->day_fourteen = "P";
-                                    } elseif ($current_date_number == 15) {
-                                        $monthly_attendance->day_fifteen = "P";
-                                    } elseif ($current_date_number == 16) {
-                                        $monthly_attendance->day_sixteen = "P";
-                                    } elseif ($current_date_number == 17) {
-                                        $monthly_attendance->day_seventeen = "P";
-                                    } elseif ($current_date_number == 18) {
-                                        $monthly_attendance->day_eighteen = "P";
-                                    } elseif ($current_date_number == 19) {
-                                        $monthly_attendance->day_nineteen = "P";
-                                    } elseif ($current_date_number == 20) {
-                                        $monthly_attendance->day_twenty = "P";
-                                    } elseif ($current_date_number == 21) {
-                                        $monthly_attendance->day_twenty_one = "P";
-                                    } elseif ($current_date_number == 22) {
-                                        $monthly_attendance->day_twenty_two = "P";
-                                    } elseif ($current_date_number == 23) {
-                                        $monthly_attendance->day_twenty_three = "P";
-                                    } elseif ($current_date_number == 24) {
-                                        $monthly_attendance->day_twenty_four = "P";
-                                    } elseif ($current_date_number == 25) {
-                                        $monthly_attendance->day_twenty_five = "P";
-                                    } elseif ($current_date_number == 26) {
-                                        $monthly_attendance->day_twenty_six = "P";
-                                    } elseif ($current_date_number == 27) {
-                                        $monthly_attendance->day_twenty_seven = "P";
-                                    } elseif ($current_date_number == 28) {
-                                        $monthly_attendance->day_twenty_eight = "P";
-                                    } elseif ($current_date_number == 29) {
-                                        $monthly_attendance->day_twenty_nine = "P";
-                                    } elseif ($current_date_number == 30) {
-                                        $monthly_attendance->day_thirty = "P";
-                                    } elseif ($current_date_number == 31) {
-                                        $monthly_attendance->day_thirty_one = "P";
-                                    } else {
-                                        return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                    }
-
-                                    $monthly_attendance->save();
-                                }
-                            }
-                                ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
-
-                                return back()->with('message', 'Attendance Submitted Successfully ');
-                            }
-                        } else {
-
-                            if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
-                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_in_attempt']);
-                                foreach ($attempt_counts as $attempt_counts_value) {
-                                    $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
-                                    $attendance_location->attendance_location_com_id = Auth::user()->com_id;
-                                    $attendance_location->attendance_location_employee_id = $request->employee_id;
-                                    $attendance_location->attendance_location_date = $current_date;
-                                    $attendance_location->attendance_location_check_in_latitude = $request->lat;
-                                    $attendance_location->attendance_location_check_in_longitude = $request->longt;
-                                    $attendance_location->attendance_location_check_in_attempt = $attempt_counts_value->attendance_location_check_in_attempt + 1;
-                                    // $attempt_counts_value->browser = $browser;
-                                    $attendance_location->save();
-                                }
-                            } else {
-                                $attendance_location = new AttendanceLocation();
-                                $attendance_location->attendance_location_com_id = Auth::user()->com_id;
-                                $attendance_location->attendance_location_employee_id = $request->employee_id;
-                                $attendance_location->attendance_location_date = $current_date;
-                                $attendance_location->attendance_location_check_in_latitude = $request->lat;
-                                $attendance_location->attendance_location_check_in_longitude = $request->longt;
-                                $attendance_location->attendance_location_check_in_attempt = 1;
-                                // $attendance_location->browser = $browser;
-                                $attendance_location->save();
-                            }
-
-                            return back()->with('message', 'Your Checkin Location not Matched!!!!');
-                        }
-                    }
-                }
-            } else {
-
-                return back()->with('message', 'Your Browser Or Device not Supported Geolocaton');
-            }
-            ////////// Attandance check-in code Ends...
-
-        } else {
-
-            ////////// Attandance checkout code Starts...
-
-
-            if ($request->lat && $request->longt) {
-
-
-                $users = User::where('id', $request->employee_id)->get();
-
-                $latitude = $request->lat;
-                $longitude = $request->longt;
-                $employee_id = $request->employee_id;
-
-                foreach ($users as $usersValue) {
-
-                    if ($usersValue->check_out_latitude == '' || $usersValue->check_out_longitude == '' || $usersValue->check_out_latitude == NULL || $usersValue->check_out_longitude == NULL || $usersValue->check_out_latitude === 'No' || $usersValue->check_out_longitude === 'No') {
-
-                        $user = User::find($request->employee_id);
-                        $user->check_out_ip = $local_server_ip;
-                        $user->check_out_latitude = $request->lat;
-                        $user->check_out_longitude = $request->longt;
-                        $user->save();
-
-                        $attendance_employee_id = Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->get();
-
-
-                        foreach ($attendance_employee_id as $attendance_employee_id_value) {
-
-                            $attendance = Attendance::find($attendance_employee_id_value->id);
-                            $attendance->clock_out = $current_time;
-                            $attendance->check_out_latitude = $request->lat;
-                            $attendance->check_out_longitude = $request->longt;
-                            $attendance->check_out_ip = $local_server_ip;
-                            if (date_create($current_time) >= date_create($payable_over_time_hour)) {
-                                if ($shift_in != 0 && $shift_out != 0) {
-                                    $attendance->overtime = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
-
-                                    $todays_over_time = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
-                                    if (Auth::user()->over_time_payable == 'Yes' && Auth::user()->user_over_time_type == 'Automatic') {
-
-                                        if (OverTime::where('over_time_employee_id', $request->employee_id)->where('over_time_date', $current_date)->exists()) {
-
-                                            $over_times = OverTime::where('over_time_employee_id', $request->employee_id)->where('over_time_date', $current_date)->get('id');
-
-                                            foreach ($over_times as $over_times_value) {
-
-                                                $over_time = OverTime::find($over_times_value->id);
-                                                $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
-                                                $over_time->save();
-                                            }
-                                        } else {
-
-                                            $over_time = new OverTime();
-                                            $over_time->over_time_com_id = Auth::user()->com_id;
-                                            $over_time->over_time_employee_id = Auth::user()->id;
-                                            $over_time->over_time_type = "Automatic";
-                                            $over_time->over_time_date = $current_date;
-                                            $over_time->customize_over_time_month = $attendance_month;
-                                            $over_time->customize_over_time_year = $attendance_year;
-                                            $over_time->over_time_company_duty_in_seconds = $diff_shift_seconds_for_the_day;
-                                            $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
-                                            $over_time->over_time_rate = Auth::user()->user_over_time_rate;
-                                            $over_time->save();
-                                        }
-                                    }
-                                }
-                            }
-                            if (date_create($current_time) <= date_create($shift_out)) {
-                                if ($shift_in != 0 && $shift_out != 0) {
-                                    $attendance->early_leaving = date_create($current_time)->diff(date_create($shift_out))->format('%H:%i:%s');
-                                }
-                            }
-                            $attendance->check_in_out = 1;
-                            // $attendance->browser = $browser;
-                            $attendance->save();
-
-                            ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
-                            $permission = "3.28";
-if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
-
-                            $year = date('Y');
-
-                            $month =  date('m');
-                            $day =  date('d');
-
-                            $currentDate = Carbon::now();  // Get the current date and time
-                            $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
-
-                            $previousYear =  $previousMonth->format('Y');
-
-                            $previousMonth = $previousMonth->format('m');
-
-                            $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
-
-                            if ($month == "01") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $previousYear;
-                                    $attendance_month = "12";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "01";
-                                }
-                            } elseif ($month == "02") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
-
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $previousYear;
-                                    $attendance_month = "01";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "02";
-                                }
-                            } elseif ($month == "03") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $previousYear;
-                                    $attendance_month = "02";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "03";
-                                }
-                            } elseif ($month == "04") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "03";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "04";
-                                }
-                            } elseif ($month == "05") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "04";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "05";
-                                }
-                            } elseif ($month == "06") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "05";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "06";
-                                }
-                            } elseif ($month == "07") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "06";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "07";
-                                }
-                            } elseif ($month == "08") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "07";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "08";
-                                }
-                            } elseif ($month == "09") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "08";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "09";
-                                }
-                            } elseif ($month == "10") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "09";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "10";
-                                }
-                            } elseif ($month == "11") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "10";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "11";
-                                }
-                            } elseif ($month == "12") {
-                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
-                                if ($customize_date->end_date >= $day) {
-                                    $attendance_year = $year;
-                                    $attendance_month = "11";
-                                } else {
-                                    $attendance_year = $year;
-                                    $attendance_month = "12";
-                                }
-                            }
-
-
-                            if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
-
-                                $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
-
-                                foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                    $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                    if ($current_date_number == 1) {
-                                        $monthly_attendance->day_one = "P";
-                                    } elseif ($current_date_number == 2) {
-                                        $monthly_attendance->day_two = "P";
-                                    } elseif ($current_date_number == 3) {
-                                        $monthly_attendance->day_three = "P";
-                                    } elseif ($current_date_number == 4) {
-                                        $monthly_attendance->day_four = "P";
-                                    } elseif ($current_date_number == 5) {
-                                        $monthly_attendance->day_five = "P";
-                                    } elseif ($current_date_number == 6) {
-                                        $monthly_attendance->day_six = "P";
-                                    } elseif ($current_date_number == 7) {
-                                        $monthly_attendance->day_seven = "P";
-                                    } elseif ($current_date_number == 8) {
-                                        $monthly_attendance->day_eight = "P";
-                                    } elseif ($current_date_number == 9) {
-                                        $monthly_attendance->day_nine = "P";
-                                    } elseif ($current_date_number == 10) {
-                                        $monthly_attendance->day_ten = "P";
-                                    } elseif ($current_date_number == 11) {
-                                        $monthly_attendance->day_eleven = "P";
-                                    } elseif ($current_date_number == 12) {
-                                        $monthly_attendance->day_twelve = "P";
-                                    } elseif ($current_date_number == 13) {
-                                        $monthly_attendance->day_thirteen = "P";
-                                    } elseif ($current_date_number == 14) {
-                                        $monthly_attendance->day_fourteen = "P";
-                                    } elseif ($current_date_number == 15) {
-                                        $monthly_attendance->day_fifteen = "P";
-                                    } elseif ($current_date_number == 16) {
-                                        $monthly_attendance->day_sixteen = "P";
-                                    } elseif ($current_date_number == 17) {
-                                        $monthly_attendance->day_seventeen = "P";
-                                    } elseif ($current_date_number == 18) {
-                                        $monthly_attendance->day_eighteen = "P";
-                                    } elseif ($current_date_number == 19) {
-                                        $monthly_attendance->day_nineteen = "P";
-                                    } elseif ($current_date_number == 20) {
-                                        $monthly_attendance->day_twenty = "P";
-                                    } elseif ($current_date_number == 21) {
-                                        $monthly_attendance->day_twenty_one = "P";
-                                    } elseif ($current_date_number == 22) {
-                                        $monthly_attendance->day_twenty_two = "P";
-                                    } elseif ($current_date_number == 23) {
-                                        $monthly_attendance->day_twenty_three = "P";
-                                    } elseif ($current_date_number == 24) {
-                                        $monthly_attendance->day_twenty_four = "P";
-                                    } elseif ($current_date_number == 25) {
-                                        $monthly_attendance->day_twenty_five = "P";
-                                    } elseif ($current_date_number == 26) {
-                                        $monthly_attendance->day_twenty_six = "P";
-                                    } elseif ($current_date_number == 27) {
-                                        $monthly_attendance->day_twenty_seven = "P";
-                                    } elseif ($current_date_number == 28) {
-                                        $monthly_attendance->day_twenty_eight = "P";
-                                    } elseif ($current_date_number == 29) {
-                                        $monthly_attendance->day_twenty_nine = "P";
-                                    } elseif ($current_date_number == 30) {
-                                        $monthly_attendance->day_thirty = "P";
-                                    } elseif ($current_date_number == 31) {
-                                        $monthly_attendance->day_thirty_one = "P";
-                                    } else {
-                                        return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                    }
-
-                                    $monthly_attendance->save();
-                                }
-                            } else {
-                                // return "ok";
-                                $monthly_attendance = new CustomizeMonthlyAttendance();
-                                $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
-                                $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
-                                $monthly_attendance->attendance_month = $attendance_month;
-                                $monthly_attendance->attendance_year = $attendance_year;
-                                if ($current_date_number == 1) {
-                                    $monthly_attendance->day_one = "P";
-                                } elseif ($current_date_number == 2) {
-                                    $monthly_attendance->day_two = "P";
-                                } elseif ($current_date_number == 3) {
-                                    $monthly_attendance->day_three = "P";
-                                } elseif ($current_date_number == 4) {
-                                    $monthly_attendance->day_four = "P";
-                                } elseif ($current_date_number == 5) {
-                                    $monthly_attendance->day_five = "P";
-                                } elseif ($current_date_number == 6) {
-                                    $monthly_attendance->day_six = "P";
-                                } elseif ($current_date_number == 7) {
-                                    $monthly_attendance->day_seven = "P";
-                                } elseif ($current_date_number == 8) {
-                                    $monthly_attendance->day_eight = "P";
-                                } elseif ($current_date_number == 9) {
-                                    $monthly_attendance->day_nine = "P";
-                                } elseif ($current_date_number == 10) {
-                                    $monthly_attendance->day_ten = "P";
-                                } elseif ($current_date_number == 11) {
-                                    $monthly_attendance->day_eleven = "P";
-                                } elseif ($current_date_number == 12) {
-                                    $monthly_attendance->day_twelve = "P";
-                                } elseif ($current_date_number == 13) {
-                                    $monthly_attendance->day_thirteen = "P";
-                                } elseif ($current_date_number == 14) {
-                                    $monthly_attendance->day_fourteen = "P";
-                                } elseif ($current_date_number == 15) {
-                                    $monthly_attendance->day_fifteen = "P";
-                                } elseif ($current_date_number == 16) {
-                                    $monthly_attendance->day_sixteen = "P";
-                                } elseif ($current_date_number == 17) {
-                                    $monthly_attendance->day_seventeen = "P";
-                                } elseif ($current_date_number == 18) {
-                                    $monthly_attendance->day_eighteen = "P";
-                                } elseif ($current_date_number == 19) {
-                                    $monthly_attendance->day_nineteen = "P";
-                                } elseif ($current_date_number == 20) {
-                                    $monthly_attendance->day_twenty = "P";
-                                } elseif ($current_date_number == 21) {
-                                    $monthly_attendance->day_twenty_one = "P";
-                                } elseif ($current_date_number == 22) {
-                                    $monthly_attendance->day_twenty_two = "P";
-                                } elseif ($current_date_number == 23) {
-                                    $monthly_attendance->day_twenty_three = "P";
-                                } elseif ($current_date_number == 24) {
-                                    $monthly_attendance->day_twenty_four = "P";
-                                } elseif ($current_date_number == 25) {
-                                    $monthly_attendance->day_twenty_five = "P";
-                                } elseif ($current_date_number == 26) {
-                                    $monthly_attendance->day_twenty_six = "P";
-                                } elseif ($current_date_number == 27) {
-                                    $monthly_attendance->day_twenty_seven = "P";
-                                } elseif ($current_date_number == 28) {
-                                    $monthly_attendance->day_twenty_eight = "P";
-                                } elseif ($current_date_number == 29) {
-                                    $monthly_attendance->day_twenty_nine = "P";
-                                } elseif ($current_date_number == 30) {
-                                    $monthly_attendance->day_thirty = "P";
-                                } elseif ($current_date_number == 31) {
-                                    $monthly_attendance->day_thirty_one = "P";
-                                } else {
-                                    return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                }
-
-                                $monthly_attendance->day_one = "P";
-
-                                $monthly_attendance->save();
-                            }
-                        } else {
                             if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
 
                                 $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
@@ -4056,121 +2163,662 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
                                     return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
                                 }
 
+                                $monthly_attendance->day_one = "P";
+
                                 $monthly_attendance->save();
                             }
                         }
-                            ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
+                        ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
 
-                            return back()->with('message', 'Attendance Checkout Done Successfully');
-                        }
+                        return back()->with('message', 'Attendance Submitted Successfully ');
                     } else {
 
+                        //echo 'not ok'; exit;
 
-                        $added_chackout_lat = $usersValue->check_out_latitude + .1;
-                        $deducted_checkout_lat = $usersValue->check_out_latitude - .1;
-                        $added_checkout_longi = $usersValue->check_out_longitude + .1;
-                        $deducted_checkout_longi = $usersValue->check_out_longitude - .1;
+                        $added_chackin_lat = $usersValue->check_in_latitude + .1;
+                        $deducted_checkin_lat = $usersValue->check_in_latitude - .1;
+                        $added_checkin_longi = $usersValue->check_in_longitude + .1;
+                        $deducted_checkin_longi = $usersValue->check_in_longitude - .1;
 
-                        $added_chackout_lat = $usersValue->check_out_latitude + 0.0002;
-                        $deducted_checkout_lat = $usersValue->check_out_latitude - 0.0002;
-                        $added_checkout_longi = $usersValue->check_out_longitude + 0.0002;
-                        $deducted_checkout_longi = $usersValue->check_out_longitude - 0.0002;
+                        $added_chackin_lat = $usersValue->check_in_latitude + 0.0002;
+                        $deducted_checkin_lat = $usersValue->check_in_latitude - 0.0002;
+                        $added_checkin_longi = $usersValue->check_in_longitude + 0.0002;
+                        $deducted_checkin_longi = $usersValue->check_in_longitude - 0.0002;
 
-                        $added_chackout_lat = $usersValue->check_out_latitude + 0.0112609293;
-                        $deducted_checkout_lat = $usersValue->check_out_latitude - 0.0112609293;
-                        $added_checkout_longi = $usersValue->check_out_longitude + 0.0112459999;
-                        $deducted_checkout_longi = $usersValue->check_out_longitude - 0.0112459999;
+                        $added_chackin_lat = $usersValue->check_in_latitude + 0.0112609293;
+                        $deducted_checkin_lat = $usersValue->check_in_latitude - 0.0112609293;
+                        $added_checkin_longi = $usersValue->check_in_longitude + 0.0112459999;
+                        $deducted_checkin_longi = $usersValue->check_in_longitude - 0.0112459999;
 
-                        ######################################################## Code for checkout existance starts ##############################################################################
+                        ######################################################## Code for checkin existance starts ##############################################################################
+                        $requested_check_in_lat = number_format($request->lat, 2, '.', '');
+                        $first_check_in_lat = number_format($usersValue->check_in_latitude, 2, '.', '');
 
-                        $requested_check_out_lat = number_format($request->lat, 2, '.', '');
-
-                        $first_check_out_lat = number_format($usersValue->check_out_latitude, 2, '.', '');
-
-                        if ($first_check_out_lat == $requested_check_out_lat) {
+                        if ($first_check_in_lat == $requested_check_in_lat) {
                             //skip
+                            dd('Mohim');
                         } else {
 
-                            if ($usersValue->check_out_latitude != "" || $usersValue->check_out_latitude != NULL) {
-                           //skip
+                            if ($usersValue->check_in_latitude != "" || $usersValue->check_in_latitude != NULL) {
                             } else {
                                 $user = User::find($request->employee_id);
-                                $user->check_out_latitude = $request->lat;
-                                $user->check_out_longitude = $request->longt;
+                                $user->check_in_latitude = $request->lat;
+                                $user->check_in_longitude = $request->longt;
                                 $user->save();
                             }
                         }
+                        ########################################################### Code for checkin existance ends ###########################################################################
 
-                        ########################################################### Code for checkout existance ends ###########################################################################
-
-                        ############################################ Multiple checkout latitudes and longitudes code starts from here ###############################
+                        ############################################ Multiple checkin latitudes and longitudes code starts from here ###############################
 
                         /////////////////////// checkin latitude portion starts/////////////////////////
-                        $requested_check_out_latitude = number_format($request->lat, 2, '.', '');
-                        if ($usersValue->check_out_latitude == "" || $usersValue->check_out_latitude == NULL) {
-                            $first_check_out_latitude = 0.00;
+                        $requested_check_in_latitude = number_format($request->lat, 2, '.', '');
+
+                        if ($usersValue->check_in_latitude == "" || $usersValue->check_in_latitude == NULL) {
+                            $first_check_in_latitude = 0.00;
                         } else {
-                            $first_check_out_latitude = number_format($usersValue->check_out_latitude, 2, '.', '');
+                            $first_check_in_latitude = number_format($usersValue->check_in_latitude, 2, '.', '');
+                        }
+
+                        if ($usersValue->check_in_latitude_two == "" || $usersValue->check_in_latitude_two == NULL) {
+                            $second_check_in_latitude = 0.00;
+                        } else {
+                            $second_check_in_latitude = number_format($usersValue->check_in_latitude_two, 2, '.', '');
+                        }
+
+                        if ($usersValue->check_in_latitude_three == "" || $usersValue->check_in_latitude_three == NULL) {
+                            $third_check_in_latitude = 0.00;
+                        } else {
+                            $third_check_in_latitude = number_format($usersValue->check_in_latitude_three, 2, '.', '');
+                        }
+
+                        if ($usersValue->check_in_latitude_four == "" || $usersValue->check_in_latitude_four == NULL) {
+                            $fourth_check_in_latitude = 0.00;
+                        } else {
+                            $fourth_check_in_latitude = number_format($usersValue->check_in_latitude_four, 2, '.', '');
+                        }
+                        if ($usersValue->check_in_latitude_five == "" || $usersValue->check_in_latitude_five == NULL) {
+                            $fifth_check_in_latitude = 0.00;
+                        } else {
+                            $fifth_check_in_latitude = number_format($usersValue->check_in_latitude_five, 2, '.', '');
+                        }
+                        if ($usersValue->check_in_latitude_six == "" || $usersValue->check_in_latitude_six == NULL) {
+                            $sixth_check_in_latitude = 0.00;
+                        } else {
+                            $sixth_check_in_latitude = number_format($usersValue->check_in_latitude_six, 2, '.', '');
+                        }
+                        if ($usersValue->check_in_latitude_seven == "" || $usersValue->check_in_latitude_seven == NULL) {
+                            $seventh_check_in_latitude = 0.00;
+                        } else {
+                            $seventh_check_in_latitude = number_format($usersValue->check_in_latitude_seven, 2, '.', '');
+                        }
+
+                        if ($first_check_in_latitude == $requested_check_in_latitude) {
+                            //echo "first checkin latitude matched";
+                            $added_chackin_lat = $usersValue->check_in_latitude + 0.0003;
+                            $deducted_checkin_lat = $usersValue->check_in_latitude - 0.0003;
+                        } elseif ($usersValue->multi_attendance == 1) {
+
+                            $attendance =  new Attendance();
+                            $attendance->attendance_com_id = Auth::user()->com_id;
+                            $attendance->employee_id = $request->employee_id;
+                            $attendance->attendance_date = $current_date;
+                            $attendance->customize_attendance_month = $attendance_month;
+                            $attendance->customize_attendance_year = $attendance_year;
+                            $attendance->clock_in = $current_time;
+                            $attendance->check_in_latitude = $request->lat;
+                            $attendance->check_in_longitude = $request->longt;
+                            $attendance->check_in_ip = $local_server_ip;
+                            if (date_create($current_time) >= date_create($shift_in)) {
+                                if ($shift_in != 0 && $shift_out != 0) {
+
+                                    $attendance->time_late = date_create($shift_in)->diff(date_create($current_time))->format('%H:%i:%s');
+
+                                    if ($current_time_in_seconds >= $office_late_time_config_in_seconds) {
+                                        $late_time = new LateTime();
+                                        $late_time->late_time_com_id = Auth::user()->com_id;
+                                        $late_time->late_time_employee_id = $request->employee_id;
+                                        $late_time->late_time_date = $current_date;
+
+                                        $late_time->customize_late_time_month = $attendance_month;
+                                        $late_time->customize_late_time_year = $attendance_year;
+                                        $late_time->save();
+                                    }
+                                }
+                            }
+
+                            $attendance->check_in_out = 1;
+                            $attendance->attendance_status = "Present";
+                            $attendance->save();
+
+                            $permission = "3.28";
+                            if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
+
+                                $year = date('Y');
+
+                                $month =  date('m');
+                                $day =  date('d');
+
+                                $currentDate = Carbon::now();  // Get the current date and time
+                                $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+
+                                $previousYear =  $previousMonth->format('Y');
+
+                                $previousMonth = $previousMonth->format('m');
+
+                                $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
+
+                                if ($month == "01") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $previousYear;
+                                        $attendance_month = "12";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "01";
+                                    }
+                                } elseif ($month == "02") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
+
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $previousYear;
+                                        $attendance_month = "01";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "02";
+                                    }
+                                } elseif ($month == "03") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $previousYear;
+                                        $attendance_month = "02";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "03";
+                                    }
+                                } elseif ($month == "04") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "03";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "04";
+                                    }
+                                } elseif ($month == "05") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "04";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "05";
+                                    }
+                                } elseif ($month == "06") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "05";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "06";
+                                    }
+                                } elseif ($month == "07") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "06";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "07";
+                                    }
+                                } elseif ($month == "08") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "07";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "08";
+                                    }
+                                } elseif ($month == "09") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "08";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "09";
+                                    }
+                                } elseif ($month == "10") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "09";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "10";
+                                    }
+                                } elseif ($month == "11") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "10";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "11";
+                                    }
+                                } elseif ($month == "12") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "11";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "12";
+                                    }
+                                }
+
+
+                                if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
+
+                                    $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
+
+                                    foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                        $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->save();
+                                    }
+                                } else {
+                                    // return "ok";
+                                    $monthly_attendance = new CustomizeMonthlyAttendance();
+                                    $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
+                                    $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
+                                    $monthly_attendance->attendance_month = $attendance_month;
+                                    $monthly_attendance->attendance_year = $attendance_year;
+                                    if ($current_date_number == 1) {
+                                        $monthly_attendance->day_one = "P";
+                                    } elseif ($current_date_number == 2) {
+                                        $monthly_attendance->day_two = "P";
+                                    } elseif ($current_date_number == 3) {
+                                        $monthly_attendance->day_three = "P";
+                                    } elseif ($current_date_number == 4) {
+                                        $monthly_attendance->day_four = "P";
+                                    } elseif ($current_date_number == 5) {
+                                        $monthly_attendance->day_five = "P";
+                                    } elseif ($current_date_number == 6) {
+                                        $monthly_attendance->day_six = "P";
+                                    } elseif ($current_date_number == 7) {
+                                        $monthly_attendance->day_seven = "P";
+                                    } elseif ($current_date_number == 8) {
+                                        $monthly_attendance->day_eight = "P";
+                                    } elseif ($current_date_number == 9) {
+                                        $monthly_attendance->day_nine = "P";
+                                    } elseif ($current_date_number == 10) {
+                                        $monthly_attendance->day_ten = "P";
+                                    } elseif ($current_date_number == 11) {
+                                        $monthly_attendance->day_eleven = "P";
+                                    } elseif ($current_date_number == 12) {
+                                        $monthly_attendance->day_twelve = "P";
+                                    } elseif ($current_date_number == 13) {
+                                        $monthly_attendance->day_thirteen = "P";
+                                    } elseif ($current_date_number == 14) {
+                                        $monthly_attendance->day_fourteen = "P";
+                                    } elseif ($current_date_number == 15) {
+                                        $monthly_attendance->day_fifteen = "P";
+                                    } elseif ($current_date_number == 16) {
+                                        $monthly_attendance->day_sixteen = "P";
+                                    } elseif ($current_date_number == 17) {
+                                        $monthly_attendance->day_seventeen = "P";
+                                    } elseif ($current_date_number == 18) {
+                                        $monthly_attendance->day_eighteen = "P";
+                                    } elseif ($current_date_number == 19) {
+                                        $monthly_attendance->day_nineteen = "P";
+                                    } elseif ($current_date_number == 20) {
+                                        $monthly_attendance->day_twenty = "P";
+                                    } elseif ($current_date_number == 21) {
+                                        $monthly_attendance->day_twenty_one = "P";
+                                    } elseif ($current_date_number == 22) {
+                                        $monthly_attendance->day_twenty_two = "P";
+                                    } elseif ($current_date_number == 23) {
+                                        $monthly_attendance->day_twenty_three = "P";
+                                    } elseif ($current_date_number == 24) {
+                                        $monthly_attendance->day_twenty_four = "P";
+                                    } elseif ($current_date_number == 25) {
+                                        $monthly_attendance->day_twenty_five = "P";
+                                    } elseif ($current_date_number == 26) {
+                                        $monthly_attendance->day_twenty_six = "P";
+                                    } elseif ($current_date_number == 27) {
+                                        $monthly_attendance->day_twenty_seven = "P";
+                                    } elseif ($current_date_number == 28) {
+                                        $monthly_attendance->day_twenty_eight = "P";
+                                    } elseif ($current_date_number == 29) {
+                                        $monthly_attendance->day_twenty_nine = "P";
+                                    } elseif ($current_date_number == 30) {
+                                        $monthly_attendance->day_thirty = "P";
+                                    } elseif ($current_date_number == 31) {
+                                        $monthly_attendance->day_thirty_one = "P";
+                                    } else {
+                                        return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                    }
+
+                                    $monthly_attendance->day_one = "P";
+
+                                    $monthly_attendance->save();
+                                }
+                            } else {
+
+                                if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
+
+                                    $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
+
+                                    foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                        $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->save();
+                                    }
+                                } else {
+
+                                    $monthly_attendance = new MonthlyAttendance();
+                                    $monthly_attendance->monthly_com_id = Auth::user()->com_id;
+                                    $monthly_attendance->monthly_employee_id = $request->employee_id;
+                                    $monthly_attendance->attendance_month = $current_date;
+                                    $monthly_attendance->attendance_year = $current_date;
+                                    if ($current_date_number == 1) {
+                                        $monthly_attendance->day_one = "P";
+                                    } elseif ($current_date_number == 2) {
+                                        $monthly_attendance->day_two = "P";
+                                    } elseif ($current_date_number == 3) {
+                                        $monthly_attendance->day_three = "P";
+                                    } elseif ($current_date_number == 4) {
+                                        $monthly_attendance->day_four = "P";
+                                    } elseif ($current_date_number == 5) {
+                                        $monthly_attendance->day_five = "P";
+                                    } elseif ($current_date_number == 6) {
+                                        $monthly_attendance->day_six = "P";
+                                    } elseif ($current_date_number == 7) {
+                                        $monthly_attendance->day_seven = "P";
+                                    } elseif ($current_date_number == 8) {
+                                        $monthly_attendance->day_eight = "P";
+                                    } elseif ($current_date_number == 9) {
+                                        $monthly_attendance->day_nine = "P";
+                                    } elseif ($current_date_number == 10) {
+                                        $monthly_attendance->day_ten = "P";
+                                    } elseif ($current_date_number == 11) {
+                                        $monthly_attendance->day_eleven = "P";
+                                    } elseif ($current_date_number == 12) {
+                                        $monthly_attendance->day_twelve = "P";
+                                    } elseif ($current_date_number == 13) {
+                                        $monthly_attendance->day_thirteen = "P";
+                                    } elseif ($current_date_number == 14) {
+                                        $monthly_attendance->day_fourteen = "P";
+                                    } elseif ($current_date_number == 15) {
+                                        $monthly_attendance->day_fifteen = "P";
+                                    } elseif ($current_date_number == 16) {
+                                        $monthly_attendance->day_sixteen = "P";
+                                    } elseif ($current_date_number == 17) {
+                                        $monthly_attendance->day_seventeen = "P";
+                                    } elseif ($current_date_number == 18) {
+                                        $monthly_attendance->day_eighteen = "P";
+                                    } elseif ($current_date_number == 19) {
+                                        $monthly_attendance->day_nineteen = "P";
+                                    } elseif ($current_date_number == 20) {
+                                        $monthly_attendance->day_twenty = "P";
+                                    } elseif ($current_date_number == 21) {
+                                        $monthly_attendance->day_twenty_one = "P";
+                                    } elseif ($current_date_number == 22) {
+                                        $monthly_attendance->day_twenty_two = "P";
+                                    } elseif ($current_date_number == 23) {
+                                        $monthly_attendance->day_twenty_three = "P";
+                                    } elseif ($current_date_number == 24) {
+                                        $monthly_attendance->day_twenty_four = "P";
+                                    } elseif ($current_date_number == 25) {
+                                        $monthly_attendance->day_twenty_five = "P";
+                                    } elseif ($current_date_number == 26) {
+                                        $monthly_attendance->day_twenty_six = "P";
+                                    } elseif ($current_date_number == 27) {
+                                        $monthly_attendance->day_twenty_seven = "P";
+                                    } elseif ($current_date_number == 28) {
+                                        $monthly_attendance->day_twenty_eight = "P";
+                                    } elseif ($current_date_number == 29) {
+                                        $monthly_attendance->day_twenty_nine = "P";
+                                    } elseif ($current_date_number == 30) {
+                                        $monthly_attendance->day_thirty = "P";
+                                    } elseif ($current_date_number == 31) {
+                                        $monthly_attendance->day_thirty_one = "P";
+                                    } else {
+                                        return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                    }
+
+                                    $monthly_attendance->day_one = "P";
+
+                                    $monthly_attendance->save();
+                                }
+                            }
+
+
+
+                            return back()->with('message', 'Attendance Submitted Successfully');
+                        } else {
+                            if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
+                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_in_attempt']);
+                                foreach ($attempt_counts as $attempt_counts_value) {
+                                    $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
+                                    $attendance_location->attendance_location_com_id = Auth::user()->com_id;
+                                    $attendance_location->attendance_location_employee_id = $request->employee_id;
+                                    $attendance_location->attendance_location_date = $current_date;
+                                    $attendance_location->attendance_location_check_in_latitude = $request->lat;
+                                    $attendance_location->attendance_location_check_in_longitude = $request->longt;
+                                    $attendance_location->attendance_location_check_in_attempt = $attempt_counts_value->attendance_location_check_in_attempt + 1;
+                                    // $attendance_location->browser = $browser;
+                                    $attendance_location->save();
+                                }
+                            } else {
+                                $attendance_location = new AttendanceLocation();
+                                $attendance_location->attendance_location_com_id = Auth::user()->com_id;
+                                $attendance_location->attendance_location_employee_id = $request->employee_id;
+                                $attendance_location->attendance_location_date = $current_date;
+                                $attendance_location->attendance_location_check_in_latitude = $request->lat;
+                                $attendance_location->attendance_location_check_in_longitude = $request->longt;
+                                $attendance_location->attendance_location_check_in_attempt = 1;
+                                // $attendance_location->browser = $browser;
+                                $attendance_location->save();
+                            }
+                            return back()->with('message', 'Checkin Latitude Not Matched!!! Try again after some time.');
+                        }
+                        /////////////////////// checkin latitude portion ends/////////////////////////
+                        /////////////////////// checkin longitude portion starts/////////////////////////
+
+                        $requested_check_in_longitude = number_format($request->longt, 2, '.', '');
+
+                        if ($usersValue->check_in_longitude == "" || $usersValue->check_in_longitude == NULL) {
+                            $first_check_in_longitude = 0.00;
+                        } else {
+                            $first_check_in_longitude = number_format($usersValue->check_in_longitude, 2, '.', '');
+                        }
+
+                        if ($usersValue->check_in_longitude_two == "" || $usersValue->check_in_longitude_two == NULL) {
+                            $second_check_in_longitude = 0.00;
+                        } else {
+                            $second_check_in_longitude = number_format($usersValue->check_in_longitude_two, 2, '.', '');
+                        }
+
+                        if ($usersValue->check_in_longitude_three == "" || $usersValue->check_in_longitude_three == NULL) {
+                            $third_check_in_longitude = 0.00;
+                        } else {
+                            $third_check_in_longitude = number_format($usersValue->check_in_longitude_three, 2, '.', '');
+                        }
+
+                        if ($usersValue->check_in_longitude_four == "" || $usersValue->check_in_longitude_four == NULL) {
+                            $fourth_check_in_longitude = 0.00;
+                        } else {
+                            $fourth_check_in_longitude = number_format($usersValue->check_in_longitude_four, 2, '.', '');
+                        }
+                        if ($usersValue->check_in_longitude_five == "" || $usersValue->check_in_longitude_five == NULL) {
+                            $fifth_check_in_longitude = 0.00;
+                        } else {
+                            $fifth_check_in_longitude = number_format($usersValue->check_in_longitude_five, 2, '.', '');
+                        }
+                        if ($usersValue->check_in_longitude_six == "" || $usersValue->check_in_longitude_six == NULL) {
+                            $sixth_check_in_longitude = 0.00;
+                        } else {
+                            $sixth_check_in_longitude = number_format($usersValue->check_in_longitude_six, 2, '.', '');
+                        }
+                        if ($usersValue->check_in_longitude_seven == "" || $usersValue->check_in_longitude_seven == NULL) {
+                            $seventh_check_in_longitude = 0.00;
+                        } else {
+                            $seventh_check_in_longitude = number_format($usersValue->check_in_longitude_seven, 2, '.', '');
                         }
                         //echo "ok"; exit;
-                        if ($first_check_out_latitude == $requested_check_out_latitude) {
-                            //echo "first checkout latitude matched";
-                            $added_chackout_lat = $usersValue->check_out_latitude + 0.0003;
-                            $deducted_checkout_lat = $usersValue->check_out_latitude - 0.0003;
-                        } elseif ($usersValue->multi_attendance == 1) {
-                           $attendance_employee_id = Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->get();
 
-                           foreach ($attendance_employee_id as $attendance_employee_id_value) {
-                            $attendance = Attendance::find($attendance_employee_id_value->id);
-                            $attendance->clock_out = $current_time;
-                            $attendance->customize_attendance_month = $attendance_month;
-                            $attendance->customize_attendance_year = $attendance_year;
-                            $attendance->check_out_latitude = $request->lat;
-                            $attendance->check_out_longitude = $request->longt;
-                            $attendance->check_out_ip = $local_server_ip;
-                            if (date_create($current_time) >= date_create($payable_over_time_hour)) {
-                                if ($shift_in != 0 && $shift_out != 0) {
-                                    $attendance->overtime = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
-
-                                    $todays_over_time = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
-                                    if ($request->over_time_payable == 'Yes' && $request->user_over_time_type == 'Automatic') {
-                                        $over_time = new OverTime();
-                                        $over_time->over_time_com_id = $request->com_id;
-                                        $over_time->over_time_employee_id = $request->employee_id;
-                                        $over_time->over_time_type = "Automatic";
-                                        $over_time->over_time_date = $current_date;
-                                        $over_time->customize_over_time_month = $attendance_month;
-                                        $over_time->customize_over_time_year = $attendance_year;
-                                        $over_time->over_time_company_duty_in_seconds = $diff_shift_seconds_for_the_day;
-                                        $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
-                                        //$over_time->over_time_rate = $request->user_over_time_rate;
-                                        $over_time->over_time_rate = Auth::user()->user_over_time_rate;
-                                        $over_time->save();
-                                    }
-                                }
-                            }
-                            if (date_create($current_time) <= date_create($shift_out)) {
-                                if ($shift_in != 0 && $shift_out != 0) {
-                                    $attendance->early_leaving = date_create($current_time)->diff(date_create($shift_out))->format('%H:%i:%s');
-                                }
-                            }
-                            $attendance->check_in_out = 1;
-                            $attendance->save();
-                            return back()->with('message', 'Attendance Checkout Done Successfully');
-                        }
+                        if ($first_check_in_longitude == $requested_check_in_longitude) {
+                            //echo "first checkin longitude matched";
+                            $added_checkin_longi = $usersValue->check_in_longitude + 0.0003;
+                            $deducted_checkin_longi = $usersValue->check_in_longitude - 0.0003;
                         } else {
-                            //echo "ok"; exit;
-
                             if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
-                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_out_attempt']);
+                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_in_attempt']);
                                 foreach ($attempt_counts as $attempt_counts_value) {
                                     $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
                                     $attendance_location->attendance_location_com_id = Auth::user()->com_id;
                                     $attendance_location->attendance_location_employee_id = $request->employee_id;
                                     $attendance_location->attendance_location_date = $current_date;
-                                    $attendance_location->attendance_location_check_out_latitude = $request->lat;
-                                    $attendance_location->attendance_location_check_out_longitude = $request->longt;
-                                    $attendance_location->attendance_location_check_out_attempt = $attempt_counts_value->attendance_location_check_out_attempt + 1;
+                                    $attendance_location->attendance_location_check_in_latitude = $request->lat;
+                                    $attendance_location->attendance_location_check_in_longitude = $request->longt;
+                                    $attendance_location->attendance_location_check_in_attempt = $attempt_counts_value->attendance_location_check_in_attempt + 1;
+                                    // $attendance_location->browser = $browser;
                                     $attendance_location->save();
                                 }
                             } else {
@@ -4178,479 +2826,932 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
                                 $attendance_location->attendance_location_com_id = Auth::user()->com_id;
                                 $attendance_location->attendance_location_employee_id = $request->employee_id;
                                 $attendance_location->attendance_location_date = $current_date;
-                                $attendance_location->attendance_location_check_out_latitude = $request->lat;
-                                $attendance_location->attendance_location_check_out_longitude = $request->longt;
-                                $attendance_location->attendance_location_check_out_attempt = 1;
+                                $attendance_location->attendance_location_check_in_latitude = $request->lat;
+                                $attendance_location->attendance_location_check_in_longitude = $request->longt;
+                                $attendance_location->attendance_location_check_in_attempt = 1;
+                                // $attendance_location->browser = $browser;
                                 $attendance_location->save();
                             }
-
-                            return back()->with('message', 'Checkout Latitude Not Matched!!! Please try again after some time.');
-                            //echo "checkout latitude not matched";
+                            return back()->with('message', 'Checkin Longitude Not Matched!!! Try again after some time.');
                         }
-                        /////////////////////// checkout latitude portion ends/////////////////////////
-                        /////////////////////// checkout longitude portion starts/////////////////////////
+                        /////////////////////// checkin longitude portion ends/////////////////////////
+                        ############################################ Multiple checkin latitudes and longitudes code ends here ###############################
 
-                        $requested_check_out_longitude = number_format($request->longt, 2, '.', '');
 
-                        if ($usersValue->check_out_longitude == "" || $usersValue->check_out_longitude == NULL) {
-                            $first_check_out_longitude = 0.00;
-                        } else {
-                            $first_check_out_longitude = number_format($usersValue->check_out_longitude, 2, '.', '');
-                        }
 
-                        if ($usersValue->check_out_longitude_two == "" || $usersValue->check_out_longitude_two == NULL) {
-                            $second_check_out_longitude = 0.00;
-                        } else {
-                            $second_check_out_longitude = number_format($usersValue->check_out_longitude_two, 2, '.', '');
-                        }
+                        if (($added_chackin_lat >= $request->lat && $deducted_checkin_lat <= $request->lat) || ($added_checkin_longi >= $request->longt && $deducted_checkin_longi <= $request->longt)) {
 
-                        if ($usersValue->check_out_longitude_three == "" || $usersValue->check_out_longitude_three == NULL) {
-                            $third_check_out_longitude = 0.00;
-                        } else {
-                            $third_check_out_longitude = number_format($usersValue->check_out_longitude_three, 2, '.', '');
-                        }
-                        if ($usersValue->check_out_longitude_four == "" || $usersValue->check_out_longitude_four == NULL) {
-                            $fourth_check_out_longitude = 0.00;
-                        } else {
-                            $fourth_check_out_longitude = number_format($usersValue->check_out_longitude_four, 2, '.', '');
-                        }
-                        if ($usersValue->check_out_longitude_five == "" || $usersValue->check_out_longitude_five == NULL) {
-                            $fifth_check_out_longitude = 0.00;
-                        } else {
-                            $fifth_check_out_longitude = number_format($usersValue->check_out_longitude_five, 2, '.', '');
-                        }
-                        if ($usersValue->check_out_longitude_six == "" || $usersValue->check_out_longitude_six == NULL) {
-                            $sixth_check_out_longitude = 0.00;
-                        } else {
-                            $sixth_check_out_longitude = number_format($usersValue->check_out_longitude_six, 2, '.', '');
-                        }
-                        if ($usersValue->check_out_longitude_seven == "" || $usersValue->check_out_longitude_seven == NULL) {
-                            $seventh_check_out_longitude = 0.00;
-                        } else {
-                            $seventh_check_out_longitude = number_format($usersValue->check_out_longitude_seven, 2, '.', '');
-                        }
+                            if (Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->exists()) {
 
-                        if ($first_check_out_longitude == $requested_check_out_longitude) {
-                            //echo "ok"; exit;
-                            $added_checkout_longi = $usersValue->check_out_longitude + 0.0003;
-                            $deducted_checkout_longi = $usersValue->check_out_longitude - 0.0003;
-                        } elseif ($usersValue->multi_attendance == 1) {
-                           $attendance_employee_id = Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->get();
-
-                           foreach ($attendance_employee_id as $attendance_employee_id_value) {
-                            $attendance = Attendance::find($attendance_employee_id_value->id);
-                            $attendance->clock_out = $current_time;
-                            $attendance->customize_attendance_month = $attendance_month;
-                            $attendance->customize_attendance_year = $attendance_year;
-                            $attendance->check_out_latitude = $request->lat;
-                            $attendance->check_out_longitude = $request->longt;
-                            $attendance->check_out_ip = $local_server_ip;
-                            if (date_create($current_time) >= date_create($payable_over_time_hour)) {
-                                if ($shift_in != 0 && $shift_out != 0) {
-                                    $attendance->overtime = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
-
-                                    $todays_over_time = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
-                                    if ($request->over_time_payable == 'Yes' && $request->user_over_time_type == 'Automatic') {
-                                        $over_time = new OverTime();
-                                        $over_time->over_time_com_id = $request->com_id;
-                                        $over_time->over_time_employee_id = $request->employee_id;
-                                        $over_time->over_time_type = "Automatic";
-                                        $over_time->over_time_date = $current_date;
-                                        $over_time->customize_over_time_month = $attendance_month;
-                                        $over_time->customize_over_time_year = $attendance_year;
-                                        $over_time->over_time_company_duty_in_seconds = $diff_shift_seconds_for_the_day;
-                                        $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
-                                        //$over_time->over_time_rate = $request->user_over_time_rate;
-                                        $over_time->over_time_rate = Auth::user()->user_over_time_rate;
-                                        $over_time->save();
-                                    }
-                                }
-                            }
-                            if (date_create($current_time) <= date_create($shift_out)) {
-                                if ($shift_in != 0 && $shift_out != 0) {
-                                    $attendance->early_leaving = date_create($current_time)->diff(date_create($shift_out))->format('%H:%i:%s');
-                                }
-                            }
-                            $attendance->check_in_out = 1;
-                            $attendance->save();
-
-                        }
-                        } else {
-
-                            //echo "ok"; exit;
-
-                            if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
-                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_out_attempt']);
-                                foreach ($attempt_counts as $attempt_counts_value) {
-                                    $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
-                                    $attendance_location->attendance_location_com_id = Auth::user()->com_id;
-                                    $attendance_location->attendance_location_employee_id = $request->employee_id;
-                                    $attendance_location->attendance_location_date = $current_date;
-                                    $attendance_location->attendance_location_check_out_latitude = $request->lat;
-                                    $attendance_location->attendance_location_check_out_longitude = $request->longt;
-                                    $attendance_location->attendance_location_check_out_attempt = $attempt_counts_value->attendance_location_check_out_attempt + 1;
-                                    $attendance_location->save();
-                                }
+                                return back()->with('message', 'Already Checked In For Today!!! Please Contact With The System Administrator!!!');
                             } else {
-                                $attendance_location = new AttendanceLocation();
-                                $attendance_location->attendance_location_com_id = Auth::user()->com_id;
-                                $attendance_location->attendance_location_employee_id = $request->employee_id;
-                                $attendance_location->attendance_location_date = $current_date;
-                                $attendance_location->attendance_location_check_out_latitude = $request->lat;
-                                $attendance_location->attendance_location_check_out_longitude = $request->longt;
-                                $attendance_location->attendance_location_check_out_attempt = 1;
-                                $attendance_location->save();
-                            }
 
-                            return back()->with('message', 'Checkout Longitude Not Matched!!! Please try again after some time.');
-                            //echo "checkout longitude location not matched";
-                        }
-                        /////////////////////// checkout longitude portion ends/////////////////////////
-                        ############################################ Multiple checkout latitudes and longitudes code starts from here ###############################
-
-                        if (($added_chackout_lat >= $request->lat && $deducted_checkout_lat <= $request->lat) || ($added_checkout_longi >= $request->longt && $deducted_checkout_longi <= $request->longt)) {
-
-
-                            $attendance_employee_id = Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->get();
-
-
-                            foreach ($attendance_employee_id as $attendance_employee_id_value) {
-
-                                // if($attendance_employee_id_value->check_in_out === 1){
-
-                                //     return back()->with('message','Already Checked Out For Today!!! Please Contact With The System Administrator!!!');
-
-                                // }else{
-
-                                $attendance = Attendance::find($attendance_employee_id_value->id);
-                                $attendance->clock_out = $current_time;
-                                $attendance->check_out_latitude = $request->lat;
-                                $attendance->check_out_longitude = $request->longt;
-                                $attendance->check_out_ip = $local_server_ip;
-                                if (date_create($current_time) >= date_create($payable_over_time_hour)) {
+                                $attendance = new Attendance();
+                                $attendance->attendance_com_id = Auth::user()->com_id;
+                                $attendance->employee_id = $request->employee_id;
+                                $attendance->attendance_date = $current_date;
+                                $attendance->customize_attendance_month = $attendance_month;
+                                $attendance->customize_attendance_year = $attendance_year;
+                                $attendance->clock_in = $current_time;
+                                $attendance->check_in_latitude = $request->lat;
+                                $attendance->check_in_longitude = $request->longt;
+                                $attendance->check_in_ip = $local_server_ip;
+                                if (date_create($current_time) >= date_create($shift_in)) {
                                     if ($shift_in != 0 && $shift_out != 0) {
-                                        $attendance->overtime = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
 
-                                        $todays_over_time = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
-                                        if (Auth::user()->over_time_payable == 'Yes' && Auth::user()->user_over_time_type == 'Automatic') {
+                                        $attendance->time_late = date_create($shift_in)->diff(date_create($current_time))->format('%H:%i:%s');
 
-                                            if (OverTime::where('over_time_employee_id', $request->employee_id)->where('over_time_date', $current_date)->exists()) {
+                                        if ($current_time_in_seconds >= $office_late_time_config_in_seconds) {
 
-                                                $over_times = OverTime::where('over_time_employee_id', $request->employee_id)->where('over_time_date', $current_date)->get('id');
+                                            if (LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->exists()) {
 
-                                                foreach ($over_times as $over_times_value) {
+                                                $late_times = LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->get('id');
 
-                                                    $over_time = OverTime::find($over_times_value->id);
-                                                    $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
-                                                    $over_time->save();
+                                                foreach ($late_times as $late_times_value) {
+
+                                                    $late_time = LateTime::find($late_times_value->id);
+                                                    $late_time->late_time_com_id = Auth::user()->com_id;
+                                                    $late_time->late_time_employee_id = $request->employee_id;
+                                                    $late_time->late_time_date = $current_date;
+                                                    $late_time->customize_late_time_month = $attendance_month;
+                                                    $late_time->customize_late_time_year = $attendance_year;
+                                                    $late_time->save();
                                                 }
                                             } else {
-
-                                                $over_time = new OverTime();
-                                                $over_time->over_time_com_id = Auth::user()->com_id;
-                                                $over_time->over_time_employee_id = Auth::user()->id;
-                                                $over_time->over_time_type = "Automatic";
-                                                $over_time->over_time_date = $current_date;
-                                                $over_time->customize_over_time_month = $attendance_month;
-                                                $over_time->customize_over_time_year = $attendance_year;
-                                                $over_time->over_time_company_duty_in_seconds = $diff_shift_seconds_for_the_day;
-                                                $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
-                                                $over_time->over_time_rate = Auth::user()->user_over_time_rate;
-                                                $over_time->save();
+                                                $late_time = new LateTime();
+                                                $late_time->late_time_com_id = Auth::user()->com_id;
+                                                $late_time->late_time_employee_id = $request->employee_id;
+                                                $late_time->late_time_date = $current_date;
+                                                $late_time->customize_late_time_month = $attendance_month;
+                                                $late_time->customize_late_time_year = $attendance_year;
+                                                $late_time->save();
                                             }
                                         }
                                     }
                                 }
-                                if (date_create($current_time) <= date_create($shift_out)) {
-                                    if ($shift_in != 0 && $shift_out != 0) {
-                                        $attendance->early_leaving = date_create($current_time)->diff(date_create($shift_out))->format('%H:%i:%s');
+                                //$attendance->check_in_out = 0;
+                                $attendance->check_in_out = 1;
+                                $attendance->attendance_status = "Present";
+                                // $attendance->browser = $browser;
+                                $attendance->save();
+
+                                if (Holiday::where('holiday_com_id', Auth::user()->com_id)->where('holiday_type', '=', 'Weekly-Holiday')->where('holiday_name', $current_day_name)->exists()) { //condition for weekly holiday
+                                    //echo "yes";
+                                    $compensatory_leave = new CompensatoryLeave();
+                                    $compensatory_leave->compen_leave_com_id = Auth::user()->com_id;
+                                    $compensatory_leave->compen_leave_employee_id = $request->employee_id;
+                                    $compensatory_leave->compen_leave_duty_date = $current_date;
+                                    $compensatory_leave->compen_leave_status = 0;
+                                    $compensatory_leave->save();
+                                } else {
+
+                                    if (Holiday::where('holiday_com_id', Auth::user()->com_id)->where('holiday_type', '=', 'Other-Holiday')->whereRaw('"' . $current_date . '" between `start_date` and `end_date`')->exists()) { //condition for weekly holiday
+                                        //echo "yes";
+                                        $compensatory_leave = new CompensatoryLeave();
+                                        $compensatory_leave->compen_leave_com_id = Auth::user()->com_id;
+                                        $compensatory_leave->compen_leave_employee_id = $request->employee_id;
+                                        $compensatory_leave->compen_leave_duty_date = $current_date;
+                                        $compensatory_leave->compen_leave_status = 0;
+                                        $compensatory_leave->save();
                                     }
                                 }
-                                $attendance->total_work = date_create($attendance->clock_in)->diff(date_create($attendance->clock_out))->format('%H:%i:%s');
-                                $attendance->check_in_out = 1;
-                                $attendance->save();
+
+                                ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
                                 $permission = "3.28";
                                 if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
 
-                                                            $year = date('Y');
+                                    $year = date('Y');
 
-                                                            $month =  date('m');
-                                                            $day =  date('d');
+                                    $month =  date('m');
+                                    $day =  date('d');
 
-                                                            $currentDate = Carbon::now();  // Get the current date and time
-                                                            $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+                                    $currentDate = Carbon::now();  // Get the current date and time
+                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
 
-                                                            $previousYear =  $previousMonth->format('Y');
+                                    $previousYear =  $previousMonth->format('Y');
 
-                                                            $previousMonth = $previousMonth->format('m');
+                                    $previousMonth = $previousMonth->format('m');
 
-                                                            $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
+                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
 
-                                                            if ($month == "01") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $previousYear;
-                                                                    $attendance_month = "12";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "01";
-                                                                }
-                                                            } elseif ($month == "02") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
+                                    if ($month == "01") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "12";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "01";
+                                        }
+                                    } elseif ($month == "02") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
 
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $previousYear;
-                                                                    $attendance_month = "01";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "02";
-                                                                }
-                                                            } elseif ($month == "03") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $previousYear;
-                                                                    $attendance_month = "02";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "03";
-                                                                }
-                                                            } elseif ($month == "04") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "03";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "04";
-                                                                }
-                                                            } elseif ($month == "05") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "04";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "05";
-                                                                }
-                                                            } elseif ($month == "06") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "05";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "06";
-                                                                }
-                                                            } elseif ($month == "07") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "06";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "07";
-                                                                }
-                                                            } elseif ($month == "08") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "07";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "08";
-                                                                }
-                                                            } elseif ($month == "09") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "08";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "09";
-                                                                }
-                                                            } elseif ($month == "10") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "09";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "10";
-                                                                }
-                                                            } elseif ($month == "11") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "10";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "11";
-                                                                }
-                                                            } elseif ($month == "12") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "11";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "12";
-                                                                }
-                                                            }
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "01";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "02";
+                                        }
+                                    } elseif ($month == "03") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "02";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "03";
+                                        }
+                                    } elseif ($month == "04") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "03";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "04";
+                                        }
+                                    } elseif ($month == "05") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "04";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "05";
+                                        }
+                                    } elseif ($month == "06") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "05";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "06";
+                                        }
+                                    } elseif ($month == "07") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "06";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "07";
+                                        }
+                                    } elseif ($month == "08") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "07";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "08";
+                                        }
+                                    } elseif ($month == "09") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "08";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "09";
+                                        }
+                                    } elseif ($month == "10") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "09";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "10";
+                                        }
+                                    } elseif ($month == "11") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "10";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "11";
+                                        }
+                                    } elseif ($month == "12") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "11";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "12";
+                                        }
+                                    }
 
 
-                                                            if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
+                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
 
-                                                                $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
+                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
 
-                                                                foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
 
-                                                                    $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                                                    if ($current_date_number == 1) {
-                                                                        $monthly_attendance->day_one = "P";
-                                                                    } elseif ($current_date_number == 2) {
-                                                                        $monthly_attendance->day_two = "P";
-                                                                    } elseif ($current_date_number == 3) {
-                                                                        $monthly_attendance->day_three = "P";
-                                                                    } elseif ($current_date_number == 4) {
-                                                                        $monthly_attendance->day_four = "P";
-                                                                    } elseif ($current_date_number == 5) {
-                                                                        $monthly_attendance->day_five = "P";
-                                                                    } elseif ($current_date_number == 6) {
-                                                                        $monthly_attendance->day_six = "P";
-                                                                    } elseif ($current_date_number == 7) {
-                                                                        $monthly_attendance->day_seven = "P";
-                                                                    } elseif ($current_date_number == 8) {
-                                                                        $monthly_attendance->day_eight = "P";
-                                                                    } elseif ($current_date_number == 9) {
-                                                                        $monthly_attendance->day_nine = "P";
-                                                                    } elseif ($current_date_number == 10) {
-                                                                        $monthly_attendance->day_ten = "P";
-                                                                    } elseif ($current_date_number == 11) {
-                                                                        $monthly_attendance->day_eleven = "P";
-                                                                    } elseif ($current_date_number == 12) {
-                                                                        $monthly_attendance->day_twelve = "P";
-                                                                    } elseif ($current_date_number == 13) {
-                                                                        $monthly_attendance->day_thirteen = "P";
-                                                                    } elseif ($current_date_number == 14) {
-                                                                        $monthly_attendance->day_fourteen = "P";
-                                                                    } elseif ($current_date_number == 15) {
-                                                                        $monthly_attendance->day_fifteen = "P";
-                                                                    } elseif ($current_date_number == 16) {
-                                                                        $monthly_attendance->day_sixteen = "P";
-                                                                    } elseif ($current_date_number == 17) {
-                                                                        $monthly_attendance->day_seventeen = "P";
-                                                                    } elseif ($current_date_number == 18) {
-                                                                        $monthly_attendance->day_eighteen = "P";
-                                                                    } elseif ($current_date_number == 19) {
-                                                                        $monthly_attendance->day_nineteen = "P";
-                                                                    } elseif ($current_date_number == 20) {
-                                                                        $monthly_attendance->day_twenty = "P";
-                                                                    } elseif ($current_date_number == 21) {
-                                                                        $monthly_attendance->day_twenty_one = "P";
-                                                                    } elseif ($current_date_number == 22) {
-                                                                        $monthly_attendance->day_twenty_two = "P";
-                                                                    } elseif ($current_date_number == 23) {
-                                                                        $monthly_attendance->day_twenty_three = "P";
-                                                                    } elseif ($current_date_number == 24) {
-                                                                        $monthly_attendance->day_twenty_four = "P";
-                                                                    } elseif ($current_date_number == 25) {
-                                                                        $monthly_attendance->day_twenty_five = "P";
-                                                                    } elseif ($current_date_number == 26) {
-                                                                        $monthly_attendance->day_twenty_six = "P";
-                                                                    } elseif ($current_date_number == 27) {
-                                                                        $monthly_attendance->day_twenty_seven = "P";
-                                                                    } elseif ($current_date_number == 28) {
-                                                                        $monthly_attendance->day_twenty_eight = "P";
-                                                                    } elseif ($current_date_number == 29) {
-                                                                        $monthly_attendance->day_twenty_nine = "P";
-                                                                    } elseif ($current_date_number == 30) {
-                                                                        $monthly_attendance->day_thirty = "P";
-                                                                    } elseif ($current_date_number == 31) {
-                                                                        $monthly_attendance->day_thirty_one = "P";
-                                                                    } else {
-                                                                        return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                                    }
+                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                            if ($current_date_number == 1) {
+                                                $monthly_attendance->day_one = "P";
+                                            } elseif ($current_date_number == 2) {
+                                                $monthly_attendance->day_two = "P";
+                                            } elseif ($current_date_number == 3) {
+                                                $monthly_attendance->day_three = "P";
+                                            } elseif ($current_date_number == 4) {
+                                                $monthly_attendance->day_four = "P";
+                                            } elseif ($current_date_number == 5) {
+                                                $monthly_attendance->day_five = "P";
+                                            } elseif ($current_date_number == 6) {
+                                                $monthly_attendance->day_six = "P";
+                                            } elseif ($current_date_number == 7) {
+                                                $monthly_attendance->day_seven = "P";
+                                            } elseif ($current_date_number == 8) {
+                                                $monthly_attendance->day_eight = "P";
+                                            } elseif ($current_date_number == 9) {
+                                                $monthly_attendance->day_nine = "P";
+                                            } elseif ($current_date_number == 10) {
+                                                $monthly_attendance->day_ten = "P";
+                                            } elseif ($current_date_number == 11) {
+                                                $monthly_attendance->day_eleven = "P";
+                                            } elseif ($current_date_number == 12) {
+                                                $monthly_attendance->day_twelve = "P";
+                                            } elseif ($current_date_number == 13) {
+                                                $monthly_attendance->day_thirteen = "P";
+                                            } elseif ($current_date_number == 14) {
+                                                $monthly_attendance->day_fourteen = "P";
+                                            } elseif ($current_date_number == 15) {
+                                                $monthly_attendance->day_fifteen = "P";
+                                            } elseif ($current_date_number == 16) {
+                                                $monthly_attendance->day_sixteen = "P";
+                                            } elseif ($current_date_number == 17) {
+                                                $monthly_attendance->day_seventeen = "P";
+                                            } elseif ($current_date_number == 18) {
+                                                $monthly_attendance->day_eighteen = "P";
+                                            } elseif ($current_date_number == 19) {
+                                                $monthly_attendance->day_nineteen = "P";
+                                            } elseif ($current_date_number == 20) {
+                                                $monthly_attendance->day_twenty = "P";
+                                            } elseif ($current_date_number == 21) {
+                                                $monthly_attendance->day_twenty_one = "P";
+                                            } elseif ($current_date_number == 22) {
+                                                $monthly_attendance->day_twenty_two = "P";
+                                            } elseif ($current_date_number == 23) {
+                                                $monthly_attendance->day_twenty_three = "P";
+                                            } elseif ($current_date_number == 24) {
+                                                $monthly_attendance->day_twenty_four = "P";
+                                            } elseif ($current_date_number == 25) {
+                                                $monthly_attendance->day_twenty_five = "P";
+                                            } elseif ($current_date_number == 26) {
+                                                $monthly_attendance->day_twenty_six = "P";
+                                            } elseif ($current_date_number == 27) {
+                                                $monthly_attendance->day_twenty_seven = "P";
+                                            } elseif ($current_date_number == 28) {
+                                                $monthly_attendance->day_twenty_eight = "P";
+                                            } elseif ($current_date_number == 29) {
+                                                $monthly_attendance->day_twenty_nine = "P";
+                                            } elseif ($current_date_number == 30) {
+                                                $monthly_attendance->day_thirty = "P";
+                                            } elseif ($current_date_number == 31) {
+                                                $monthly_attendance->day_thirty_one = "P";
+                                            } else {
+                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                            }
 
-                                                                    $monthly_attendance->save();
-                                                                }
-                                                            } else {
-                                                                // return "ok";
-                                                                $monthly_attendance = new CustomizeMonthlyAttendance();
-                                                                $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
-                                                                $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
-                                                                $monthly_attendance->attendance_month = $attendance_month;
-                                                                $monthly_attendance->attendance_year = $attendance_year;
-                                                                if ($current_date_number == 1) {
-                                                                    $monthly_attendance->day_one = "P";
-                                                                } elseif ($current_date_number == 2) {
-                                                                    $monthly_attendance->day_two = "P";
-                                                                } elseif ($current_date_number == 3) {
-                                                                    $monthly_attendance->day_three = "P";
-                                                                } elseif ($current_date_number == 4) {
-                                                                    $monthly_attendance->day_four = "P";
-                                                                } elseif ($current_date_number == 5) {
-                                                                    $monthly_attendance->day_five = "P";
-                                                                } elseif ($current_date_number == 6) {
-                                                                    $monthly_attendance->day_six = "P";
-                                                                } elseif ($current_date_number == 7) {
-                                                                    $monthly_attendance->day_seven = "P";
-                                                                } elseif ($current_date_number == 8) {
-                                                                    $monthly_attendance->day_eight = "P";
-                                                                } elseif ($current_date_number == 9) {
-                                                                    $monthly_attendance->day_nine = "P";
-                                                                } elseif ($current_date_number == 10) {
-                                                                    $monthly_attendance->day_ten = "P";
-                                                                } elseif ($current_date_number == 11) {
-                                                                    $monthly_attendance->day_eleven = "P";
-                                                                } elseif ($current_date_number == 12) {
-                                                                    $monthly_attendance->day_twelve = "P";
-                                                                } elseif ($current_date_number == 13) {
-                                                                    $monthly_attendance->day_thirteen = "P";
-                                                                } elseif ($current_date_number == 14) {
-                                                                    $monthly_attendance->day_fourteen = "P";
-                                                                } elseif ($current_date_number == 15) {
-                                                                    $monthly_attendance->day_fifteen = "P";
-                                                                } elseif ($current_date_number == 16) {
-                                                                    $monthly_attendance->day_sixteen = "P";
-                                                                } elseif ($current_date_number == 17) {
-                                                                    $monthly_attendance->day_seventeen = "P";
-                                                                } elseif ($current_date_number == 18) {
-                                                                    $monthly_attendance->day_eighteen = "P";
-                                                                } elseif ($current_date_number == 19) {
-                                                                    $monthly_attendance->day_nineteen = "P";
-                                                                } elseif ($current_date_number == 20) {
-                                                                    $monthly_attendance->day_twenty = "P";
-                                                                } elseif ($current_date_number == 21) {
-                                                                    $monthly_attendance->day_twenty_one = "P";
-                                                                } elseif ($current_date_number == 22) {
-                                                                    $monthly_attendance->day_twenty_two = "P";
-                                                                } elseif ($current_date_number == 23) {
-                                                                    $monthly_attendance->day_twenty_three = "P";
-                                                                } elseif ($current_date_number == 24) {
-                                                                    $monthly_attendance->day_twenty_four = "P";
-                                                                } elseif ($current_date_number == 25) {
-                                                                    $monthly_attendance->day_twenty_five = "P";
-                                                                } elseif ($current_date_number == 26) {
-                                                                    $monthly_attendance->day_twenty_six = "P";
-                                                                } elseif ($current_date_number == 27) {
-                                                                    $monthly_attendance->day_twenty_seven = "P";
-                                                                } elseif ($current_date_number == 28) {
-                                                                    $monthly_attendance->day_twenty_eight = "P";
-                                                                } elseif ($current_date_number == 29) {
-                                                                    $monthly_attendance->day_twenty_nine = "P";
-                                                                } elseif ($current_date_number == 30) {
-                                                                    $monthly_attendance->day_thirty = "P";
-                                                                } elseif ($current_date_number == 31) {
-                                                                    $monthly_attendance->day_thirty_one = "P";
-                                                                } else {
-                                                                    return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                                }
+                                            $monthly_attendance->save();
+                                        }
+                                    } else {
+                                        // return "ok";
+                                        $monthly_attendance = new CustomizeMonthlyAttendance();
+                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
+                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
+                                        $monthly_attendance->attendance_month = $attendance_month;
+                                        $monthly_attendance->attendance_year = $attendance_year;
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
 
-                                                                $monthly_attendance->day_one = "P";
+                                        $monthly_attendance->day_one = "P";
 
-                                                                $monthly_attendance->save();
-                                                            }
-                                                        } else {
+                                        $monthly_attendance->save();
+                                    }
+                                } else {
+                                    if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
+
+                                        $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
+
+                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                            $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                            if ($current_date_number == 1) {
+                                                $monthly_attendance->day_one = "P";
+                                            } elseif ($current_date_number == 2) {
+                                                $monthly_attendance->day_two = "P";
+                                            } elseif ($current_date_number == 3) {
+                                                $monthly_attendance->day_three = "P";
+                                            } elseif ($current_date_number == 4) {
+                                                $monthly_attendance->day_four = "P";
+                                            } elseif ($current_date_number == 5) {
+                                                $monthly_attendance->day_five = "P";
+                                            } elseif ($current_date_number == 6) {
+                                                $monthly_attendance->day_six = "P";
+                                            } elseif ($current_date_number == 7) {
+                                                $monthly_attendance->day_seven = "P";
+                                            } elseif ($current_date_number == 8) {
+                                                $monthly_attendance->day_eight = "P";
+                                            } elseif ($current_date_number == 9) {
+                                                $monthly_attendance->day_nine = "P";
+                                            } elseif ($current_date_number == 10) {
+                                                $monthly_attendance->day_ten = "P";
+                                            } elseif ($current_date_number == 11) {
+                                                $monthly_attendance->day_eleven = "P";
+                                            } elseif ($current_date_number == 12) {
+                                                $monthly_attendance->day_twelve = "P";
+                                            } elseif ($current_date_number == 13) {
+                                                $monthly_attendance->day_thirteen = "P";
+                                            } elseif ($current_date_number == 14) {
+                                                $monthly_attendance->day_fourteen = "P";
+                                            } elseif ($current_date_number == 15) {
+                                                $monthly_attendance->day_fifteen = "P";
+                                            } elseif ($current_date_number == 16) {
+                                                $monthly_attendance->day_sixteen = "P";
+                                            } elseif ($current_date_number == 17) {
+                                                $monthly_attendance->day_seventeen = "P";
+                                            } elseif ($current_date_number == 18) {
+                                                $monthly_attendance->day_eighteen = "P";
+                                            } elseif ($current_date_number == 19) {
+                                                $monthly_attendance->day_nineteen = "P";
+                                            } elseif ($current_date_number == 20) {
+                                                $monthly_attendance->day_twenty = "P";
+                                            } elseif ($current_date_number == 21) {
+                                                $monthly_attendance->day_twenty_one = "P";
+                                            } elseif ($current_date_number == 22) {
+                                                $monthly_attendance->day_twenty_two = "P";
+                                            } elseif ($current_date_number == 23) {
+                                                $monthly_attendance->day_twenty_three = "P";
+                                            } elseif ($current_date_number == 24) {
+                                                $monthly_attendance->day_twenty_four = "P";
+                                            } elseif ($current_date_number == 25) {
+                                                $monthly_attendance->day_twenty_five = "P";
+                                            } elseif ($current_date_number == 26) {
+                                                $monthly_attendance->day_twenty_six = "P";
+                                            } elseif ($current_date_number == 27) {
+                                                $monthly_attendance->day_twenty_seven = "P";
+                                            } elseif ($current_date_number == 28) {
+                                                $monthly_attendance->day_twenty_eight = "P";
+                                            } elseif ($current_date_number == 29) {
+                                                $monthly_attendance->day_twenty_nine = "P";
+                                            } elseif ($current_date_number == 30) {
+                                                $monthly_attendance->day_thirty = "P";
+                                            } elseif ($current_date_number == 31) {
+                                                $monthly_attendance->day_thirty_one = "P";
+                                            } else {
+                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                            }
+
+                                            $monthly_attendance->save();
+                                        }
+                                    } else {
+
+                                        $monthly_attendance = new MonthlyAttendance();
+                                        $monthly_attendance->monthly_com_id = Auth::user()->com_id;
+                                        $monthly_attendance->monthly_employee_id = $request->employee_id;
+                                        $monthly_attendance->attendance_month = $current_date;
+                                        $monthly_attendance->attendance_year = $current_date;
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->save();
+                                    }
+                                }
+                                ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
+
+                                return back()->with('message', 'Attendance Submitted Successfully ');
+                            }
+                        } else {
+
+
+                            if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
+                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_in_attempt']);
+                                foreach ($attempt_counts as $attempt_counts_value) {
+                                    $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
+                                    $attendance_location->attendance_location_com_id = Auth::user()->com_id;
+                                    $attendance_location->attendance_location_employee_id = $request->employee_id;
+                                    $attendance_location->attendance_location_date = $current_date;
+                                    $attendance_location->attendance_location_check_in_latitude = $request->lat;
+                                    $attendance_location->attendance_location_check_in_longitude = $request->longt;
+                                    $attendance_location->attendance_location_check_in_attempt = $attempt_counts_value->attendance_location_check_in_attempt + 1;
+                                    // $attempt_counts_value->browser = $browser;
+                                    $attendance_location->save();
+                                }
+                            } else {
+                                $attendance_location = new AttendanceLocation();
+                                $attendance_location->attendance_location_com_id = Auth::user()->com_id;
+                                $attendance_location->attendance_location_employee_id = $request->employee_id;
+                                $attendance_location->attendance_location_date = $current_date;
+                                $attendance_location->attendance_location_check_in_latitude = $request->lat;
+                                $attendance_location->attendance_location_check_in_longitude = $request->longt;
+                                $attendance_location->attendance_location_check_in_attempt = 1;
+                                // $attendance_location->browser = $browser;
+                                $attendance_location->save();
+                            }
+
+                            return back()->with('message', 'Your Checkin Location not Matched!!!!');
+                        }
+                    }
+                }
+            // } else {
+
+            //     return back()->with('message', 'Your Browser Or Device not Supported Geolocaton Mohim');
+            // }
+            ////////// Attandance check-in code Ends...
+
+        } else {
+
+            ////////// Attandance checkout code Starts...
+
+            dd('Mohim1');
+            if ($request->lat && $request->longt) {
+
+
+                $users = User::where('id', $request->employee_id)->get();
+
+                $latitude = $request->lat;
+                $longitude = $request->longt;
+                $employee_id = $request->employee_id;
+
+                foreach ($users as $usersValue) {
+
+                    if ($usersValue->check_out_latitude == '' || $usersValue->check_out_longitude == '' || $usersValue->check_out_latitude == NULL || $usersValue->check_out_longitude == NULL || $usersValue->check_out_latitude === 'No' || $usersValue->check_out_longitude === 'No') {
+
+                        $user = User::find($request->employee_id);
+                        $user->check_out_ip = $local_server_ip;
+                        $user->check_out_latitude = $request->lat;
+                        $user->check_out_longitude = $request->longt;
+                        $user->save();
+
+                        $attendance_employee_id = Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->get();
+
+
+                        foreach ($attendance_employee_id as $attendance_employee_id_value) {
+
+                            $attendance = Attendance::find($attendance_employee_id_value->id);
+                            $attendance->clock_out = $current_time;
+                            $attendance->check_out_latitude = $request->lat;
+                            $attendance->check_out_longitude = $request->longt;
+                            $attendance->check_out_ip = $local_server_ip;
+                            if (date_create($current_time) >= date_create($payable_over_time_hour)) {
+                                if ($shift_in != 0 && $shift_out != 0) {
+                                    $attendance->overtime = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
+
+                                    $todays_over_time = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
+                                    if (Auth::user()->over_time_payable == 'Yes' && Auth::user()->user_over_time_type == 'Automatic') {
+
+                                        if (OverTime::where('over_time_employee_id', $request->employee_id)->where('over_time_date', $current_date)->exists()) {
+
+                                            $over_times = OverTime::where('over_time_employee_id', $request->employee_id)->where('over_time_date', $current_date)->get('id');
+
+                                            foreach ($over_times as $over_times_value) {
+
+                                                $over_time = OverTime::find($over_times_value->id);
+                                                $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
+                                                $over_time->save();
+                                            }
+                                        } else {
+
+                                            $over_time = new OverTime();
+                                            $over_time->over_time_com_id = Auth::user()->com_id;
+                                            $over_time->over_time_employee_id = Auth::user()->id;
+                                            $over_time->over_time_type = "Automatic";
+                                            $over_time->over_time_date = $current_date;
+                                            $over_time->customize_over_time_month = $attendance_month;
+                                            $over_time->customize_over_time_year = $attendance_year;
+                                            $over_time->over_time_company_duty_in_seconds = $diff_shift_seconds_for_the_day;
+                                            $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
+                                            $over_time->over_time_rate = Auth::user()->user_over_time_rate;
+                                            $over_time->save();
+                                        }
+                                    }
+                                }
+                            }
+                            if (date_create($current_time) <= date_create($shift_out)) {
+                                if ($shift_in != 0 && $shift_out != 0) {
+                                    $attendance->early_leaving = date_create($current_time)->diff(date_create($shift_out))->format('%H:%i:%s');
+                                }
+                            }
+                            $attendance->check_in_out = 1;
+                            // $attendance->browser = $browser;
+                            $attendance->save();
+
+                            ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
+                            $permission = "3.28";
+                            if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
+
+                                $year = date('Y');
+
+                                $month =  date('m');
+                                $day =  date('d');
+
+                                $currentDate = Carbon::now();  // Get the current date and time
+                                $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+
+                                $previousYear =  $previousMonth->format('Y');
+
+                                $previousMonth = $previousMonth->format('m');
+
+                                $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
+
+                                if ($month == "01") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $previousYear;
+                                        $attendance_month = "12";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "01";
+                                    }
+                                } elseif ($month == "02") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
+
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $previousYear;
+                                        $attendance_month = "01";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "02";
+                                    }
+                                } elseif ($month == "03") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $previousYear;
+                                        $attendance_month = "02";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "03";
+                                    }
+                                } elseif ($month == "04") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "03";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "04";
+                                    }
+                                } elseif ($month == "05") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "04";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "05";
+                                    }
+                                } elseif ($month == "06") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "05";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "06";
+                                    }
+                                } elseif ($month == "07") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "06";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "07";
+                                    }
+                                } elseif ($month == "08") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "07";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "08";
+                                    }
+                                } elseif ($month == "09") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "08";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "09";
+                                    }
+                                } elseif ($month == "10") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "09";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "10";
+                                    }
+                                } elseif ($month == "11") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "10";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "11";
+                                    }
+                                } elseif ($month == "12") {
+                                    $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+                                    if ($customize_date->end_date >= $day) {
+                                        $attendance_year = $year;
+                                        $attendance_month = "11";
+                                    } else {
+                                        $attendance_year = $year;
+                                        $attendance_month = "12";
+                                    }
+                                }
+
+
+                                if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
+
+                                    $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
+
+                                    foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                        $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->save();
+                                    }
+                                } else {
+                                    // return "ok";
+                                    $monthly_attendance = new CustomizeMonthlyAttendance();
+                                    $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
+                                    $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
+                                    $monthly_attendance->attendance_month = $attendance_month;
+                                    $monthly_attendance->attendance_year = $attendance_year;
+                                    if ($current_date_number == 1) {
+                                        $monthly_attendance->day_one = "P";
+                                    } elseif ($current_date_number == 2) {
+                                        $monthly_attendance->day_two = "P";
+                                    } elseif ($current_date_number == 3) {
+                                        $monthly_attendance->day_three = "P";
+                                    } elseif ($current_date_number == 4) {
+                                        $monthly_attendance->day_four = "P";
+                                    } elseif ($current_date_number == 5) {
+                                        $monthly_attendance->day_five = "P";
+                                    } elseif ($current_date_number == 6) {
+                                        $monthly_attendance->day_six = "P";
+                                    } elseif ($current_date_number == 7) {
+                                        $monthly_attendance->day_seven = "P";
+                                    } elseif ($current_date_number == 8) {
+                                        $monthly_attendance->day_eight = "P";
+                                    } elseif ($current_date_number == 9) {
+                                        $monthly_attendance->day_nine = "P";
+                                    } elseif ($current_date_number == 10) {
+                                        $monthly_attendance->day_ten = "P";
+                                    } elseif ($current_date_number == 11) {
+                                        $monthly_attendance->day_eleven = "P";
+                                    } elseif ($current_date_number == 12) {
+                                        $monthly_attendance->day_twelve = "P";
+                                    } elseif ($current_date_number == 13) {
+                                        $monthly_attendance->day_thirteen = "P";
+                                    } elseif ($current_date_number == 14) {
+                                        $monthly_attendance->day_fourteen = "P";
+                                    } elseif ($current_date_number == 15) {
+                                        $monthly_attendance->day_fifteen = "P";
+                                    } elseif ($current_date_number == 16) {
+                                        $monthly_attendance->day_sixteen = "P";
+                                    } elseif ($current_date_number == 17) {
+                                        $monthly_attendance->day_seventeen = "P";
+                                    } elseif ($current_date_number == 18) {
+                                        $monthly_attendance->day_eighteen = "P";
+                                    } elseif ($current_date_number == 19) {
+                                        $monthly_attendance->day_nineteen = "P";
+                                    } elseif ($current_date_number == 20) {
+                                        $monthly_attendance->day_twenty = "P";
+                                    } elseif ($current_date_number == 21) {
+                                        $monthly_attendance->day_twenty_one = "P";
+                                    } elseif ($current_date_number == 22) {
+                                        $monthly_attendance->day_twenty_two = "P";
+                                    } elseif ($current_date_number == 23) {
+                                        $monthly_attendance->day_twenty_three = "P";
+                                    } elseif ($current_date_number == 24) {
+                                        $monthly_attendance->day_twenty_four = "P";
+                                    } elseif ($current_date_number == 25) {
+                                        $monthly_attendance->day_twenty_five = "P";
+                                    } elseif ($current_date_number == 26) {
+                                        $monthly_attendance->day_twenty_six = "P";
+                                    } elseif ($current_date_number == 27) {
+                                        $monthly_attendance->day_twenty_seven = "P";
+                                    } elseif ($current_date_number == 28) {
+                                        $monthly_attendance->day_twenty_eight = "P";
+                                    } elseif ($current_date_number == 29) {
+                                        $monthly_attendance->day_twenty_nine = "P";
+                                    } elseif ($current_date_number == 30) {
+                                        $monthly_attendance->day_thirty = "P";
+                                    } elseif ($current_date_number == 31) {
+                                        $monthly_attendance->day_thirty_one = "P";
+                                    } else {
+                                        return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                    }
+
+                                    $monthly_attendance->day_one = "P";
+
+                                    $monthly_attendance->save();
+                                }
+                            } else {
                                 if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
 
                                     $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
@@ -4802,6 +3903,748 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
                                     $monthly_attendance->save();
                                 }
                             }
+                            ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
+
+                            return back()->with('message', 'Attendance Checkout Done Successfully');
+                        }
+                    } else {
+
+
+                        $added_chackout_lat = $usersValue->check_out_latitude + .1;
+                        $deducted_checkout_lat = $usersValue->check_out_latitude - .1;
+                        $added_checkout_longi = $usersValue->check_out_longitude + .1;
+                        $deducted_checkout_longi = $usersValue->check_out_longitude - .1;
+
+                        $added_chackout_lat = $usersValue->check_out_latitude + 0.0002;
+                        $deducted_checkout_lat = $usersValue->check_out_latitude - 0.0002;
+                        $added_checkout_longi = $usersValue->check_out_longitude + 0.0002;
+                        $deducted_checkout_longi = $usersValue->check_out_longitude - 0.0002;
+
+                        $added_chackout_lat = $usersValue->check_out_latitude + 0.0112609293;
+                        $deducted_checkout_lat = $usersValue->check_out_latitude - 0.0112609293;
+                        $added_checkout_longi = $usersValue->check_out_longitude + 0.0112459999;
+                        $deducted_checkout_longi = $usersValue->check_out_longitude - 0.0112459999;
+
+                        ######################################################## Code for checkout existance starts ##############################################################################
+
+                        $requested_check_out_lat = number_format($request->lat, 2, '.', '');
+
+                        $first_check_out_lat = number_format($usersValue->check_out_latitude, 2, '.', '');
+
+                        if ($first_check_out_lat == $requested_check_out_lat) {
+                            //skip
+                        } else {
+
+                            if ($usersValue->check_out_latitude != "" || $usersValue->check_out_latitude != NULL) {
+                                //skip
+                            } else {
+                                $user = User::find($request->employee_id);
+                                $user->check_out_latitude = $request->lat;
+                                $user->check_out_longitude = $request->longt;
+                                $user->save();
+                            }
+                        }
+
+                        ########################################################### Code for checkout existance ends ###########################################################################
+
+                        ############################################ Multiple checkout latitudes and longitudes code starts from here ###############################
+
+                        /////////////////////// checkin latitude portion starts/////////////////////////
+                        $requested_check_out_latitude = number_format($request->lat, 2, '.', '');
+                        if ($usersValue->check_out_latitude == "" || $usersValue->check_out_latitude == NULL) {
+                            $first_check_out_latitude = 0.00;
+                        } else {
+                            $first_check_out_latitude = number_format($usersValue->check_out_latitude, 2, '.', '');
+                        }
+                        //echo "ok"; exit;
+                        if ($first_check_out_latitude == $requested_check_out_latitude) {
+                            //echo "first checkout latitude matched";
+                            $added_chackout_lat = $usersValue->check_out_latitude + 0.0003;
+                            $deducted_checkout_lat = $usersValue->check_out_latitude - 0.0003;
+                        } elseif ($usersValue->multi_attendance == 1) {
+                            $attendance_employee_id = Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->get();
+
+                            foreach ($attendance_employee_id as $attendance_employee_id_value) {
+                                $attendance = Attendance::find($attendance_employee_id_value->id);
+                                $attendance->clock_out = $current_time;
+                                $attendance->customize_attendance_month = $attendance_month;
+                                $attendance->customize_attendance_year = $attendance_year;
+                                $attendance->check_out_latitude = $request->lat;
+                                $attendance->check_out_longitude = $request->longt;
+                                $attendance->check_out_ip = $local_server_ip;
+                                if (date_create($current_time) >= date_create($payable_over_time_hour)) {
+                                    if ($shift_in != 0 && $shift_out != 0) {
+                                        $attendance->overtime = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
+
+                                        $todays_over_time = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
+                                        if ($request->over_time_payable == 'Yes' && $request->user_over_time_type == 'Automatic') {
+                                            $over_time = new OverTime();
+                                            $over_time->over_time_com_id = $request->com_id;
+                                            $over_time->over_time_employee_id = $request->employee_id;
+                                            $over_time->over_time_type = "Automatic";
+                                            $over_time->over_time_date = $current_date;
+                                            $over_time->customize_over_time_month = $attendance_month;
+                                            $over_time->customize_over_time_year = $attendance_year;
+                                            $over_time->over_time_company_duty_in_seconds = $diff_shift_seconds_for_the_day;
+                                            $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
+                                            //$over_time->over_time_rate = $request->user_over_time_rate;
+                                            $over_time->over_time_rate = Auth::user()->user_over_time_rate;
+                                            $over_time->save();
+                                        }
+                                    }
+                                }
+                                if (date_create($current_time) <= date_create($shift_out)) {
+                                    if ($shift_in != 0 && $shift_out != 0) {
+                                        $attendance->early_leaving = date_create($current_time)->diff(date_create($shift_out))->format('%H:%i:%s');
+                                    }
+                                }
+                                $attendance->check_in_out = 1;
+                                $attendance->save();
+                                return back()->with('message', 'Attendance Checkout Done Successfully');
+                            }
+                        } else {
+                            //echo "ok"; exit;
+
+                            if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
+                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_out_attempt']);
+                                foreach ($attempt_counts as $attempt_counts_value) {
+                                    $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
+                                    $attendance_location->attendance_location_com_id = Auth::user()->com_id;
+                                    $attendance_location->attendance_location_employee_id = $request->employee_id;
+                                    $attendance_location->attendance_location_date = $current_date;
+                                    $attendance_location->attendance_location_check_out_latitude = $request->lat;
+                                    $attendance_location->attendance_location_check_out_longitude = $request->longt;
+                                    $attendance_location->attendance_location_check_out_attempt = $attempt_counts_value->attendance_location_check_out_attempt + 1;
+                                    $attendance_location->save();
+                                }
+                            } else {
+                                $attendance_location = new AttendanceLocation();
+                                $attendance_location->attendance_location_com_id = Auth::user()->com_id;
+                                $attendance_location->attendance_location_employee_id = $request->employee_id;
+                                $attendance_location->attendance_location_date = $current_date;
+                                $attendance_location->attendance_location_check_out_latitude = $request->lat;
+                                $attendance_location->attendance_location_check_out_longitude = $request->longt;
+                                $attendance_location->attendance_location_check_out_attempt = 1;
+                                $attendance_location->save();
+                            }
+
+                            return back()->with('message', 'Checkout Latitude Not Matched!!! Please try again after some time.');
+                            //echo "checkout latitude not matched";
+                        }
+                        /////////////////////// checkout latitude portion ends/////////////////////////
+                        /////////////////////// checkout longitude portion starts/////////////////////////
+
+                        $requested_check_out_longitude = number_format($request->longt, 2, '.', '');
+
+                        if ($usersValue->check_out_longitude == "" || $usersValue->check_out_longitude == NULL) {
+                            $first_check_out_longitude = 0.00;
+                        } else {
+                            $first_check_out_longitude = number_format($usersValue->check_out_longitude, 2, '.', '');
+                        }
+
+                        if ($usersValue->check_out_longitude_two == "" || $usersValue->check_out_longitude_two == NULL) {
+                            $second_check_out_longitude = 0.00;
+                        } else {
+                            $second_check_out_longitude = number_format($usersValue->check_out_longitude_two, 2, '.', '');
+                        }
+
+                        if ($usersValue->check_out_longitude_three == "" || $usersValue->check_out_longitude_three == NULL) {
+                            $third_check_out_longitude = 0.00;
+                        } else {
+                            $third_check_out_longitude = number_format($usersValue->check_out_longitude_three, 2, '.', '');
+                        }
+                        if ($usersValue->check_out_longitude_four == "" || $usersValue->check_out_longitude_four == NULL) {
+                            $fourth_check_out_longitude = 0.00;
+                        } else {
+                            $fourth_check_out_longitude = number_format($usersValue->check_out_longitude_four, 2, '.', '');
+                        }
+                        if ($usersValue->check_out_longitude_five == "" || $usersValue->check_out_longitude_five == NULL) {
+                            $fifth_check_out_longitude = 0.00;
+                        } else {
+                            $fifth_check_out_longitude = number_format($usersValue->check_out_longitude_five, 2, '.', '');
+                        }
+                        if ($usersValue->check_out_longitude_six == "" || $usersValue->check_out_longitude_six == NULL) {
+                            $sixth_check_out_longitude = 0.00;
+                        } else {
+                            $sixth_check_out_longitude = number_format($usersValue->check_out_longitude_six, 2, '.', '');
+                        }
+                        if ($usersValue->check_out_longitude_seven == "" || $usersValue->check_out_longitude_seven == NULL) {
+                            $seventh_check_out_longitude = 0.00;
+                        } else {
+                            $seventh_check_out_longitude = number_format($usersValue->check_out_longitude_seven, 2, '.', '');
+                        }
+
+                        if ($first_check_out_longitude == $requested_check_out_longitude) {
+                            //echo "ok"; exit;
+                            $added_checkout_longi = $usersValue->check_out_longitude + 0.0003;
+                            $deducted_checkout_longi = $usersValue->check_out_longitude - 0.0003;
+                        } elseif ($usersValue->multi_attendance == 1) {
+                            $attendance_employee_id = Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->get();
+
+                            foreach ($attendance_employee_id as $attendance_employee_id_value) {
+                                $attendance = Attendance::find($attendance_employee_id_value->id);
+                                $attendance->clock_out = $current_time;
+                                $attendance->customize_attendance_month = $attendance_month;
+                                $attendance->customize_attendance_year = $attendance_year;
+                                $attendance->check_out_latitude = $request->lat;
+                                $attendance->check_out_longitude = $request->longt;
+                                $attendance->check_out_ip = $local_server_ip;
+                                if (date_create($current_time) >= date_create($payable_over_time_hour)) {
+                                    if ($shift_in != 0 && $shift_out != 0) {
+                                        $attendance->overtime = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
+
+                                        $todays_over_time = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
+                                        if ($request->over_time_payable == 'Yes' && $request->user_over_time_type == 'Automatic') {
+                                            $over_time = new OverTime();
+                                            $over_time->over_time_com_id = $request->com_id;
+                                            $over_time->over_time_employee_id = $request->employee_id;
+                                            $over_time->over_time_type = "Automatic";
+                                            $over_time->over_time_date = $current_date;
+                                            $over_time->customize_over_time_month = $attendance_month;
+                                            $over_time->customize_over_time_year = $attendance_year;
+                                            $over_time->over_time_company_duty_in_seconds = $diff_shift_seconds_for_the_day;
+                                            $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
+                                            //$over_time->over_time_rate = $request->user_over_time_rate;
+                                            $over_time->over_time_rate = Auth::user()->user_over_time_rate;
+                                            $over_time->save();
+                                        }
+                                    }
+                                }
+                                if (date_create($current_time) <= date_create($shift_out)) {
+                                    if ($shift_in != 0 && $shift_out != 0) {
+                                        $attendance->early_leaving = date_create($current_time)->diff(date_create($shift_out))->format('%H:%i:%s');
+                                    }
+                                }
+                                $attendance->check_in_out = 1;
+                                $attendance->save();
+                            }
+                        } else {
+
+                            //echo "ok"; exit;
+
+                            if (AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->exists()) {
+                                $attempt_counts = AttendanceLocation::where('attendance_location_employee_id', $request->employee_id)->where('attendance_location_date', '=', $current_date)->get(['id', 'attendance_location_check_out_attempt']);
+                                foreach ($attempt_counts as $attempt_counts_value) {
+                                    $attendance_location = AttendanceLocation::find($attempt_counts_value->id);
+                                    $attendance_location->attendance_location_com_id = Auth::user()->com_id;
+                                    $attendance_location->attendance_location_employee_id = $request->employee_id;
+                                    $attendance_location->attendance_location_date = $current_date;
+                                    $attendance_location->attendance_location_check_out_latitude = $request->lat;
+                                    $attendance_location->attendance_location_check_out_longitude = $request->longt;
+                                    $attendance_location->attendance_location_check_out_attempt = $attempt_counts_value->attendance_location_check_out_attempt + 1;
+                                    $attendance_location->save();
+                                }
+                            } else {
+                                $attendance_location = new AttendanceLocation();
+                                $attendance_location->attendance_location_com_id = Auth::user()->com_id;
+                                $attendance_location->attendance_location_employee_id = $request->employee_id;
+                                $attendance_location->attendance_location_date = $current_date;
+                                $attendance_location->attendance_location_check_out_latitude = $request->lat;
+                                $attendance_location->attendance_location_check_out_longitude = $request->longt;
+                                $attendance_location->attendance_location_check_out_attempt = 1;
+                                $attendance_location->save();
+                            }
+
+                            return back()->with('message', 'Checkout Longitude Not Matched!!! Please try again after some time.');
+                            //echo "checkout longitude location not matched";
+                        }
+                        /////////////////////// checkout longitude portion ends/////////////////////////
+                        ############################################ Multiple checkout latitudes and longitudes code starts from here ###############################
+
+                        if (($added_chackout_lat >= $request->lat && $deducted_checkout_lat <= $request->lat) || ($added_checkout_longi >= $request->longt && $deducted_checkout_longi <= $request->longt)) {
+
+
+                            $attendance_employee_id = Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->get();
+
+
+                            foreach ($attendance_employee_id as $attendance_employee_id_value) {
+
+                                // if($attendance_employee_id_value->check_in_out === 1){
+
+                                //     return back()->with('message','Already Checked Out For Today!!! Please Contact With The System Administrator!!!');
+
+                                // }else{
+
+                                $attendance = Attendance::find($attendance_employee_id_value->id);
+                                $attendance->clock_out = $current_time;
+                                $attendance->check_out_latitude = $request->lat;
+                                $attendance->check_out_longitude = $request->longt;
+                                $attendance->check_out_ip = $local_server_ip;
+                                if (date_create($current_time) >= date_create($payable_over_time_hour)) {
+                                    if ($shift_in != 0 && $shift_out != 0) {
+                                        $attendance->overtime = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
+
+                                        $todays_over_time = date_create($shift_out)->diff(date_create($current_time))->format('%H:%i:%s');
+                                        if (Auth::user()->over_time_payable == 'Yes' && Auth::user()->user_over_time_type == 'Automatic') {
+
+                                            if (OverTime::where('over_time_employee_id', $request->employee_id)->where('over_time_date', $current_date)->exists()) {
+
+                                                $over_times = OverTime::where('over_time_employee_id', $request->employee_id)->where('over_time_date', $current_date)->get('id');
+
+                                                foreach ($over_times as $over_times_value) {
+
+                                                    $over_time = OverTime::find($over_times_value->id);
+                                                    $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
+                                                    $over_time->save();
+                                                }
+                                            } else {
+
+                                                $over_time = new OverTime();
+                                                $over_time->over_time_com_id = Auth::user()->com_id;
+                                                $over_time->over_time_employee_id = Auth::user()->id;
+                                                $over_time->over_time_type = "Automatic";
+                                                $over_time->over_time_date = $current_date;
+                                                $over_time->customize_over_time_month = $attendance_month;
+                                                $over_time->customize_over_time_year = $attendance_year;
+                                                $over_time->over_time_company_duty_in_seconds = $diff_shift_seconds_for_the_day;
+                                                $over_time->over_time_employee_in_seconds = strtotime($todays_over_time) - strtotime('TODAY');
+                                                $over_time->over_time_rate = Auth::user()->user_over_time_rate;
+                                                $over_time->save();
+                                            }
+                                        }
+                                    }
+                                }
+                                if (date_create($current_time) <= date_create($shift_out)) {
+                                    if ($shift_in != 0 && $shift_out != 0) {
+                                        $attendance->early_leaving = date_create($current_time)->diff(date_create($shift_out))->format('%H:%i:%s');
+                                    }
+                                }
+                                $attendance->total_work = date_create($attendance->clock_in)->diff(date_create($attendance->clock_out))->format('%H:%i:%s');
+                                $attendance->check_in_out = 1;
+                                $attendance->save();
+                                $permission = "3.28";
+                                if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
+
+                                    $year = date('Y');
+
+                                    $month =  date('m');
+                                    $day =  date('d');
+
+                                    $currentDate = Carbon::now();  // Get the current date and time
+                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+
+                                    $previousYear =  $previousMonth->format('Y');
+
+                                    $previousMonth = $previousMonth->format('m');
+
+                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
+
+                                    if ($month == "01") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "12";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "01";
+                                        }
+                                    } elseif ($month == "02") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
+
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "01";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "02";
+                                        }
+                                    } elseif ($month == "03") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "02";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "03";
+                                        }
+                                    } elseif ($month == "04") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "03";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "04";
+                                        }
+                                    } elseif ($month == "05") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "04";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "05";
+                                        }
+                                    } elseif ($month == "06") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "05";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "06";
+                                        }
+                                    } elseif ($month == "07") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "06";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "07";
+                                        }
+                                    } elseif ($month == "08") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "07";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "08";
+                                        }
+                                    } elseif ($month == "09") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "08";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "09";
+                                        }
+                                    } elseif ($month == "10") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "09";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "10";
+                                        }
+                                    } elseif ($month == "11") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "10";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "11";
+                                        }
+                                    } elseif ($month == "12") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "11";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "12";
+                                        }
+                                    }
+
+
+                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
+
+                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
+
+                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                            if ($current_date_number == 1) {
+                                                $monthly_attendance->day_one = "P";
+                                            } elseif ($current_date_number == 2) {
+                                                $monthly_attendance->day_two = "P";
+                                            } elseif ($current_date_number == 3) {
+                                                $monthly_attendance->day_three = "P";
+                                            } elseif ($current_date_number == 4) {
+                                                $monthly_attendance->day_four = "P";
+                                            } elseif ($current_date_number == 5) {
+                                                $monthly_attendance->day_five = "P";
+                                            } elseif ($current_date_number == 6) {
+                                                $monthly_attendance->day_six = "P";
+                                            } elseif ($current_date_number == 7) {
+                                                $monthly_attendance->day_seven = "P";
+                                            } elseif ($current_date_number == 8) {
+                                                $monthly_attendance->day_eight = "P";
+                                            } elseif ($current_date_number == 9) {
+                                                $monthly_attendance->day_nine = "P";
+                                            } elseif ($current_date_number == 10) {
+                                                $monthly_attendance->day_ten = "P";
+                                            } elseif ($current_date_number == 11) {
+                                                $monthly_attendance->day_eleven = "P";
+                                            } elseif ($current_date_number == 12) {
+                                                $monthly_attendance->day_twelve = "P";
+                                            } elseif ($current_date_number == 13) {
+                                                $monthly_attendance->day_thirteen = "P";
+                                            } elseif ($current_date_number == 14) {
+                                                $monthly_attendance->day_fourteen = "P";
+                                            } elseif ($current_date_number == 15) {
+                                                $monthly_attendance->day_fifteen = "P";
+                                            } elseif ($current_date_number == 16) {
+                                                $monthly_attendance->day_sixteen = "P";
+                                            } elseif ($current_date_number == 17) {
+                                                $monthly_attendance->day_seventeen = "P";
+                                            } elseif ($current_date_number == 18) {
+                                                $monthly_attendance->day_eighteen = "P";
+                                            } elseif ($current_date_number == 19) {
+                                                $monthly_attendance->day_nineteen = "P";
+                                            } elseif ($current_date_number == 20) {
+                                                $monthly_attendance->day_twenty = "P";
+                                            } elseif ($current_date_number == 21) {
+                                                $monthly_attendance->day_twenty_one = "P";
+                                            } elseif ($current_date_number == 22) {
+                                                $monthly_attendance->day_twenty_two = "P";
+                                            } elseif ($current_date_number == 23) {
+                                                $monthly_attendance->day_twenty_three = "P";
+                                            } elseif ($current_date_number == 24) {
+                                                $monthly_attendance->day_twenty_four = "P";
+                                            } elseif ($current_date_number == 25) {
+                                                $monthly_attendance->day_twenty_five = "P";
+                                            } elseif ($current_date_number == 26) {
+                                                $monthly_attendance->day_twenty_six = "P";
+                                            } elseif ($current_date_number == 27) {
+                                                $monthly_attendance->day_twenty_seven = "P";
+                                            } elseif ($current_date_number == 28) {
+                                                $monthly_attendance->day_twenty_eight = "P";
+                                            } elseif ($current_date_number == 29) {
+                                                $monthly_attendance->day_twenty_nine = "P";
+                                            } elseif ($current_date_number == 30) {
+                                                $monthly_attendance->day_thirty = "P";
+                                            } elseif ($current_date_number == 31) {
+                                                $monthly_attendance->day_thirty_one = "P";
+                                            } else {
+                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                            }
+
+                                            $monthly_attendance->save();
+                                        }
+                                    } else {
+                                        // return "ok";
+                                        $monthly_attendance = new CustomizeMonthlyAttendance();
+                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
+                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
+                                        $monthly_attendance->attendance_month = $attendance_month;
+                                        $monthly_attendance->attendance_year = $attendance_year;
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->day_one = "P";
+
+                                        $monthly_attendance->save();
+                                    }
+                                } else {
+                                    if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
+
+                                        $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
+
+                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                            $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                            if ($current_date_number == 1) {
+                                                $monthly_attendance->day_one = "P";
+                                            } elseif ($current_date_number == 2) {
+                                                $monthly_attendance->day_two = "P";
+                                            } elseif ($current_date_number == 3) {
+                                                $monthly_attendance->day_three = "P";
+                                            } elseif ($current_date_number == 4) {
+                                                $monthly_attendance->day_four = "P";
+                                            } elseif ($current_date_number == 5) {
+                                                $monthly_attendance->day_five = "P";
+                                            } elseif ($current_date_number == 6) {
+                                                $monthly_attendance->day_six = "P";
+                                            } elseif ($current_date_number == 7) {
+                                                $monthly_attendance->day_seven = "P";
+                                            } elseif ($current_date_number == 8) {
+                                                $monthly_attendance->day_eight = "P";
+                                            } elseif ($current_date_number == 9) {
+                                                $monthly_attendance->day_nine = "P";
+                                            } elseif ($current_date_number == 10) {
+                                                $monthly_attendance->day_ten = "P";
+                                            } elseif ($current_date_number == 11) {
+                                                $monthly_attendance->day_eleven = "P";
+                                            } elseif ($current_date_number == 12) {
+                                                $monthly_attendance->day_twelve = "P";
+                                            } elseif ($current_date_number == 13) {
+                                                $monthly_attendance->day_thirteen = "P";
+                                            } elseif ($current_date_number == 14) {
+                                                $monthly_attendance->day_fourteen = "P";
+                                            } elseif ($current_date_number == 15) {
+                                                $monthly_attendance->day_fifteen = "P";
+                                            } elseif ($current_date_number == 16) {
+                                                $monthly_attendance->day_sixteen = "P";
+                                            } elseif ($current_date_number == 17) {
+                                                $monthly_attendance->day_seventeen = "P";
+                                            } elseif ($current_date_number == 18) {
+                                                $monthly_attendance->day_eighteen = "P";
+                                            } elseif ($current_date_number == 19) {
+                                                $monthly_attendance->day_nineteen = "P";
+                                            } elseif ($current_date_number == 20) {
+                                                $monthly_attendance->day_twenty = "P";
+                                            } elseif ($current_date_number == 21) {
+                                                $monthly_attendance->day_twenty_one = "P";
+                                            } elseif ($current_date_number == 22) {
+                                                $monthly_attendance->day_twenty_two = "P";
+                                            } elseif ($current_date_number == 23) {
+                                                $monthly_attendance->day_twenty_three = "P";
+                                            } elseif ($current_date_number == 24) {
+                                                $monthly_attendance->day_twenty_four = "P";
+                                            } elseif ($current_date_number == 25) {
+                                                $monthly_attendance->day_twenty_five = "P";
+                                            } elseif ($current_date_number == 26) {
+                                                $monthly_attendance->day_twenty_six = "P";
+                                            } elseif ($current_date_number == 27) {
+                                                $monthly_attendance->day_twenty_seven = "P";
+                                            } elseif ($current_date_number == 28) {
+                                                $monthly_attendance->day_twenty_eight = "P";
+                                            } elseif ($current_date_number == 29) {
+                                                $monthly_attendance->day_twenty_nine = "P";
+                                            } elseif ($current_date_number == 30) {
+                                                $monthly_attendance->day_thirty = "P";
+                                            } elseif ($current_date_number == 31) {
+                                                $monthly_attendance->day_thirty_one = "P";
+                                            } else {
+                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                            }
+
+                                            $monthly_attendance->save();
+                                        }
+                                    } else {
+
+                                        $monthly_attendance = new MonthlyAttendance();
+                                        $monthly_attendance->monthly_com_id = Auth::user()->com_id;
+                                        $monthly_attendance->monthly_employee_id = $request->employee_id;
+                                        $monthly_attendance->attendance_month = $current_date;
+                                        $monthly_attendance->attendance_year = $current_date;
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->save();
+                                    }
+                                }
                                 return back()->with('message', 'Attendance Checkout Done Successfully');
 
                                 //}
@@ -5117,796 +4960,142 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
 
                         ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
 
-                                $permission = "3.28";
-                                if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
-
-                                                            $year = date('Y');
-
-                                                            $month =  date('m');
-                                                            $day =  date('d');
-
-                                                            $currentDate = Carbon::now();  // Get the current date and time
-                                                            $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
-
-                                                            $previousYear =  $previousMonth->format('Y');
-
-                                                            $previousMonth = $previousMonth->format('m');
-
-                                                            $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
-
-                                                            if ($month == "1") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $previousYear;
-                                                                    $attendance_month = "12";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "1";
-                                                                }
-                                                            } elseif ($month == "2") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
-
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $previousYear;
-                                                                    $attendance_month = "1";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "2";
-                                                                }
-                                                            } elseif ($month == "3") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $previousYear;
-                                                                    $attendance_month = "2";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "3";
-                                                                }
-                                                            } elseif ($month == "4") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "3";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "4";
-                                                                }
-                                                            } elseif ($month == "5") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "4";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "5";
-                                                                }
-                                                            } elseif ($month == "6") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "5";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "6";
-                                                                }
-                                                            } elseif ($month == "7") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "6";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "7";
-                                                                }
-                                                            } elseif ($month == "8") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "7";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "8";
-                                                                }
-                                                            } elseif ($month == "9") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "8";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "9";
-                                                                }
-                                                            } elseif ($month == "10") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "9";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "10";
-                                                                }
-                                                            } elseif ($month == "11") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "10";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "11";
-                                                                }
-                                                            } elseif ($month == "12") {
-                                                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
-                                                                if ($customize_date->end_date >= $day) {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "11";
-                                                                } else {
-                                                                    $attendance_year = $year;
-                                                                    $attendance_month = "12";
-                                                                }
-                                                            }
-
-
-                                                            if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
-
-                                                                $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
-
-                                                                foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                                                    $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                                                    if ($current_date_number == 1) {
-                                                                        $monthly_attendance->day_one = "P";
-                                                                    } elseif ($current_date_number == 2) {
-                                                                        $monthly_attendance->day_two = "P";
-                                                                    } elseif ($current_date_number == 3) {
-                                                                        $monthly_attendance->day_three = "P";
-                                                                    } elseif ($current_date_number == 4) {
-                                                                        $monthly_attendance->day_four = "P";
-                                                                    } elseif ($current_date_number == 5) {
-                                                                        $monthly_attendance->day_five = "P";
-                                                                    } elseif ($current_date_number == 6) {
-                                                                        $monthly_attendance->day_six = "P";
-                                                                    } elseif ($current_date_number == 7) {
-                                                                        $monthly_attendance->day_seven = "P";
-                                                                    } elseif ($current_date_number == 8) {
-                                                                        $monthly_attendance->day_eight = "P";
-                                                                    } elseif ($current_date_number == 9) {
-                                                                        $monthly_attendance->day_nine = "P";
-                                                                    } elseif ($current_date_number == 10) {
-                                                                        $monthly_attendance->day_ten = "P";
-                                                                    } elseif ($current_date_number == 11) {
-                                                                        $monthly_attendance->day_eleven = "P";
-                                                                    } elseif ($current_date_number == 12) {
-                                                                        $monthly_attendance->day_twelve = "P";
-                                                                    } elseif ($current_date_number == 13) {
-                                                                        $monthly_attendance->day_thirteen = "P";
-                                                                    } elseif ($current_date_number == 14) {
-                                                                        $monthly_attendance->day_fourteen = "P";
-                                                                    } elseif ($current_date_number == 15) {
-                                                                        $monthly_attendance->day_fifteen = "P";
-                                                                    } elseif ($current_date_number == 16) {
-                                                                        $monthly_attendance->day_sixteen = "P";
-                                                                    } elseif ($current_date_number == 17) {
-                                                                        $monthly_attendance->day_seventeen = "P";
-                                                                    } elseif ($current_date_number == 18) {
-                                                                        $monthly_attendance->day_eighteen = "P";
-                                                                    } elseif ($current_date_number == 19) {
-                                                                        $monthly_attendance->day_nineteen = "P";
-                                                                    } elseif ($current_date_number == 20) {
-                                                                        $monthly_attendance->day_twenty = "P";
-                                                                    } elseif ($current_date_number == 21) {
-                                                                        $monthly_attendance->day_twenty_one = "P";
-                                                                    } elseif ($current_date_number == 22) {
-                                                                        $monthly_attendance->day_twenty_two = "P";
-                                                                    } elseif ($current_date_number == 23) {
-                                                                        $monthly_attendance->day_twenty_three = "P";
-                                                                    } elseif ($current_date_number == 24) {
-                                                                        $monthly_attendance->day_twenty_four = "P";
-                                                                    } elseif ($current_date_number == 25) {
-                                                                        $monthly_attendance->day_twenty_five = "P";
-                                                                    } elseif ($current_date_number == 26) {
-                                                                        $monthly_attendance->day_twenty_six = "P";
-                                                                    } elseif ($current_date_number == 27) {
-                                                                        $monthly_attendance->day_twenty_seven = "P";
-                                                                    } elseif ($current_date_number == 28) {
-                                                                        $monthly_attendance->day_twenty_eight = "P";
-                                                                    } elseif ($current_date_number == 29) {
-                                                                        $monthly_attendance->day_twenty_nine = "P";
-                                                                    } elseif ($current_date_number == 30) {
-                                                                        $monthly_attendance->day_thirty = "P";
-                                                                    } elseif ($current_date_number == 31) {
-                                                                        $monthly_attendance->day_thirty_one = "P";
-                                                                    } else {
-                                                                        return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                                    }
-
-                                                                    $monthly_attendance->save();
-                                                                }
-                                                            } else {
-                                                                // return "ok";
-                                                                $monthly_attendance = new CustomizeMonthlyAttendance();
-                                                                $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
-                                                                $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
-                                                                $monthly_attendance->attendance_month = $attendance_month;
-                                                                $monthly_attendance->attendance_year = $attendance_year;
-                                                                if ($current_date_number == 1) {
-                                                                    $monthly_attendance->day_one = "P";
-                                                                } elseif ($current_date_number == 2) {
-                                                                    $monthly_attendance->day_two = "P";
-                                                                } elseif ($current_date_number == 3) {
-                                                                    $monthly_attendance->day_three = "P";
-                                                                } elseif ($current_date_number == 4) {
-                                                                    $monthly_attendance->day_four = "P";
-                                                                } elseif ($current_date_number == 5) {
-                                                                    $monthly_attendance->day_five = "P";
-                                                                } elseif ($current_date_number == 6) {
-                                                                    $monthly_attendance->day_six = "P";
-                                                                } elseif ($current_date_number == 7) {
-                                                                    $monthly_attendance->day_seven = "P";
-                                                                } elseif ($current_date_number == 8) {
-                                                                    $monthly_attendance->day_eight = "P";
-                                                                } elseif ($current_date_number == 9) {
-                                                                    $monthly_attendance->day_nine = "P";
-                                                                } elseif ($current_date_number == 10) {
-                                                                    $monthly_attendance->day_ten = "P";
-                                                                } elseif ($current_date_number == 11) {
-                                                                    $monthly_attendance->day_eleven = "P";
-                                                                } elseif ($current_date_number == 12) {
-                                                                    $monthly_attendance->day_twelve = "P";
-                                                                } elseif ($current_date_number == 13) {
-                                                                    $monthly_attendance->day_thirteen = "P";
-                                                                } elseif ($current_date_number == 14) {
-                                                                    $monthly_attendance->day_fourteen = "P";
-                                                                } elseif ($current_date_number == 15) {
-                                                                    $monthly_attendance->day_fifteen = "P";
-                                                                } elseif ($current_date_number == 16) {
-                                                                    $monthly_attendance->day_sixteen = "P";
-                                                                } elseif ($current_date_number == 17) {
-                                                                    $monthly_attendance->day_seventeen = "P";
-                                                                } elseif ($current_date_number == 18) {
-                                                                    $monthly_attendance->day_eighteen = "P";
-                                                                } elseif ($current_date_number == 19) {
-                                                                    $monthly_attendance->day_nineteen = "P";
-                                                                } elseif ($current_date_number == 20) {
-                                                                    $monthly_attendance->day_twenty = "P";
-                                                                } elseif ($current_date_number == 21) {
-                                                                    $monthly_attendance->day_twenty_one = "P";
-                                                                } elseif ($current_date_number == 22) {
-                                                                    $monthly_attendance->day_twenty_two = "P";
-                                                                } elseif ($current_date_number == 23) {
-                                                                    $monthly_attendance->day_twenty_three = "P";
-                                                                } elseif ($current_date_number == 24) {
-                                                                    $monthly_attendance->day_twenty_four = "P";
-                                                                } elseif ($current_date_number == 25) {
-                                                                    $monthly_attendance->day_twenty_five = "P";
-                                                                } elseif ($current_date_number == 26) {
-                                                                    $monthly_attendance->day_twenty_six = "P";
-                                                                } elseif ($current_date_number == 27) {
-                                                                    $monthly_attendance->day_twenty_seven = "P";
-                                                                } elseif ($current_date_number == 28) {
-                                                                    $monthly_attendance->day_twenty_eight = "P";
-                                                                } elseif ($current_date_number == 29) {
-                                                                    $monthly_attendance->day_twenty_nine = "P";
-                                                                } elseif ($current_date_number == 30) {
-                                                                    $monthly_attendance->day_thirty = "P";
-                                                                } elseif ($current_date_number == 31) {
-                                                                    $monthly_attendance->day_thirty_one = "P";
-                                                                } else {
-                                                                    return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                                }
-
-                                                                $monthly_attendance->day_one = "P";
-
-                                                                $monthly_attendance->save();
-                                                            }
-                                                        } else {
-
-
-                        $monthly_attendance = new MonthlyAttendance();
-                        $monthly_attendance->monthly_com_id = Auth::user()->com_id;
-                        $monthly_attendance->monthly_employee_id = $request->employee_id;
-                        $monthly_attendance->attendance_month = $current_date;
-                        $monthly_attendance->attendance_year = $current_date;
-                        if ($current_date_number == 1) {
-                            $monthly_attendance->day_one = "P";
-                        } elseif ($current_date_number == 2) {
-                            $monthly_attendance->day_two = "P";
-                        } elseif ($current_date_number == 3) {
-                            $monthly_attendance->day_three = "P";
-                        } elseif ($current_date_number == 4) {
-                            $monthly_attendance->day_four = "P";
-                        } elseif ($current_date_number == 5) {
-                            $monthly_attendance->day_five = "P";
-                        } elseif ($current_date_number == 6) {
-                            $monthly_attendance->day_six = "P";
-                        } elseif ($current_date_number == 7) {
-                            $monthly_attendance->day_seven = "P";
-                        } elseif ($current_date_number == 8) {
-                            $monthly_attendance->day_eight = "P";
-                        } elseif ($current_date_number == 9) {
-                            $monthly_attendance->day_nine = "P";
-                        } elseif ($current_date_number == 10) {
-                            $monthly_attendance->day_ten = "P";
-                        } elseif ($current_date_number == 11) {
-                            $monthly_attendance->day_eleven = "P";
-                        } elseif ($current_date_number == 12) {
-                            $monthly_attendance->day_twelve = "P";
-                        } elseif ($current_date_number == 13) {
-                            $monthly_attendance->day_thirteen = "P";
-                        } elseif ($current_date_number == 14) {
-                            $monthly_attendance->day_fourteen = "P";
-                        } elseif ($current_date_number == 15) {
-                            $monthly_attendance->day_fifteen = "P";
-                        } elseif ($current_date_number == 16) {
-                            $monthly_attendance->day_sixteen = "P";
-                        } elseif ($current_date_number == 17) {
-                            $monthly_attendance->day_seventeen = "P";
-                        } elseif ($current_date_number == 18) {
-                            $monthly_attendance->day_eighteen = "P";
-                        } elseif ($current_date_number == 19) {
-                            $monthly_attendance->day_nineteen = "P";
-                        } elseif ($current_date_number == 20) {
-                            $monthly_attendance->day_twenty = "P";
-                        } elseif ($current_date_number == 21) {
-                            $monthly_attendance->day_twenty_one = "P";
-                        } elseif ($current_date_number == 22) {
-                            $monthly_attendance->day_twenty_two = "P";
-                        } elseif ($current_date_number == 23) {
-                            $monthly_attendance->day_twenty_three = "P";
-                        } elseif ($current_date_number == 24) {
-                            $monthly_attendance->day_twenty_four = "P";
-                        } elseif ($current_date_number == 25) {
-                            $monthly_attendance->day_twenty_five = "P";
-                        } elseif ($current_date_number == 26) {
-                            $monthly_attendance->day_twenty_six = "P";
-                        } elseif ($current_date_number == 27) {
-                            $monthly_attendance->day_twenty_seven = "P";
-                        } elseif ($current_date_number == 28) {
-                            $monthly_attendance->day_twenty_eight = "P";
-                        } elseif ($current_date_number == 29) {
-                            $monthly_attendance->day_twenty_nine = "P";
-                        } elseif ($current_date_number == 30) {
-                            $monthly_attendance->day_thirty = "P";
-                        } elseif ($current_date_number == 31) {
-                            $monthly_attendance->day_thirty_one = "P";
-                        } else {
-                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                        }
-
-                        $monthly_attendance->day_one = "P";
-
-                        $monthly_attendance->save();
-                        }
-                        ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
-
-                        return back()->with('message', 'Attendance Submitted Successfully');
-                    } else {
-
-                        //echo 'not ok'; exit;
-
-                        // $added_chackin_lat = $usersValue->check_in_latitude + .1;
-                        // $deducted_checkin_lat = $usersValue->check_in_latitude - .1;
-                        // $added_checkin_longi = $usersValue->check_in_longitude + .1;
-                        // $deducted_checkin_longi = $usersValue->check_in_longitude - .1;
-
-
-                        //if(($added_chackin_lat >= $request->lat && $deducted_checkin_lat <= $request->lat) || ($added_checkin_longi >= $request->longt && $deducted_checkin_longi <= $request->longt)){
-                        if (($usersValue->check_in_ip = $local_server_ip)) {
-
-                            if (Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->exists()) {
-
-                                return back()->with('message', 'Already Checked In For Today!!! Please Contact With The System Administrator!!!');
-                            } else {
-
-                                $attendance = new Attendance();
-                                $attendance->attendance_com_id = Auth::user()->com_id;
-                                $attendance->employee_id = $request->employee_id;
-                                $attendance->attendance_date = $current_date;
-                                $attendance->clock_in = $current_time;
-                                // $attendance->check_in_latitude = $request->lat;
-                                // $attendance->check_in_longitude = $request->longt;
-                                $attendance->check_in_ip = $local_server_ip;
-                                if (date_create($current_time) >= date_create($shift_in)) {
-                                    if ($shift_in != 0 && $shift_out != 0) {
-
-                                        $attendance->time_late = date_create($shift_in)->diff(date_create($current_time))->format('%H:%i:%s');
-
-                                        if ($current_time_in_seconds >= $office_late_time_config_in_seconds) {
-
-                                            if (LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->exists()) {
-
-                                                $late_times = LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->get('id');
-
-                                                foreach ($late_times as $late_times_value) {
-
-                                                    $late_time = LateTime::find($late_times_value->id);
-                                                    $late_time->late_time_com_id = Auth::user()->com_id;
-                                                    $late_time->late_time_employee_id = $request->employee_id;
-                                                    $late_time->late_time_date = $current_date;
-                                                    $late_time->save();
-                                                }
-                                            } else {
-                                                $late_time = new LateTime();
-                                                $late_time->late_time_com_id = Auth::user()->com_id;
-                                                $late_time->late_time_employee_id = $request->employee_id;
-                                                $late_time->late_time_date = $current_date;
-                                                $late_time->save();
-                                            }
-                                        }
-                                    }
-                                }
-                                //$attendance->check_in_out = 0;
-                                $attendance->check_in_out = 1;
-                                $attendance->attendance_status = "Present";
-                                $attendance->save();
-
-                                ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
                         $permission = "3.28";
                         if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
 
-                                                    $year = date('Y');
+                            $year = date('Y');
 
-                                                    $month =  date('m');
-                                                    $day =  date('d');
+                            $month =  date('m');
+                            $day =  date('d');
 
-                                                    $currentDate = Carbon::now();  // Get the current date and time
-                                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+                            $currentDate = Carbon::now();  // Get the current date and time
+                            $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
 
-                                                    $previousYear =  $previousMonth->format('Y');
+                            $previousYear =  $previousMonth->format('Y');
 
-                                                    $previousMonth = $previousMonth->format('m');
+                            $previousMonth = $previousMonth->format('m');
 
-                                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
+                            $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
 
-                                                    if ($month == "1") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "12";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "1";
-                                                        }
-                                                    } elseif ($month == "2") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
-
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "1";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "2";
-                                                        }
-                                                    } elseif ($month == "3") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "2";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "3";
-                                                        }
-                                                    } elseif ($month == "4") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "3";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "4";
-                                                        }
-                                                    } elseif ($month == "5") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "4";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "5";
-                                                        }
-                                                    } elseif ($month == "6") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "5";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "6";
-                                                        }
-                                                    } elseif ($month == "7") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "6";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "7";
-                                                        }
-                                                    } elseif ($month == "8") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "7";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "8";
-                                                        }
-                                                    } elseif ($month == "9") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "8";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "9";
-                                                        }
-                                                    } elseif ($month == "10") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "9";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        }
-                                                    } elseif ($month == "11") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        }
-                                                    } elseif ($month == "12") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "12";
-                                                        }
-                                                    }
-
-
-                                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
-
-                                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
-
-                                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                                            if ($current_date_number == 1) {
-                                                                $monthly_attendance->day_one = "P";
-                                                            } elseif ($current_date_number == 2) {
-                                                                $monthly_attendance->day_two = "P";
-                                                            } elseif ($current_date_number == 3) {
-                                                                $monthly_attendance->day_three = "P";
-                                                            } elseif ($current_date_number == 4) {
-                                                                $monthly_attendance->day_four = "P";
-                                                            } elseif ($current_date_number == 5) {
-                                                                $monthly_attendance->day_five = "P";
-                                                            } elseif ($current_date_number == 6) {
-                                                                $monthly_attendance->day_six = "P";
-                                                            } elseif ($current_date_number == 7) {
-                                                                $monthly_attendance->day_seven = "P";
-                                                            } elseif ($current_date_number == 8) {
-                                                                $monthly_attendance->day_eight = "P";
-                                                            } elseif ($current_date_number == 9) {
-                                                                $monthly_attendance->day_nine = "P";
-                                                            } elseif ($current_date_number == 10) {
-                                                                $monthly_attendance->day_ten = "P";
-                                                            } elseif ($current_date_number == 11) {
-                                                                $monthly_attendance->day_eleven = "P";
-                                                            } elseif ($current_date_number == 12) {
-                                                                $monthly_attendance->day_twelve = "P";
-                                                            } elseif ($current_date_number == 13) {
-                                                                $monthly_attendance->day_thirteen = "P";
-                                                            } elseif ($current_date_number == 14) {
-                                                                $monthly_attendance->day_fourteen = "P";
-                                                            } elseif ($current_date_number == 15) {
-                                                                $monthly_attendance->day_fifteen = "P";
-                                                            } elseif ($current_date_number == 16) {
-                                                                $monthly_attendance->day_sixteen = "P";
-                                                            } elseif ($current_date_number == 17) {
-                                                                $monthly_attendance->day_seventeen = "P";
-                                                            } elseif ($current_date_number == 18) {
-                                                                $monthly_attendance->day_eighteen = "P";
-                                                            } elseif ($current_date_number == 19) {
-                                                                $monthly_attendance->day_nineteen = "P";
-                                                            } elseif ($current_date_number == 20) {
-                                                                $monthly_attendance->day_twenty = "P";
-                                                            } elseif ($current_date_number == 21) {
-                                                                $monthly_attendance->day_twenty_one = "P";
-                                                            } elseif ($current_date_number == 22) {
-                                                                $monthly_attendance->day_twenty_two = "P";
-                                                            } elseif ($current_date_number == 23) {
-                                                                $monthly_attendance->day_twenty_three = "P";
-                                                            } elseif ($current_date_number == 24) {
-                                                                $monthly_attendance->day_twenty_four = "P";
-                                                            } elseif ($current_date_number == 25) {
-                                                                $monthly_attendance->day_twenty_five = "P";
-                                                            } elseif ($current_date_number == 26) {
-                                                                $monthly_attendance->day_twenty_six = "P";
-                                                            } elseif ($current_date_number == 27) {
-                                                                $monthly_attendance->day_twenty_seven = "P";
-                                                            } elseif ($current_date_number == 28) {
-                                                                $monthly_attendance->day_twenty_eight = "P";
-                                                            } elseif ($current_date_number == 29) {
-                                                                $monthly_attendance->day_twenty_nine = "P";
-                                                            } elseif ($current_date_number == 30) {
-                                                                $monthly_attendance->day_thirty = "P";
-                                                            } elseif ($current_date_number == 31) {
-                                                                $monthly_attendance->day_thirty_one = "P";
-                                                            } else {
-                                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                            }
-
-                                                            $monthly_attendance->save();
-                                                        }
-                                                    } else {
-                                                        // return "ok";
-                                                        $monthly_attendance = new CustomizeMonthlyAttendance();
-                                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
-                                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
-                                                        $monthly_attendance->attendance_month = $attendance_month;
-                                                        $monthly_attendance->attendance_year = $attendance_year;
-                                                        if ($current_date_number == 1) {
-                                                            $monthly_attendance->day_one = "P";
-                                                        } elseif ($current_date_number == 2) {
-                                                            $monthly_attendance->day_two = "P";
-                                                        } elseif ($current_date_number == 3) {
-                                                            $monthly_attendance->day_three = "P";
-                                                        } elseif ($current_date_number == 4) {
-                                                            $monthly_attendance->day_four = "P";
-                                                        } elseif ($current_date_number == 5) {
-                                                            $monthly_attendance->day_five = "P";
-                                                        } elseif ($current_date_number == 6) {
-                                                            $monthly_attendance->day_six = "P";
-                                                        } elseif ($current_date_number == 7) {
-                                                            $monthly_attendance->day_seven = "P";
-                                                        } elseif ($current_date_number == 8) {
-                                                            $monthly_attendance->day_eight = "P";
-                                                        } elseif ($current_date_number == 9) {
-                                                            $monthly_attendance->day_nine = "P";
-                                                        } elseif ($current_date_number == 10) {
-                                                            $monthly_attendance->day_ten = "P";
-                                                        } elseif ($current_date_number == 11) {
-                                                            $monthly_attendance->day_eleven = "P";
-                                                        } elseif ($current_date_number == 12) {
-                                                            $monthly_attendance->day_twelve = "P";
-                                                        } elseif ($current_date_number == 13) {
-                                                            $monthly_attendance->day_thirteen = "P";
-                                                        } elseif ($current_date_number == 14) {
-                                                            $monthly_attendance->day_fourteen = "P";
-                                                        } elseif ($current_date_number == 15) {
-                                                            $monthly_attendance->day_fifteen = "P";
-                                                        } elseif ($current_date_number == 16) {
-                                                            $monthly_attendance->day_sixteen = "P";
-                                                        } elseif ($current_date_number == 17) {
-                                                            $monthly_attendance->day_seventeen = "P";
-                                                        } elseif ($current_date_number == 18) {
-                                                            $monthly_attendance->day_eighteen = "P";
-                                                        } elseif ($current_date_number == 19) {
-                                                            $monthly_attendance->day_nineteen = "P";
-                                                        } elseif ($current_date_number == 20) {
-                                                            $monthly_attendance->day_twenty = "P";
-                                                        } elseif ($current_date_number == 21) {
-                                                            $monthly_attendance->day_twenty_one = "P";
-                                                        } elseif ($current_date_number == 22) {
-                                                            $monthly_attendance->day_twenty_two = "P";
-                                                        } elseif ($current_date_number == 23) {
-                                                            $monthly_attendance->day_twenty_three = "P";
-                                                        } elseif ($current_date_number == 24) {
-                                                            $monthly_attendance->day_twenty_four = "P";
-                                                        } elseif ($current_date_number == 25) {
-                                                            $monthly_attendance->day_twenty_five = "P";
-                                                        } elseif ($current_date_number == 26) {
-                                                            $monthly_attendance->day_twenty_six = "P";
-                                                        } elseif ($current_date_number == 27) {
-                                                            $monthly_attendance->day_twenty_seven = "P";
-                                                        } elseif ($current_date_number == 28) {
-                                                            $monthly_attendance->day_twenty_eight = "P";
-                                                        } elseif ($current_date_number == 29) {
-                                                            $monthly_attendance->day_twenty_nine = "P";
-                                                        } elseif ($current_date_number == 30) {
-                                                            $monthly_attendance->day_thirty = "P";
-                                                        } elseif ($current_date_number == 31) {
-                                                            $monthly_attendance->day_thirty_one = "P";
-                                                        } else {
-                                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                        }
-
-                                                        $monthly_attendance->day_one = "P";
-
-                                                        $monthly_attendance->save();
-                                                    }
-                                                } else {
-
-
-
-                                if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
-
-                                    $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
-
-                                    foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                        $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                        if ($current_date_number == 1) {
-                                            $monthly_attendance->day_one = "P";
-                                        } elseif ($current_date_number == 2) {
-                                            $monthly_attendance->day_two = "P";
-                                        } elseif ($current_date_number == 3) {
-                                            $monthly_attendance->day_three = "P";
-                                        } elseif ($current_date_number == 4) {
-                                            $monthly_attendance->day_four = "P";
-                                        } elseif ($current_date_number == 5) {
-                                            $monthly_attendance->day_five = "P";
-                                        } elseif ($current_date_number == 6) {
-                                            $monthly_attendance->day_six = "P";
-                                        } elseif ($current_date_number == 7) {
-                                            $monthly_attendance->day_seven = "P";
-                                        } elseif ($current_date_number == 8) {
-                                            $monthly_attendance->day_eight = "P";
-                                        } elseif ($current_date_number == 9) {
-                                            $monthly_attendance->day_nine = "P";
-                                        } elseif ($current_date_number == 10) {
-                                            $monthly_attendance->day_ten = "P";
-                                        } elseif ($current_date_number == 11) {
-                                            $monthly_attendance->day_eleven = "P";
-                                        } elseif ($current_date_number == 12) {
-                                            $monthly_attendance->day_twelve = "P";
-                                        } elseif ($current_date_number == 13) {
-                                            $monthly_attendance->day_thirteen = "P";
-                                        } elseif ($current_date_number == 14) {
-                                            $monthly_attendance->day_fourteen = "P";
-                                        } elseif ($current_date_number == 15) {
-                                            $monthly_attendance->day_fifteen = "P";
-                                        } elseif ($current_date_number == 16) {
-                                            $monthly_attendance->day_sixteen = "P";
-                                        } elseif ($current_date_number == 17) {
-                                            $monthly_attendance->day_seventeen = "P";
-                                        } elseif ($current_date_number == 18) {
-                                            $monthly_attendance->day_eighteen = "P";
-                                        } elseif ($current_date_number == 19) {
-                                            $monthly_attendance->day_nineteen = "P";
-                                        } elseif ($current_date_number == 20) {
-                                            $monthly_attendance->day_twenty = "P";
-                                        } elseif ($current_date_number == 21) {
-                                            $monthly_attendance->day_twenty_one = "P";
-                                        } elseif ($current_date_number == 22) {
-                                            $monthly_attendance->day_twenty_two = "P";
-                                        } elseif ($current_date_number == 23) {
-                                            $monthly_attendance->day_twenty_three = "P";
-                                        } elseif ($current_date_number == 24) {
-                                            $monthly_attendance->day_twenty_four = "P";
-                                        } elseif ($current_date_number == 25) {
-                                            $monthly_attendance->day_twenty_five = "P";
-                                        } elseif ($current_date_number == 26) {
-                                            $monthly_attendance->day_twenty_six = "P";
-                                        } elseif ($current_date_number == 27) {
-                                            $monthly_attendance->day_twenty_seven = "P";
-                                        } elseif ($current_date_number == 28) {
-                                            $monthly_attendance->day_twenty_eight = "P";
-                                        } elseif ($current_date_number == 29) {
-                                            $monthly_attendance->day_twenty_nine = "P";
-                                        } elseif ($current_date_number == 30) {
-                                            $monthly_attendance->day_thirty = "P";
-                                        } elseif ($current_date_number == 31) {
-                                            $monthly_attendance->day_thirty_one = "P";
-                                        } else {
-                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                        }
-
-                                        $monthly_attendance->save();
-                                    }
+                            if ($month == "1") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $previousYear;
+                                    $attendance_month = "12";
                                 } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "1";
+                                }
+                            } elseif ($month == "2") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
 
-                                    $monthly_attendance = new MonthlyAttendance();
-                                    $monthly_attendance->monthly_com_id = Auth::user()->com_id;
-                                    $monthly_attendance->monthly_employee_id = $request->employee_id;
-                                    $monthly_attendance->attendance_month = $current_date;
-                                    $monthly_attendance->attendance_year = $current_date;
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $previousYear;
+                                    $attendance_month = "1";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "2";
+                                }
+                            } elseif ($month == "3") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $previousYear;
+                                    $attendance_month = "2";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "3";
+                                }
+                            } elseif ($month == "4") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "3";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "4";
+                                }
+                            } elseif ($month == "5") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "4";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "5";
+                                }
+                            } elseif ($month == "6") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "5";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "6";
+                                }
+                            } elseif ($month == "7") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "6";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "7";
+                                }
+                            } elseif ($month == "8") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "7";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "8";
+                                }
+                            } elseif ($month == "9") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "8";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "9";
+                                }
+                            } elseif ($month == "10") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "9";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "10";
+                                }
+                            } elseif ($month == "11") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "10";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "11";
+                                }
+                            } elseif ($month == "12") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "11";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "12";
+                                }
+                            }
+
+
+                            if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
+
+                                $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
+
+                                foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                    $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
                                     if ($current_date_number == 1) {
                                         $monthly_attendance->day_one = "P";
                                     } elseif ($current_date_number == 2) {
@@ -5975,7 +5164,661 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
 
                                     $monthly_attendance->save();
                                 }
-                             }
+                            } else {
+                                // return "ok";
+                                $monthly_attendance = new CustomizeMonthlyAttendance();
+                                $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
+                                $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
+                                $monthly_attendance->attendance_month = $attendance_month;
+                                $monthly_attendance->attendance_year = $attendance_year;
+                                if ($current_date_number == 1) {
+                                    $monthly_attendance->day_one = "P";
+                                } elseif ($current_date_number == 2) {
+                                    $monthly_attendance->day_two = "P";
+                                } elseif ($current_date_number == 3) {
+                                    $monthly_attendance->day_three = "P";
+                                } elseif ($current_date_number == 4) {
+                                    $monthly_attendance->day_four = "P";
+                                } elseif ($current_date_number == 5) {
+                                    $monthly_attendance->day_five = "P";
+                                } elseif ($current_date_number == 6) {
+                                    $monthly_attendance->day_six = "P";
+                                } elseif ($current_date_number == 7) {
+                                    $monthly_attendance->day_seven = "P";
+                                } elseif ($current_date_number == 8) {
+                                    $monthly_attendance->day_eight = "P";
+                                } elseif ($current_date_number == 9) {
+                                    $monthly_attendance->day_nine = "P";
+                                } elseif ($current_date_number == 10) {
+                                    $monthly_attendance->day_ten = "P";
+                                } elseif ($current_date_number == 11) {
+                                    $monthly_attendance->day_eleven = "P";
+                                } elseif ($current_date_number == 12) {
+                                    $monthly_attendance->day_twelve = "P";
+                                } elseif ($current_date_number == 13) {
+                                    $monthly_attendance->day_thirteen = "P";
+                                } elseif ($current_date_number == 14) {
+                                    $monthly_attendance->day_fourteen = "P";
+                                } elseif ($current_date_number == 15) {
+                                    $monthly_attendance->day_fifteen = "P";
+                                } elseif ($current_date_number == 16) {
+                                    $monthly_attendance->day_sixteen = "P";
+                                } elseif ($current_date_number == 17) {
+                                    $monthly_attendance->day_seventeen = "P";
+                                } elseif ($current_date_number == 18) {
+                                    $monthly_attendance->day_eighteen = "P";
+                                } elseif ($current_date_number == 19) {
+                                    $monthly_attendance->day_nineteen = "P";
+                                } elseif ($current_date_number == 20) {
+                                    $monthly_attendance->day_twenty = "P";
+                                } elseif ($current_date_number == 21) {
+                                    $monthly_attendance->day_twenty_one = "P";
+                                } elseif ($current_date_number == 22) {
+                                    $monthly_attendance->day_twenty_two = "P";
+                                } elseif ($current_date_number == 23) {
+                                    $monthly_attendance->day_twenty_three = "P";
+                                } elseif ($current_date_number == 24) {
+                                    $monthly_attendance->day_twenty_four = "P";
+                                } elseif ($current_date_number == 25) {
+                                    $monthly_attendance->day_twenty_five = "P";
+                                } elseif ($current_date_number == 26) {
+                                    $monthly_attendance->day_twenty_six = "P";
+                                } elseif ($current_date_number == 27) {
+                                    $monthly_attendance->day_twenty_seven = "P";
+                                } elseif ($current_date_number == 28) {
+                                    $monthly_attendance->day_twenty_eight = "P";
+                                } elseif ($current_date_number == 29) {
+                                    $monthly_attendance->day_twenty_nine = "P";
+                                } elseif ($current_date_number == 30) {
+                                    $monthly_attendance->day_thirty = "P";
+                                } elseif ($current_date_number == 31) {
+                                    $monthly_attendance->day_thirty_one = "P";
+                                } else {
+                                    return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                }
+
+                                $monthly_attendance->day_one = "P";
+
+                                $monthly_attendance->save();
+                            }
+                        } else {
+
+
+                            $monthly_attendance = new MonthlyAttendance();
+                            $monthly_attendance->monthly_com_id = Auth::user()->com_id;
+                            $monthly_attendance->monthly_employee_id = $request->employee_id;
+                            $monthly_attendance->attendance_month = $current_date;
+                            $monthly_attendance->attendance_year = $current_date;
+                            if ($current_date_number == 1) {
+                                $monthly_attendance->day_one = "P";
+                            } elseif ($current_date_number == 2) {
+                                $monthly_attendance->day_two = "P";
+                            } elseif ($current_date_number == 3) {
+                                $monthly_attendance->day_three = "P";
+                            } elseif ($current_date_number == 4) {
+                                $monthly_attendance->day_four = "P";
+                            } elseif ($current_date_number == 5) {
+                                $monthly_attendance->day_five = "P";
+                            } elseif ($current_date_number == 6) {
+                                $monthly_attendance->day_six = "P";
+                            } elseif ($current_date_number == 7) {
+                                $monthly_attendance->day_seven = "P";
+                            } elseif ($current_date_number == 8) {
+                                $monthly_attendance->day_eight = "P";
+                            } elseif ($current_date_number == 9) {
+                                $monthly_attendance->day_nine = "P";
+                            } elseif ($current_date_number == 10) {
+                                $monthly_attendance->day_ten = "P";
+                            } elseif ($current_date_number == 11) {
+                                $monthly_attendance->day_eleven = "P";
+                            } elseif ($current_date_number == 12) {
+                                $monthly_attendance->day_twelve = "P";
+                            } elseif ($current_date_number == 13) {
+                                $monthly_attendance->day_thirteen = "P";
+                            } elseif ($current_date_number == 14) {
+                                $monthly_attendance->day_fourteen = "P";
+                            } elseif ($current_date_number == 15) {
+                                $monthly_attendance->day_fifteen = "P";
+                            } elseif ($current_date_number == 16) {
+                                $monthly_attendance->day_sixteen = "P";
+                            } elseif ($current_date_number == 17) {
+                                $monthly_attendance->day_seventeen = "P";
+                            } elseif ($current_date_number == 18) {
+                                $monthly_attendance->day_eighteen = "P";
+                            } elseif ($current_date_number == 19) {
+                                $monthly_attendance->day_nineteen = "P";
+                            } elseif ($current_date_number == 20) {
+                                $monthly_attendance->day_twenty = "P";
+                            } elseif ($current_date_number == 21) {
+                                $monthly_attendance->day_twenty_one = "P";
+                            } elseif ($current_date_number == 22) {
+                                $monthly_attendance->day_twenty_two = "P";
+                            } elseif ($current_date_number == 23) {
+                                $monthly_attendance->day_twenty_three = "P";
+                            } elseif ($current_date_number == 24) {
+                                $monthly_attendance->day_twenty_four = "P";
+                            } elseif ($current_date_number == 25) {
+                                $monthly_attendance->day_twenty_five = "P";
+                            } elseif ($current_date_number == 26) {
+                                $monthly_attendance->day_twenty_six = "P";
+                            } elseif ($current_date_number == 27) {
+                                $monthly_attendance->day_twenty_seven = "P";
+                            } elseif ($current_date_number == 28) {
+                                $monthly_attendance->day_twenty_eight = "P";
+                            } elseif ($current_date_number == 29) {
+                                $monthly_attendance->day_twenty_nine = "P";
+                            } elseif ($current_date_number == 30) {
+                                $monthly_attendance->day_thirty = "P";
+                            } elseif ($current_date_number == 31) {
+                                $monthly_attendance->day_thirty_one = "P";
+                            } else {
+                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                            }
+
+                            $monthly_attendance->day_one = "P";
+
+                            $monthly_attendance->save();
+                        }
+                        ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
+
+                        return back()->with('message', 'Attendance Submitted Successfully');
+                    } else {
+
+                        //echo 'not ok'; exit;
+
+                        // $added_chackin_lat = $usersValue->check_in_latitude + .1;
+                        // $deducted_checkin_lat = $usersValue->check_in_latitude - .1;
+                        // $added_checkin_longi = $usersValue->check_in_longitude + .1;
+                        // $deducted_checkin_longi = $usersValue->check_in_longitude - .1;
+
+
+                        //if(($added_chackin_lat >= $request->lat && $deducted_checkin_lat <= $request->lat) || ($added_checkin_longi >= $request->longt && $deducted_checkin_longi <= $request->longt)){
+                        if (($usersValue->check_in_ip = $local_server_ip)) {
+
+                            if (Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->exists()) {
+
+                                return back()->with('message', 'Already Checked In For Today!!! Please Contact With The System Administrator!!!');
+                            } else {
+
+                                $attendance = new Attendance();
+                                $attendance->attendance_com_id = Auth::user()->com_id;
+                                $attendance->employee_id = $request->employee_id;
+                                $attendance->attendance_date = $current_date;
+                                $attendance->clock_in = $current_time;
+                                // $attendance->check_in_latitude = $request->lat;
+                                // $attendance->check_in_longitude = $request->longt;
+                                $attendance->check_in_ip = $local_server_ip;
+                                if (date_create($current_time) >= date_create($shift_in)) {
+                                    if ($shift_in != 0 && $shift_out != 0) {
+
+                                        $attendance->time_late = date_create($shift_in)->diff(date_create($current_time))->format('%H:%i:%s');
+
+                                        if ($current_time_in_seconds >= $office_late_time_config_in_seconds) {
+
+                                            if (LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->exists()) {
+
+                                                $late_times = LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->get('id');
+
+                                                foreach ($late_times as $late_times_value) {
+
+                                                    $late_time = LateTime::find($late_times_value->id);
+                                                    $late_time->late_time_com_id = Auth::user()->com_id;
+                                                    $late_time->late_time_employee_id = $request->employee_id;
+                                                    $late_time->late_time_date = $current_date;
+                                                    $late_time->save();
+                                                }
+                                            } else {
+                                                $late_time = new LateTime();
+                                                $late_time->late_time_com_id = Auth::user()->com_id;
+                                                $late_time->late_time_employee_id = $request->employee_id;
+                                                $late_time->late_time_date = $current_date;
+                                                $late_time->save();
+                                            }
+                                        }
+                                    }
+                                }
+                                //$attendance->check_in_out = 0;
+                                $attendance->check_in_out = 1;
+                                $attendance->attendance_status = "Present";
+                                $attendance->save();
+
+                                ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
+                                $permission = "3.28";
+                                if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
+
+                                    $year = date('Y');
+
+                                    $month =  date('m');
+                                    $day =  date('d');
+
+                                    $currentDate = Carbon::now();  // Get the current date and time
+                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+
+                                    $previousYear =  $previousMonth->format('Y');
+
+                                    $previousMonth = $previousMonth->format('m');
+
+                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
+
+                                    if ($month == "1") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "12";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "1";
+                                        }
+                                    } elseif ($month == "2") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
+
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "1";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "2";
+                                        }
+                                    } elseif ($month == "3") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "2";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "3";
+                                        }
+                                    } elseif ($month == "4") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "3";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "4";
+                                        }
+                                    } elseif ($month == "5") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "4";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "5";
+                                        }
+                                    } elseif ($month == "6") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "5";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "6";
+                                        }
+                                    } elseif ($month == "7") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "6";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "7";
+                                        }
+                                    } elseif ($month == "8") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "7";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "8";
+                                        }
+                                    } elseif ($month == "9") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "8";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "9";
+                                        }
+                                    } elseif ($month == "10") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "9";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "10";
+                                        }
+                                    } elseif ($month == "11") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "10";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "11";
+                                        }
+                                    } elseif ($month == "12") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "11";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "12";
+                                        }
+                                    }
+
+
+                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
+
+                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
+
+                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                            if ($current_date_number == 1) {
+                                                $monthly_attendance->day_one = "P";
+                                            } elseif ($current_date_number == 2) {
+                                                $monthly_attendance->day_two = "P";
+                                            } elseif ($current_date_number == 3) {
+                                                $monthly_attendance->day_three = "P";
+                                            } elseif ($current_date_number == 4) {
+                                                $monthly_attendance->day_four = "P";
+                                            } elseif ($current_date_number == 5) {
+                                                $monthly_attendance->day_five = "P";
+                                            } elseif ($current_date_number == 6) {
+                                                $monthly_attendance->day_six = "P";
+                                            } elseif ($current_date_number == 7) {
+                                                $monthly_attendance->day_seven = "P";
+                                            } elseif ($current_date_number == 8) {
+                                                $monthly_attendance->day_eight = "P";
+                                            } elseif ($current_date_number == 9) {
+                                                $monthly_attendance->day_nine = "P";
+                                            } elseif ($current_date_number == 10) {
+                                                $monthly_attendance->day_ten = "P";
+                                            } elseif ($current_date_number == 11) {
+                                                $monthly_attendance->day_eleven = "P";
+                                            } elseif ($current_date_number == 12) {
+                                                $monthly_attendance->day_twelve = "P";
+                                            } elseif ($current_date_number == 13) {
+                                                $monthly_attendance->day_thirteen = "P";
+                                            } elseif ($current_date_number == 14) {
+                                                $monthly_attendance->day_fourteen = "P";
+                                            } elseif ($current_date_number == 15) {
+                                                $monthly_attendance->day_fifteen = "P";
+                                            } elseif ($current_date_number == 16) {
+                                                $monthly_attendance->day_sixteen = "P";
+                                            } elseif ($current_date_number == 17) {
+                                                $monthly_attendance->day_seventeen = "P";
+                                            } elseif ($current_date_number == 18) {
+                                                $monthly_attendance->day_eighteen = "P";
+                                            } elseif ($current_date_number == 19) {
+                                                $monthly_attendance->day_nineteen = "P";
+                                            } elseif ($current_date_number == 20) {
+                                                $monthly_attendance->day_twenty = "P";
+                                            } elseif ($current_date_number == 21) {
+                                                $monthly_attendance->day_twenty_one = "P";
+                                            } elseif ($current_date_number == 22) {
+                                                $monthly_attendance->day_twenty_two = "P";
+                                            } elseif ($current_date_number == 23) {
+                                                $monthly_attendance->day_twenty_three = "P";
+                                            } elseif ($current_date_number == 24) {
+                                                $monthly_attendance->day_twenty_four = "P";
+                                            } elseif ($current_date_number == 25) {
+                                                $monthly_attendance->day_twenty_five = "P";
+                                            } elseif ($current_date_number == 26) {
+                                                $monthly_attendance->day_twenty_six = "P";
+                                            } elseif ($current_date_number == 27) {
+                                                $monthly_attendance->day_twenty_seven = "P";
+                                            } elseif ($current_date_number == 28) {
+                                                $monthly_attendance->day_twenty_eight = "P";
+                                            } elseif ($current_date_number == 29) {
+                                                $monthly_attendance->day_twenty_nine = "P";
+                                            } elseif ($current_date_number == 30) {
+                                                $monthly_attendance->day_thirty = "P";
+                                            } elseif ($current_date_number == 31) {
+                                                $monthly_attendance->day_thirty_one = "P";
+                                            } else {
+                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                            }
+
+                                            $monthly_attendance->save();
+                                        }
+                                    } else {
+                                        // return "ok";
+                                        $monthly_attendance = new CustomizeMonthlyAttendance();
+                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
+                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
+                                        $monthly_attendance->attendance_month = $attendance_month;
+                                        $monthly_attendance->attendance_year = $attendance_year;
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->day_one = "P";
+
+                                        $monthly_attendance->save();
+                                    }
+                                } else {
+
+
+
+                                    if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
+
+                                        $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
+
+                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                            $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                            if ($current_date_number == 1) {
+                                                $monthly_attendance->day_one = "P";
+                                            } elseif ($current_date_number == 2) {
+                                                $monthly_attendance->day_two = "P";
+                                            } elseif ($current_date_number == 3) {
+                                                $monthly_attendance->day_three = "P";
+                                            } elseif ($current_date_number == 4) {
+                                                $monthly_attendance->day_four = "P";
+                                            } elseif ($current_date_number == 5) {
+                                                $monthly_attendance->day_five = "P";
+                                            } elseif ($current_date_number == 6) {
+                                                $monthly_attendance->day_six = "P";
+                                            } elseif ($current_date_number == 7) {
+                                                $monthly_attendance->day_seven = "P";
+                                            } elseif ($current_date_number == 8) {
+                                                $monthly_attendance->day_eight = "P";
+                                            } elseif ($current_date_number == 9) {
+                                                $monthly_attendance->day_nine = "P";
+                                            } elseif ($current_date_number == 10) {
+                                                $monthly_attendance->day_ten = "P";
+                                            } elseif ($current_date_number == 11) {
+                                                $monthly_attendance->day_eleven = "P";
+                                            } elseif ($current_date_number == 12) {
+                                                $monthly_attendance->day_twelve = "P";
+                                            } elseif ($current_date_number == 13) {
+                                                $monthly_attendance->day_thirteen = "P";
+                                            } elseif ($current_date_number == 14) {
+                                                $monthly_attendance->day_fourteen = "P";
+                                            } elseif ($current_date_number == 15) {
+                                                $monthly_attendance->day_fifteen = "P";
+                                            } elseif ($current_date_number == 16) {
+                                                $monthly_attendance->day_sixteen = "P";
+                                            } elseif ($current_date_number == 17) {
+                                                $monthly_attendance->day_seventeen = "P";
+                                            } elseif ($current_date_number == 18) {
+                                                $monthly_attendance->day_eighteen = "P";
+                                            } elseif ($current_date_number == 19) {
+                                                $monthly_attendance->day_nineteen = "P";
+                                            } elseif ($current_date_number == 20) {
+                                                $monthly_attendance->day_twenty = "P";
+                                            } elseif ($current_date_number == 21) {
+                                                $monthly_attendance->day_twenty_one = "P";
+                                            } elseif ($current_date_number == 22) {
+                                                $monthly_attendance->day_twenty_two = "P";
+                                            } elseif ($current_date_number == 23) {
+                                                $monthly_attendance->day_twenty_three = "P";
+                                            } elseif ($current_date_number == 24) {
+                                                $monthly_attendance->day_twenty_four = "P";
+                                            } elseif ($current_date_number == 25) {
+                                                $monthly_attendance->day_twenty_five = "P";
+                                            } elseif ($current_date_number == 26) {
+                                                $monthly_attendance->day_twenty_six = "P";
+                                            } elseif ($current_date_number == 27) {
+                                                $monthly_attendance->day_twenty_seven = "P";
+                                            } elseif ($current_date_number == 28) {
+                                                $monthly_attendance->day_twenty_eight = "P";
+                                            } elseif ($current_date_number == 29) {
+                                                $monthly_attendance->day_twenty_nine = "P";
+                                            } elseif ($current_date_number == 30) {
+                                                $monthly_attendance->day_thirty = "P";
+                                            } elseif ($current_date_number == 31) {
+                                                $monthly_attendance->day_thirty_one = "P";
+                                            } else {
+                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                            }
+
+                                            $monthly_attendance->save();
+                                        }
+                                    } else {
+
+                                        $monthly_attendance = new MonthlyAttendance();
+                                        $monthly_attendance->monthly_com_id = Auth::user()->com_id;
+                                        $monthly_attendance->monthly_employee_id = $request->employee_id;
+                                        $monthly_attendance->attendance_month = $current_date;
+                                        $monthly_attendance->attendance_year = $current_date;
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->save();
+                                    }
+                                }
                                 ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
 
 
@@ -6685,791 +6528,139 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
                         $permission = "3.28";
                         if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
 
-                                                    $year = date('Y');
+                            $year = date('Y');
 
-                                                    $month =  date('m');
-                                                    $day =  date('d');
+                            $month =  date('m');
+                            $day =  date('d');
 
-                                                    $currentDate = Carbon::now();  // Get the current date and time
-                                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+                            $currentDate = Carbon::now();  // Get the current date and time
+                            $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
 
-                                                    $previousYear =  $previousMonth->format('Y');
+                            $previousYear =  $previousMonth->format('Y');
 
-                                                    $previousMonth = $previousMonth->format('m');
+                            $previousMonth = $previousMonth->format('m');
 
-                                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
+                            $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
 
-                                                    if ($month == "1") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "12";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "1";
-                                                        }
-                                                    } elseif ($month == "2") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
-
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "1";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "2";
-                                                        }
-                                                    } elseif ($month == "3") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "2";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "3";
-                                                        }
-                                                    } elseif ($month == "4") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "3";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "4";
-                                                        }
-                                                    } elseif ($month == "5") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "4";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "5";
-                                                        }
-                                                    } elseif ($month == "6") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "5";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "6";
-                                                        }
-                                                    } elseif ($month == "7") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "6";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "7";
-                                                        }
-                                                    } elseif ($month == "8") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "7";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "8";
-                                                        }
-                                                    } elseif ($month == "9") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "8";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "9";
-                                                        }
-                                                    } elseif ($month == "10") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "9";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        }
-                                                    } elseif ($month == "11") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        }
-                                                    } elseif ($month == "12") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "12";
-                                                        }
-                                                    }
-
-
-                                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
-
-                                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
-
-                                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                                            if ($current_date_number == 1) {
-                                                                $monthly_attendance->day_one = "P";
-                                                            } elseif ($current_date_number == 2) {
-                                                                $monthly_attendance->day_two = "P";
-                                                            } elseif ($current_date_number == 3) {
-                                                                $monthly_attendance->day_three = "P";
-                                                            } elseif ($current_date_number == 4) {
-                                                                $monthly_attendance->day_four = "P";
-                                                            } elseif ($current_date_number == 5) {
-                                                                $monthly_attendance->day_five = "P";
-                                                            } elseif ($current_date_number == 6) {
-                                                                $monthly_attendance->day_six = "P";
-                                                            } elseif ($current_date_number == 7) {
-                                                                $monthly_attendance->day_seven = "P";
-                                                            } elseif ($current_date_number == 8) {
-                                                                $monthly_attendance->day_eight = "P";
-                                                            } elseif ($current_date_number == 9) {
-                                                                $monthly_attendance->day_nine = "P";
-                                                            } elseif ($current_date_number == 10) {
-                                                                $monthly_attendance->day_ten = "P";
-                                                            } elseif ($current_date_number == 11) {
-                                                                $monthly_attendance->day_eleven = "P";
-                                                            } elseif ($current_date_number == 12) {
-                                                                $monthly_attendance->day_twelve = "P";
-                                                            } elseif ($current_date_number == 13) {
-                                                                $monthly_attendance->day_thirteen = "P";
-                                                            } elseif ($current_date_number == 14) {
-                                                                $monthly_attendance->day_fourteen = "P";
-                                                            } elseif ($current_date_number == 15) {
-                                                                $monthly_attendance->day_fifteen = "P";
-                                                            } elseif ($current_date_number == 16) {
-                                                                $monthly_attendance->day_sixteen = "P";
-                                                            } elseif ($current_date_number == 17) {
-                                                                $monthly_attendance->day_seventeen = "P";
-                                                            } elseif ($current_date_number == 18) {
-                                                                $monthly_attendance->day_eighteen = "P";
-                                                            } elseif ($current_date_number == 19) {
-                                                                $monthly_attendance->day_nineteen = "P";
-                                                            } elseif ($current_date_number == 20) {
-                                                                $monthly_attendance->day_twenty = "P";
-                                                            } elseif ($current_date_number == 21) {
-                                                                $monthly_attendance->day_twenty_one = "P";
-                                                            } elseif ($current_date_number == 22) {
-                                                                $monthly_attendance->day_twenty_two = "P";
-                                                            } elseif ($current_date_number == 23) {
-                                                                $monthly_attendance->day_twenty_three = "P";
-                                                            } elseif ($current_date_number == 24) {
-                                                                $monthly_attendance->day_twenty_four = "P";
-                                                            } elseif ($current_date_number == 25) {
-                                                                $monthly_attendance->day_twenty_five = "P";
-                                                            } elseif ($current_date_number == 26) {
-                                                                $monthly_attendance->day_twenty_six = "P";
-                                                            } elseif ($current_date_number == 27) {
-                                                                $monthly_attendance->day_twenty_seven = "P";
-                                                            } elseif ($current_date_number == 28) {
-                                                                $monthly_attendance->day_twenty_eight = "P";
-                                                            } elseif ($current_date_number == 29) {
-                                                                $monthly_attendance->day_twenty_nine = "P";
-                                                            } elseif ($current_date_number == 30) {
-                                                                $monthly_attendance->day_thirty = "P";
-                                                            } elseif ($current_date_number == 31) {
-                                                                $monthly_attendance->day_thirty_one = "P";
-                                                            } else {
-                                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                            }
-
-                                                            $monthly_attendance->save();
-                                                        }
-                                                    } else {
-                                                        // return "ok";
-                                                        $monthly_attendance = new CustomizeMonthlyAttendance();
-                                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
-                                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
-                                                        $monthly_attendance->attendance_month = $attendance_month;
-                                                        $monthly_attendance->attendance_year = $attendance_year;
-                                                        if ($current_date_number == 1) {
-                                                            $monthly_attendance->day_one = "P";
-                                                        } elseif ($current_date_number == 2) {
-                                                            $monthly_attendance->day_two = "P";
-                                                        } elseif ($current_date_number == 3) {
-                                                            $monthly_attendance->day_three = "P";
-                                                        } elseif ($current_date_number == 4) {
-                                                            $monthly_attendance->day_four = "P";
-                                                        } elseif ($current_date_number == 5) {
-                                                            $monthly_attendance->day_five = "P";
-                                                        } elseif ($current_date_number == 6) {
-                                                            $monthly_attendance->day_six = "P";
-                                                        } elseif ($current_date_number == 7) {
-                                                            $monthly_attendance->day_seven = "P";
-                                                        } elseif ($current_date_number == 8) {
-                                                            $monthly_attendance->day_eight = "P";
-                                                        } elseif ($current_date_number == 9) {
-                                                            $monthly_attendance->day_nine = "P";
-                                                        } elseif ($current_date_number == 10) {
-                                                            $monthly_attendance->day_ten = "P";
-                                                        } elseif ($current_date_number == 11) {
-                                                            $monthly_attendance->day_eleven = "P";
-                                                        } elseif ($current_date_number == 12) {
-                                                            $monthly_attendance->day_twelve = "P";
-                                                        } elseif ($current_date_number == 13) {
-                                                            $monthly_attendance->day_thirteen = "P";
-                                                        } elseif ($current_date_number == 14) {
-                                                            $monthly_attendance->day_fourteen = "P";
-                                                        } elseif ($current_date_number == 15) {
-                                                            $monthly_attendance->day_fifteen = "P";
-                                                        } elseif ($current_date_number == 16) {
-                                                            $monthly_attendance->day_sixteen = "P";
-                                                        } elseif ($current_date_number == 17) {
-                                                            $monthly_attendance->day_seventeen = "P";
-                                                        } elseif ($current_date_number == 18) {
-                                                            $monthly_attendance->day_eighteen = "P";
-                                                        } elseif ($current_date_number == 19) {
-                                                            $monthly_attendance->day_nineteen = "P";
-                                                        } elseif ($current_date_number == 20) {
-                                                            $monthly_attendance->day_twenty = "P";
-                                                        } elseif ($current_date_number == 21) {
-                                                            $monthly_attendance->day_twenty_one = "P";
-                                                        } elseif ($current_date_number == 22) {
-                                                            $monthly_attendance->day_twenty_two = "P";
-                                                        } elseif ($current_date_number == 23) {
-                                                            $monthly_attendance->day_twenty_three = "P";
-                                                        } elseif ($current_date_number == 24) {
-                                                            $monthly_attendance->day_twenty_four = "P";
-                                                        } elseif ($current_date_number == 25) {
-                                                            $monthly_attendance->day_twenty_five = "P";
-                                                        } elseif ($current_date_number == 26) {
-                                                            $monthly_attendance->day_twenty_six = "P";
-                                                        } elseif ($current_date_number == 27) {
-                                                            $monthly_attendance->day_twenty_seven = "P";
-                                                        } elseif ($current_date_number == 28) {
-                                                            $monthly_attendance->day_twenty_eight = "P";
-                                                        } elseif ($current_date_number == 29) {
-                                                            $monthly_attendance->day_twenty_nine = "P";
-                                                        } elseif ($current_date_number == 30) {
-                                                            $monthly_attendance->day_thirty = "P";
-                                                        } elseif ($current_date_number == 31) {
-                                                            $monthly_attendance->day_thirty_one = "P";
-                                                        } else {
-                                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                        }
-
-                                                        $monthly_attendance->day_one = "P";
-
-                                                        $monthly_attendance->save();
-                                                    }
-                                                } else {
-
-                        $monthly_attendance = new MonthlyAttendance();
-                        $monthly_attendance->monthly_com_id = Auth::user()->com_id;
-                        $monthly_attendance->monthly_employee_id = $request->employee_id;
-                        $monthly_attendance->attendance_month = $current_date;
-                        $monthly_attendance->attendance_year = $current_date;
-                        if ($current_date_number == 1) {
-                            $monthly_attendance->day_one = "P";
-                        } elseif ($current_date_number == 2) {
-                            $monthly_attendance->day_two = "P";
-                        } elseif ($current_date_number == 3) {
-                            $monthly_attendance->day_three = "P";
-                        } elseif ($current_date_number == 4) {
-                            $monthly_attendance->day_four = "P";
-                        } elseif ($current_date_number == 5) {
-                            $monthly_attendance->day_five = "P";
-                        } elseif ($current_date_number == 6) {
-                            $monthly_attendance->day_six = "P";
-                        } elseif ($current_date_number == 7) {
-                            $monthly_attendance->day_seven = "P";
-                        } elseif ($current_date_number == 8) {
-                            $monthly_attendance->day_eight = "P";
-                        } elseif ($current_date_number == 9) {
-                            $monthly_attendance->day_nine = "P";
-                        } elseif ($current_date_number == 10) {
-                            $monthly_attendance->day_ten = "P";
-                        } elseif ($current_date_number == 11) {
-                            $monthly_attendance->day_eleven = "P";
-                        } elseif ($current_date_number == 12) {
-                            $monthly_attendance->day_twelve = "P";
-                        } elseif ($current_date_number == 13) {
-                            $monthly_attendance->day_thirteen = "P";
-                        } elseif ($current_date_number == 14) {
-                            $monthly_attendance->day_fourteen = "P";
-                        } elseif ($current_date_number == 15) {
-                            $monthly_attendance->day_fifteen = "P";
-                        } elseif ($current_date_number == 16) {
-                            $monthly_attendance->day_sixteen = "P";
-                        } elseif ($current_date_number == 17) {
-                            $monthly_attendance->day_seventeen = "P";
-                        } elseif ($current_date_number == 18) {
-                            $monthly_attendance->day_eighteen = "P";
-                        } elseif ($current_date_number == 19) {
-                            $monthly_attendance->day_nineteen = "P";
-                        } elseif ($current_date_number == 20) {
-                            $monthly_attendance->day_twenty = "P";
-                        } elseif ($current_date_number == 21) {
-                            $monthly_attendance->day_twenty_one = "P";
-                        } elseif ($current_date_number == 22) {
-                            $monthly_attendance->day_twenty_two = "P";
-                        } elseif ($current_date_number == 23) {
-                            $monthly_attendance->day_twenty_three = "P";
-                        } elseif ($current_date_number == 24) {
-                            $monthly_attendance->day_twenty_four = "P";
-                        } elseif ($current_date_number == 25) {
-                            $monthly_attendance->day_twenty_five = "P";
-                        } elseif ($current_date_number == 26) {
-                            $monthly_attendance->day_twenty_six = "P";
-                        } elseif ($current_date_number == 27) {
-                            $monthly_attendance->day_twenty_seven = "P";
-                        } elseif ($current_date_number == 28) {
-                            $monthly_attendance->day_twenty_eight = "P";
-                        } elseif ($current_date_number == 29) {
-                            $monthly_attendance->day_twenty_nine = "P";
-                        } elseif ($current_date_number == 30) {
-                            $monthly_attendance->day_thirty = "P";
-                        } elseif ($current_date_number == 31) {
-                            $monthly_attendance->day_thirty_one = "P";
-                        } else {
-                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                        }
-
-                        $monthly_attendance->day_one = "P";
-
-                        $monthly_attendance->save();
-                                                }
-                        ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
-
-
-
-
-
-                        return back()->with('message', 'Attendance Submitted Successfully');
-                    } else {
-
-                        $added_chackin_lat = $usersValue->check_in_latitude + 0.0008;
-                        $deducted_checkin_lat = $usersValue->check_in_latitude - 0.0008;
-                        $added_checkin_longi = $usersValue->check_in_longitude + 0.0008;
-                        $deducted_checkin_longi = $usersValue->check_in_longitude - 0.0008;
-
-                        if (($added_chackin_lat >= $visitor_latitude && $deducted_checkin_lat <= $visitor_latitude) || ($added_checkin_longi >= $visitor_longitude && $deducted_checkin_longi <= $visitor_longitude)) {
-
-                            if (Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->exists()) {
-
-                                return back()->with('message', 'Already Checked In For Today!!! Please Contact With The System Administrator!!!');
-                            } else {
-
-                                $attendance = new Attendance();
-                                $attendance->attendance_com_id = Auth::user()->com_id;
-                                $attendance->employee_id = $request->employee_id;
-                                $attendance->attendance_date = $current_date;
-                                $attendance->clock_in = $current_time;
-                                $attendance->check_in_latitude = $visitor_latitude;
-                                $attendance->check_in_longitude = $visitor_longitude;
-                                $attendance->check_in_ip = $local_server_ip;
-                                if (date_create($current_time) >= date_create($shift_in)) {
-                                    if ($shift_in != 0 && $shift_out != 0) {
-
-                                        $attendance->time_late = date_create($shift_in)->diff(date_create($current_time))->format('%H:%i:%s');
-
-                                        if ($current_time_in_seconds >= $office_late_time_config_in_seconds) {
-
-                                            if (LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->exists()) {
-
-                                                $late_times = LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->get('id');
-
-                                                foreach ($late_times as $late_times_value) {
-
-                                                    $late_time = LateTime::find($late_times_value->id);
-                                                    $late_time->late_time_com_id = Auth::user()->com_id;
-                                                    $late_time->late_time_employee_id = $request->employee_id;
-                                                    $late_time->late_time_date = $current_date;
-                                                    $late_time->save();
-                                                }
-                                            } else {
-                                                $late_time = new LateTime();
-                                                $late_time->late_time_com_id = Auth::user()->com_id;
-                                                $late_time->late_time_employee_id = $request->employee_id;
-                                                $late_time->late_time_date = $current_date;
-                                                $late_time->save();
-                                            }
-                                        }
-                                    }
-                                }
-                                //$attendance->check_in_out = 0;
-                                $attendance->check_in_out = 1;
-                                $attendance->attendance_status = "Present";
-                                $attendance->save();
-
-                                ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
-
-                        $permission = "3.28";
-                        if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
-
-                                                    $year = date('Y');
-
-                                                    $month =  date('m');
-                                                    $day =  date('d');
-
-                                                    $currentDate = Carbon::now();  // Get the current date and time
-                                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
-
-                                                    $previousYear =  $previousMonth->format('Y');
-
-                                                    $previousMonth = $previousMonth->format('m');
-
-                                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
-
-                                                    if ($month == "1") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "12";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "1";
-                                                        }
-                                                    } elseif ($month == "2") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
-
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "1";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "2";
-                                                        }
-                                                    } elseif ($month == "3") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $previousYear;
-                                                            $attendance_month = "2";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "3";
-                                                        }
-                                                    } elseif ($month == "4") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "3";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "4";
-                                                        }
-                                                    } elseif ($month == "5") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "4";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "5";
-                                                        }
-                                                    } elseif ($month == "6") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "5";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "6";
-                                                        }
-                                                    } elseif ($month == "7") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "6";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "7";
-                                                        }
-                                                    } elseif ($month == "8") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "7";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "8";
-                                                        }
-                                                    } elseif ($month == "9") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "8";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "9";
-                                                        }
-                                                    } elseif ($month == "10") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "9";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        }
-                                                    } elseif ($month == "11") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "10";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        }
-                                                    } elseif ($month == "12") {
-                                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
-                                                        if ($customize_date->end_date >= $day) {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "11";
-                                                        } else {
-                                                            $attendance_year = $year;
-                                                            $attendance_month = "12";
-                                                        }
-                                                    }
-
-
-                                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
-
-                                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
-
-                                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                                            if ($current_date_number == 1) {
-                                                                $monthly_attendance->day_one = "P";
-                                                            } elseif ($current_date_number == 2) {
-                                                                $monthly_attendance->day_two = "P";
-                                                            } elseif ($current_date_number == 3) {
-                                                                $monthly_attendance->day_three = "P";
-                                                            } elseif ($current_date_number == 4) {
-                                                                $monthly_attendance->day_four = "P";
-                                                            } elseif ($current_date_number == 5) {
-                                                                $monthly_attendance->day_five = "P";
-                                                            } elseif ($current_date_number == 6) {
-                                                                $monthly_attendance->day_six = "P";
-                                                            } elseif ($current_date_number == 7) {
-                                                                $monthly_attendance->day_seven = "P";
-                                                            } elseif ($current_date_number == 8) {
-                                                                $monthly_attendance->day_eight = "P";
-                                                            } elseif ($current_date_number == 9) {
-                                                                $monthly_attendance->day_nine = "P";
-                                                            } elseif ($current_date_number == 10) {
-                                                                $monthly_attendance->day_ten = "P";
-                                                            } elseif ($current_date_number == 11) {
-                                                                $monthly_attendance->day_eleven = "P";
-                                                            } elseif ($current_date_number == 12) {
-                                                                $monthly_attendance->day_twelve = "P";
-                                                            } elseif ($current_date_number == 13) {
-                                                                $monthly_attendance->day_thirteen = "P";
-                                                            } elseif ($current_date_number == 14) {
-                                                                $monthly_attendance->day_fourteen = "P";
-                                                            } elseif ($current_date_number == 15) {
-                                                                $monthly_attendance->day_fifteen = "P";
-                                                            } elseif ($current_date_number == 16) {
-                                                                $monthly_attendance->day_sixteen = "P";
-                                                            } elseif ($current_date_number == 17) {
-                                                                $monthly_attendance->day_seventeen = "P";
-                                                            } elseif ($current_date_number == 18) {
-                                                                $monthly_attendance->day_eighteen = "P";
-                                                            } elseif ($current_date_number == 19) {
-                                                                $monthly_attendance->day_nineteen = "P";
-                                                            } elseif ($current_date_number == 20) {
-                                                                $monthly_attendance->day_twenty = "P";
-                                                            } elseif ($current_date_number == 21) {
-                                                                $monthly_attendance->day_twenty_one = "P";
-                                                            } elseif ($current_date_number == 22) {
-                                                                $monthly_attendance->day_twenty_two = "P";
-                                                            } elseif ($current_date_number == 23) {
-                                                                $monthly_attendance->day_twenty_three = "P";
-                                                            } elseif ($current_date_number == 24) {
-                                                                $monthly_attendance->day_twenty_four = "P";
-                                                            } elseif ($current_date_number == 25) {
-                                                                $monthly_attendance->day_twenty_five = "P";
-                                                            } elseif ($current_date_number == 26) {
-                                                                $monthly_attendance->day_twenty_six = "P";
-                                                            } elseif ($current_date_number == 27) {
-                                                                $monthly_attendance->day_twenty_seven = "P";
-                                                            } elseif ($current_date_number == 28) {
-                                                                $monthly_attendance->day_twenty_eight = "P";
-                                                            } elseif ($current_date_number == 29) {
-                                                                $monthly_attendance->day_twenty_nine = "P";
-                                                            } elseif ($current_date_number == 30) {
-                                                                $monthly_attendance->day_thirty = "P";
-                                                            } elseif ($current_date_number == 31) {
-                                                                $monthly_attendance->day_thirty_one = "P";
-                                                            } else {
-                                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                            }
-
-                                                            $monthly_attendance->save();
-                                                        }
-                                                    } else {
-                                                        // return "ok";
-                                                        $monthly_attendance = new CustomizeMonthlyAttendance();
-                                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
-                                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
-                                                        $monthly_attendance->attendance_month = $attendance_month;
-                                                        $monthly_attendance->attendance_year = $attendance_year;
-                                                        if ($current_date_number == 1) {
-                                                            $monthly_attendance->day_one = "P";
-                                                        } elseif ($current_date_number == 2) {
-                                                            $monthly_attendance->day_two = "P";
-                                                        } elseif ($current_date_number == 3) {
-                                                            $monthly_attendance->day_three = "P";
-                                                        } elseif ($current_date_number == 4) {
-                                                            $monthly_attendance->day_four = "P";
-                                                        } elseif ($current_date_number == 5) {
-                                                            $monthly_attendance->day_five = "P";
-                                                        } elseif ($current_date_number == 6) {
-                                                            $monthly_attendance->day_six = "P";
-                                                        } elseif ($current_date_number == 7) {
-                                                            $monthly_attendance->day_seven = "P";
-                                                        } elseif ($current_date_number == 8) {
-                                                            $monthly_attendance->day_eight = "P";
-                                                        } elseif ($current_date_number == 9) {
-                                                            $monthly_attendance->day_nine = "P";
-                                                        } elseif ($current_date_number == 10) {
-                                                            $monthly_attendance->day_ten = "P";
-                                                        } elseif ($current_date_number == 11) {
-                                                            $monthly_attendance->day_eleven = "P";
-                                                        } elseif ($current_date_number == 12) {
-                                                            $monthly_attendance->day_twelve = "P";
-                                                        } elseif ($current_date_number == 13) {
-                                                            $monthly_attendance->day_thirteen = "P";
-                                                        } elseif ($current_date_number == 14) {
-                                                            $monthly_attendance->day_fourteen = "P";
-                                                        } elseif ($current_date_number == 15) {
-                                                            $monthly_attendance->day_fifteen = "P";
-                                                        } elseif ($current_date_number == 16) {
-                                                            $monthly_attendance->day_sixteen = "P";
-                                                        } elseif ($current_date_number == 17) {
-                                                            $monthly_attendance->day_seventeen = "P";
-                                                        } elseif ($current_date_number == 18) {
-                                                            $monthly_attendance->day_eighteen = "P";
-                                                        } elseif ($current_date_number == 19) {
-                                                            $monthly_attendance->day_nineteen = "P";
-                                                        } elseif ($current_date_number == 20) {
-                                                            $monthly_attendance->day_twenty = "P";
-                                                        } elseif ($current_date_number == 21) {
-                                                            $monthly_attendance->day_twenty_one = "P";
-                                                        } elseif ($current_date_number == 22) {
-                                                            $monthly_attendance->day_twenty_two = "P";
-                                                        } elseif ($current_date_number == 23) {
-                                                            $monthly_attendance->day_twenty_three = "P";
-                                                        } elseif ($current_date_number == 24) {
-                                                            $monthly_attendance->day_twenty_four = "P";
-                                                        } elseif ($current_date_number == 25) {
-                                                            $monthly_attendance->day_twenty_five = "P";
-                                                        } elseif ($current_date_number == 26) {
-                                                            $monthly_attendance->day_twenty_six = "P";
-                                                        } elseif ($current_date_number == 27) {
-                                                            $monthly_attendance->day_twenty_seven = "P";
-                                                        } elseif ($current_date_number == 28) {
-                                                            $monthly_attendance->day_twenty_eight = "P";
-                                                        } elseif ($current_date_number == 29) {
-                                                            $monthly_attendance->day_twenty_nine = "P";
-                                                        } elseif ($current_date_number == 30) {
-                                                            $monthly_attendance->day_thirty = "P";
-                                                        } elseif ($current_date_number == 31) {
-                                                            $monthly_attendance->day_thirty_one = "P";
-                                                        } else {
-                                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                                        }
-
-                                                        $monthly_attendance->day_one = "P";
-
-                                                        $monthly_attendance->save();
-                                                    }
-                                                } else {
-
-                                if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
-
-                                    $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
-
-                                    foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
-
-                                        $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
-                                        if ($current_date_number == 1) {
-                                            $monthly_attendance->day_one = "P";
-                                        } elseif ($current_date_number == 2) {
-                                            $monthly_attendance->day_two = "P";
-                                        } elseif ($current_date_number == 3) {
-                                            $monthly_attendance->day_three = "P";
-                                        } elseif ($current_date_number == 4) {
-                                            $monthly_attendance->day_four = "P";
-                                        } elseif ($current_date_number == 5) {
-                                            $monthly_attendance->day_five = "P";
-                                        } elseif ($current_date_number == 6) {
-                                            $monthly_attendance->day_six = "P";
-                                        } elseif ($current_date_number == 7) {
-                                            $monthly_attendance->day_seven = "P";
-                                        } elseif ($current_date_number == 8) {
-                                            $monthly_attendance->day_eight = "P";
-                                        } elseif ($current_date_number == 9) {
-                                            $monthly_attendance->day_nine = "P";
-                                        } elseif ($current_date_number == 10) {
-                                            $monthly_attendance->day_ten = "P";
-                                        } elseif ($current_date_number == 11) {
-                                            $monthly_attendance->day_eleven = "P";
-                                        } elseif ($current_date_number == 12) {
-                                            $monthly_attendance->day_twelve = "P";
-                                        } elseif ($current_date_number == 13) {
-                                            $monthly_attendance->day_thirteen = "P";
-                                        } elseif ($current_date_number == 14) {
-                                            $monthly_attendance->day_fourteen = "P";
-                                        } elseif ($current_date_number == 15) {
-                                            $monthly_attendance->day_fifteen = "P";
-                                        } elseif ($current_date_number == 16) {
-                                            $monthly_attendance->day_sixteen = "P";
-                                        } elseif ($current_date_number == 17) {
-                                            $monthly_attendance->day_seventeen = "P";
-                                        } elseif ($current_date_number == 18) {
-                                            $monthly_attendance->day_eighteen = "P";
-                                        } elseif ($current_date_number == 19) {
-                                            $monthly_attendance->day_nineteen = "P";
-                                        } elseif ($current_date_number == 20) {
-                                            $monthly_attendance->day_twenty = "P";
-                                        } elseif ($current_date_number == 21) {
-                                            $monthly_attendance->day_twenty_one = "P";
-                                        } elseif ($current_date_number == 22) {
-                                            $monthly_attendance->day_twenty_two = "P";
-                                        } elseif ($current_date_number == 23) {
-                                            $monthly_attendance->day_twenty_three = "P";
-                                        } elseif ($current_date_number == 24) {
-                                            $monthly_attendance->day_twenty_four = "P";
-                                        } elseif ($current_date_number == 25) {
-                                            $monthly_attendance->day_twenty_five = "P";
-                                        } elseif ($current_date_number == 26) {
-                                            $monthly_attendance->day_twenty_six = "P";
-                                        } elseif ($current_date_number == 27) {
-                                            $monthly_attendance->day_twenty_seven = "P";
-                                        } elseif ($current_date_number == 28) {
-                                            $monthly_attendance->day_twenty_eight = "P";
-                                        } elseif ($current_date_number == 29) {
-                                            $monthly_attendance->day_twenty_nine = "P";
-                                        } elseif ($current_date_number == 30) {
-                                            $monthly_attendance->day_thirty = "P";
-                                        } elseif ($current_date_number == 31) {
-                                            $monthly_attendance->day_thirty_one = "P";
-                                        } else {
-                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
-                                        }
-
-                                        $monthly_attendance->save();
-                                    }
+                            if ($month == "1") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $previousYear;
+                                    $attendance_month = "12";
                                 } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "1";
+                                }
+                            } elseif ($month == "2") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
 
-                                    $monthly_attendance = new MonthlyAttendance();
-                                    $monthly_attendance->monthly_com_id = Auth::user()->com_id;
-                                    $monthly_attendance->monthly_employee_id = $request->employee_id;
-                                    $monthly_attendance->attendance_month = $current_date;
-                                    $monthly_attendance->attendance_year = $current_date;
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $previousYear;
+                                    $attendance_month = "1";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "2";
+                                }
+                            } elseif ($month == "3") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $previousYear;
+                                    $attendance_month = "2";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "3";
+                                }
+                            } elseif ($month == "4") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "3";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "4";
+                                }
+                            } elseif ($month == "5") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "4";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "5";
+                                }
+                            } elseif ($month == "6") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "5";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "6";
+                                }
+                            } elseif ($month == "7") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "6";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "7";
+                                }
+                            } elseif ($month == "8") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "7";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "8";
+                                }
+                            } elseif ($month == "9") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "8";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "9";
+                                }
+                            } elseif ($month == "10") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "9";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "10";
+                                }
+                            } elseif ($month == "11") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "10";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "11";
+                                }
+                            } elseif ($month == "12") {
+                                $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+                                if ($customize_date->end_date >= $day) {
+                                    $attendance_year = $year;
+                                    $attendance_month = "11";
+                                } else {
+                                    $attendance_year = $year;
+                                    $attendance_month = "12";
+                                }
+                            }
+
+
+                            if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
+
+                                $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
+
+                                foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                    $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
                                     if ($current_date_number == 1) {
                                         $monthly_attendance->day_one = "P";
                                     } elseif ($current_date_number == 2) {
@@ -7538,6 +6729,658 @@ if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(p
 
                                     $monthly_attendance->save();
                                 }
+                            } else {
+                                // return "ok";
+                                $monthly_attendance = new CustomizeMonthlyAttendance();
+                                $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
+                                $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
+                                $monthly_attendance->attendance_month = $attendance_month;
+                                $monthly_attendance->attendance_year = $attendance_year;
+                                if ($current_date_number == 1) {
+                                    $monthly_attendance->day_one = "P";
+                                } elseif ($current_date_number == 2) {
+                                    $monthly_attendance->day_two = "P";
+                                } elseif ($current_date_number == 3) {
+                                    $monthly_attendance->day_three = "P";
+                                } elseif ($current_date_number == 4) {
+                                    $monthly_attendance->day_four = "P";
+                                } elseif ($current_date_number == 5) {
+                                    $monthly_attendance->day_five = "P";
+                                } elseif ($current_date_number == 6) {
+                                    $monthly_attendance->day_six = "P";
+                                } elseif ($current_date_number == 7) {
+                                    $monthly_attendance->day_seven = "P";
+                                } elseif ($current_date_number == 8) {
+                                    $monthly_attendance->day_eight = "P";
+                                } elseif ($current_date_number == 9) {
+                                    $monthly_attendance->day_nine = "P";
+                                } elseif ($current_date_number == 10) {
+                                    $monthly_attendance->day_ten = "P";
+                                } elseif ($current_date_number == 11) {
+                                    $monthly_attendance->day_eleven = "P";
+                                } elseif ($current_date_number == 12) {
+                                    $monthly_attendance->day_twelve = "P";
+                                } elseif ($current_date_number == 13) {
+                                    $monthly_attendance->day_thirteen = "P";
+                                } elseif ($current_date_number == 14) {
+                                    $monthly_attendance->day_fourteen = "P";
+                                } elseif ($current_date_number == 15) {
+                                    $monthly_attendance->day_fifteen = "P";
+                                } elseif ($current_date_number == 16) {
+                                    $monthly_attendance->day_sixteen = "P";
+                                } elseif ($current_date_number == 17) {
+                                    $monthly_attendance->day_seventeen = "P";
+                                } elseif ($current_date_number == 18) {
+                                    $monthly_attendance->day_eighteen = "P";
+                                } elseif ($current_date_number == 19) {
+                                    $monthly_attendance->day_nineteen = "P";
+                                } elseif ($current_date_number == 20) {
+                                    $monthly_attendance->day_twenty = "P";
+                                } elseif ($current_date_number == 21) {
+                                    $monthly_attendance->day_twenty_one = "P";
+                                } elseif ($current_date_number == 22) {
+                                    $monthly_attendance->day_twenty_two = "P";
+                                } elseif ($current_date_number == 23) {
+                                    $monthly_attendance->day_twenty_three = "P";
+                                } elseif ($current_date_number == 24) {
+                                    $monthly_attendance->day_twenty_four = "P";
+                                } elseif ($current_date_number == 25) {
+                                    $monthly_attendance->day_twenty_five = "P";
+                                } elseif ($current_date_number == 26) {
+                                    $monthly_attendance->day_twenty_six = "P";
+                                } elseif ($current_date_number == 27) {
+                                    $monthly_attendance->day_twenty_seven = "P";
+                                } elseif ($current_date_number == 28) {
+                                    $monthly_attendance->day_twenty_eight = "P";
+                                } elseif ($current_date_number == 29) {
+                                    $monthly_attendance->day_twenty_nine = "P";
+                                } elseif ($current_date_number == 30) {
+                                    $monthly_attendance->day_thirty = "P";
+                                } elseif ($current_date_number == 31) {
+                                    $monthly_attendance->day_thirty_one = "P";
+                                } else {
+                                    return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                }
+
+                                $monthly_attendance->day_one = "P";
+
+                                $monthly_attendance->save();
+                            }
+                        } else {
+
+                            $monthly_attendance = new MonthlyAttendance();
+                            $monthly_attendance->monthly_com_id = Auth::user()->com_id;
+                            $monthly_attendance->monthly_employee_id = $request->employee_id;
+                            $monthly_attendance->attendance_month = $current_date;
+                            $monthly_attendance->attendance_year = $current_date;
+                            if ($current_date_number == 1) {
+                                $monthly_attendance->day_one = "P";
+                            } elseif ($current_date_number == 2) {
+                                $monthly_attendance->day_two = "P";
+                            } elseif ($current_date_number == 3) {
+                                $monthly_attendance->day_three = "P";
+                            } elseif ($current_date_number == 4) {
+                                $monthly_attendance->day_four = "P";
+                            } elseif ($current_date_number == 5) {
+                                $monthly_attendance->day_five = "P";
+                            } elseif ($current_date_number == 6) {
+                                $monthly_attendance->day_six = "P";
+                            } elseif ($current_date_number == 7) {
+                                $monthly_attendance->day_seven = "P";
+                            } elseif ($current_date_number == 8) {
+                                $monthly_attendance->day_eight = "P";
+                            } elseif ($current_date_number == 9) {
+                                $monthly_attendance->day_nine = "P";
+                            } elseif ($current_date_number == 10) {
+                                $monthly_attendance->day_ten = "P";
+                            } elseif ($current_date_number == 11) {
+                                $monthly_attendance->day_eleven = "P";
+                            } elseif ($current_date_number == 12) {
+                                $monthly_attendance->day_twelve = "P";
+                            } elseif ($current_date_number == 13) {
+                                $monthly_attendance->day_thirteen = "P";
+                            } elseif ($current_date_number == 14) {
+                                $monthly_attendance->day_fourteen = "P";
+                            } elseif ($current_date_number == 15) {
+                                $monthly_attendance->day_fifteen = "P";
+                            } elseif ($current_date_number == 16) {
+                                $monthly_attendance->day_sixteen = "P";
+                            } elseif ($current_date_number == 17) {
+                                $monthly_attendance->day_seventeen = "P";
+                            } elseif ($current_date_number == 18) {
+                                $monthly_attendance->day_eighteen = "P";
+                            } elseif ($current_date_number == 19) {
+                                $monthly_attendance->day_nineteen = "P";
+                            } elseif ($current_date_number == 20) {
+                                $monthly_attendance->day_twenty = "P";
+                            } elseif ($current_date_number == 21) {
+                                $monthly_attendance->day_twenty_one = "P";
+                            } elseif ($current_date_number == 22) {
+                                $monthly_attendance->day_twenty_two = "P";
+                            } elseif ($current_date_number == 23) {
+                                $monthly_attendance->day_twenty_three = "P";
+                            } elseif ($current_date_number == 24) {
+                                $monthly_attendance->day_twenty_four = "P";
+                            } elseif ($current_date_number == 25) {
+                                $monthly_attendance->day_twenty_five = "P";
+                            } elseif ($current_date_number == 26) {
+                                $monthly_attendance->day_twenty_six = "P";
+                            } elseif ($current_date_number == 27) {
+                                $monthly_attendance->day_twenty_seven = "P";
+                            } elseif ($current_date_number == 28) {
+                                $monthly_attendance->day_twenty_eight = "P";
+                            } elseif ($current_date_number == 29) {
+                                $monthly_attendance->day_twenty_nine = "P";
+                            } elseif ($current_date_number == 30) {
+                                $monthly_attendance->day_thirty = "P";
+                            } elseif ($current_date_number == 31) {
+                                $monthly_attendance->day_thirty_one = "P";
+                            } else {
+                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                            }
+
+                            $monthly_attendance->day_one = "P";
+
+                            $monthly_attendance->save();
+                        }
+                        ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
+
+
+
+
+
+                        return back()->with('message', 'Attendance Submitted Successfully');
+                    } else {
+
+                        $added_chackin_lat = $usersValue->check_in_latitude + 0.0008;
+                        $deducted_checkin_lat = $usersValue->check_in_latitude - 0.0008;
+                        $added_checkin_longi = $usersValue->check_in_longitude + 0.0008;
+                        $deducted_checkin_longi = $usersValue->check_in_longitude - 0.0008;
+
+                        if (($added_chackin_lat >= $visitor_latitude && $deducted_checkin_lat <= $visitor_latitude) || ($added_checkin_longi >= $visitor_longitude && $deducted_checkin_longi <= $visitor_longitude)) {
+
+                            if (Attendance::where('employee_id', $request->employee_id)->where('attendance_date', '=', $current_date)->exists()) {
+
+                                return back()->with('message', 'Already Checked In For Today!!! Please Contact With The System Administrator!!!');
+                            } else {
+
+                                $attendance = new Attendance();
+                                $attendance->attendance_com_id = Auth::user()->com_id;
+                                $attendance->employee_id = $request->employee_id;
+                                $attendance->attendance_date = $current_date;
+                                $attendance->clock_in = $current_time;
+                                $attendance->check_in_latitude = $visitor_latitude;
+                                $attendance->check_in_longitude = $visitor_longitude;
+                                $attendance->check_in_ip = $local_server_ip;
+                                if (date_create($current_time) >= date_create($shift_in)) {
+                                    if ($shift_in != 0 && $shift_out != 0) {
+
+                                        $attendance->time_late = date_create($shift_in)->diff(date_create($current_time))->format('%H:%i:%s');
+
+                                        if ($current_time_in_seconds >= $office_late_time_config_in_seconds) {
+
+                                            if (LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->exists()) {
+
+                                                $late_times = LateTime::where('late_time_employee_id', $request->employee_id)->where('late_time_date', $current_date)->get('id');
+
+                                                foreach ($late_times as $late_times_value) {
+
+                                                    $late_time = LateTime::find($late_times_value->id);
+                                                    $late_time->late_time_com_id = Auth::user()->com_id;
+                                                    $late_time->late_time_employee_id = $request->employee_id;
+                                                    $late_time->late_time_date = $current_date;
+                                                    $late_time->save();
+                                                }
+                                            } else {
+                                                $late_time = new LateTime();
+                                                $late_time->late_time_com_id = Auth::user()->com_id;
+                                                $late_time->late_time_employee_id = $request->employee_id;
+                                                $late_time->late_time_date = $current_date;
+                                                $late_time->save();
+                                            }
+                                        }
+                                    }
+                                }
+                                //$attendance->check_in_out = 0;
+                                $attendance->check_in_out = 1;
+                                $attendance->attendance_status = "Present";
+                                $attendance->save();
+
+                                ########################### MONTHLY ATTENDANCE CODE STARTS #########################################
+
+                                $permission = "3.28";
+                                if (Package::where('id', '=', Auth::user()->com_pack)->whereRaw('json_contains(package_module,\'["' . $permission . '"]\')')->exists()) {
+
+                                    $year = date('Y');
+
+                                    $month =  date('m');
+                                    $day =  date('d');
+
+                                    $currentDate = Carbon::now();  // Get the current date and time
+                                    $previousMonth = $currentDate->subMonth();  // Subtract one month from the current date
+
+                                    $previousYear =  $previousMonth->format('Y');
+
+                                    $previousMonth = $previousMonth->format('m');
+
+                                    $date_setting =  DateSetting::where('date_settings_com_id', Auth::user()->com_id)->first();
+
+                                    if ($month == "1") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "12";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "1";
+                                        }
+                                    } elseif ($month == "2") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 1)->first();
+
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "1";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "2";
+                                        }
+                                    } elseif ($month == "3") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 2)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $previousYear;
+                                            $attendance_month = "2";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "3";
+                                        }
+                                    } elseif ($month == "4") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 3)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "3";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "4";
+                                        }
+                                    } elseif ($month == "5") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 4)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "4";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "5";
+                                        }
+                                    } elseif ($month == "6") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 5)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "5";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "6";
+                                        }
+                                    } elseif ($month == "7") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 6)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "6";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "7";
+                                        }
+                                    } elseif ($month == "8") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 7)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "7";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "8";
+                                        }
+                                    } elseif ($month == "9") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 8)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "8";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "9";
+                                        }
+                                    } elseif ($month == "10") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 9)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "9";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "10";
+                                        }
+                                    } elseif ($month == "11") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 10)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "10";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "11";
+                                        }
+                                    } elseif ($month == "12") {
+                                        $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 11)->first();
+                                        if ($customize_date->end_date >= $day) {
+                                            $attendance_year = $year;
+                                            $attendance_month = "11";
+                                        } else {
+                                            $attendance_year = $year;
+                                            $attendance_month = "12";
+                                        }
+                                    }
+
+
+                                    if (CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->exists()) {
+
+                                        $monthly_attendance_employee_id = CustomizeMonthlyAttendance::where('customize_monthly_employee_id', $request->employee_id)->where('attendance_month', '=', $attendance_month)->where('attendance_year', '=', $attendance_year)->get();
+
+                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                            $monthly_attendance = CustomizeMonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                            if ($current_date_number == 1) {
+                                                $monthly_attendance->day_one = "P";
+                                            } elseif ($current_date_number == 2) {
+                                                $monthly_attendance->day_two = "P";
+                                            } elseif ($current_date_number == 3) {
+                                                $monthly_attendance->day_three = "P";
+                                            } elseif ($current_date_number == 4) {
+                                                $monthly_attendance->day_four = "P";
+                                            } elseif ($current_date_number == 5) {
+                                                $monthly_attendance->day_five = "P";
+                                            } elseif ($current_date_number == 6) {
+                                                $monthly_attendance->day_six = "P";
+                                            } elseif ($current_date_number == 7) {
+                                                $monthly_attendance->day_seven = "P";
+                                            } elseif ($current_date_number == 8) {
+                                                $monthly_attendance->day_eight = "P";
+                                            } elseif ($current_date_number == 9) {
+                                                $monthly_attendance->day_nine = "P";
+                                            } elseif ($current_date_number == 10) {
+                                                $monthly_attendance->day_ten = "P";
+                                            } elseif ($current_date_number == 11) {
+                                                $monthly_attendance->day_eleven = "P";
+                                            } elseif ($current_date_number == 12) {
+                                                $monthly_attendance->day_twelve = "P";
+                                            } elseif ($current_date_number == 13) {
+                                                $monthly_attendance->day_thirteen = "P";
+                                            } elseif ($current_date_number == 14) {
+                                                $monthly_attendance->day_fourteen = "P";
+                                            } elseif ($current_date_number == 15) {
+                                                $monthly_attendance->day_fifteen = "P";
+                                            } elseif ($current_date_number == 16) {
+                                                $monthly_attendance->day_sixteen = "P";
+                                            } elseif ($current_date_number == 17) {
+                                                $monthly_attendance->day_seventeen = "P";
+                                            } elseif ($current_date_number == 18) {
+                                                $monthly_attendance->day_eighteen = "P";
+                                            } elseif ($current_date_number == 19) {
+                                                $monthly_attendance->day_nineteen = "P";
+                                            } elseif ($current_date_number == 20) {
+                                                $monthly_attendance->day_twenty = "P";
+                                            } elseif ($current_date_number == 21) {
+                                                $monthly_attendance->day_twenty_one = "P";
+                                            } elseif ($current_date_number == 22) {
+                                                $monthly_attendance->day_twenty_two = "P";
+                                            } elseif ($current_date_number == 23) {
+                                                $monthly_attendance->day_twenty_three = "P";
+                                            } elseif ($current_date_number == 24) {
+                                                $monthly_attendance->day_twenty_four = "P";
+                                            } elseif ($current_date_number == 25) {
+                                                $monthly_attendance->day_twenty_five = "P";
+                                            } elseif ($current_date_number == 26) {
+                                                $monthly_attendance->day_twenty_six = "P";
+                                            } elseif ($current_date_number == 27) {
+                                                $monthly_attendance->day_twenty_seven = "P";
+                                            } elseif ($current_date_number == 28) {
+                                                $monthly_attendance->day_twenty_eight = "P";
+                                            } elseif ($current_date_number == 29) {
+                                                $monthly_attendance->day_twenty_nine = "P";
+                                            } elseif ($current_date_number == 30) {
+                                                $monthly_attendance->day_thirty = "P";
+                                            } elseif ($current_date_number == 31) {
+                                                $monthly_attendance->day_thirty_one = "P";
+                                            } else {
+                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                            }
+
+                                            $monthly_attendance->save();
+                                        }
+                                    } else {
+                                        // return "ok";
+                                        $monthly_attendance = new CustomizeMonthlyAttendance();
+                                        $monthly_attendance->customize_monthly_com_id = Auth::user()->com_id;
+                                        $monthly_attendance->customize_monthly_employee_id = $request->employee_id;
+                                        $monthly_attendance->attendance_month = $attendance_month;
+                                        $monthly_attendance->attendance_year = $attendance_year;
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->day_one = "P";
+
+                                        $monthly_attendance->save();
+                                    }
+                                } else {
+
+                                    if (MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->exists()) {
+
+                                        $monthly_attendance_employee_id = MonthlyAttendance::where('monthly_employee_id', $request->employee_id)->whereMonth('attendance_month', '=', $current_month)->whereYear('attendance_year', '=', $current_year)->get();
+
+                                        foreach ($monthly_attendance_employee_id as $monthly_attendance_employee_id_value) {
+
+                                            $monthly_attendance = MonthlyAttendance::find($monthly_attendance_employee_id_value->id);
+                                            if ($current_date_number == 1) {
+                                                $monthly_attendance->day_one = "P";
+                                            } elseif ($current_date_number == 2) {
+                                                $monthly_attendance->day_two = "P";
+                                            } elseif ($current_date_number == 3) {
+                                                $monthly_attendance->day_three = "P";
+                                            } elseif ($current_date_number == 4) {
+                                                $monthly_attendance->day_four = "P";
+                                            } elseif ($current_date_number == 5) {
+                                                $monthly_attendance->day_five = "P";
+                                            } elseif ($current_date_number == 6) {
+                                                $monthly_attendance->day_six = "P";
+                                            } elseif ($current_date_number == 7) {
+                                                $monthly_attendance->day_seven = "P";
+                                            } elseif ($current_date_number == 8) {
+                                                $monthly_attendance->day_eight = "P";
+                                            } elseif ($current_date_number == 9) {
+                                                $monthly_attendance->day_nine = "P";
+                                            } elseif ($current_date_number == 10) {
+                                                $monthly_attendance->day_ten = "P";
+                                            } elseif ($current_date_number == 11) {
+                                                $monthly_attendance->day_eleven = "P";
+                                            } elseif ($current_date_number == 12) {
+                                                $monthly_attendance->day_twelve = "P";
+                                            } elseif ($current_date_number == 13) {
+                                                $monthly_attendance->day_thirteen = "P";
+                                            } elseif ($current_date_number == 14) {
+                                                $monthly_attendance->day_fourteen = "P";
+                                            } elseif ($current_date_number == 15) {
+                                                $monthly_attendance->day_fifteen = "P";
+                                            } elseif ($current_date_number == 16) {
+                                                $monthly_attendance->day_sixteen = "P";
+                                            } elseif ($current_date_number == 17) {
+                                                $monthly_attendance->day_seventeen = "P";
+                                            } elseif ($current_date_number == 18) {
+                                                $monthly_attendance->day_eighteen = "P";
+                                            } elseif ($current_date_number == 19) {
+                                                $monthly_attendance->day_nineteen = "P";
+                                            } elseif ($current_date_number == 20) {
+                                                $monthly_attendance->day_twenty = "P";
+                                            } elseif ($current_date_number == 21) {
+                                                $monthly_attendance->day_twenty_one = "P";
+                                            } elseif ($current_date_number == 22) {
+                                                $monthly_attendance->day_twenty_two = "P";
+                                            } elseif ($current_date_number == 23) {
+                                                $monthly_attendance->day_twenty_three = "P";
+                                            } elseif ($current_date_number == 24) {
+                                                $monthly_attendance->day_twenty_four = "P";
+                                            } elseif ($current_date_number == 25) {
+                                                $monthly_attendance->day_twenty_five = "P";
+                                            } elseif ($current_date_number == 26) {
+                                                $monthly_attendance->day_twenty_six = "P";
+                                            } elseif ($current_date_number == 27) {
+                                                $monthly_attendance->day_twenty_seven = "P";
+                                            } elseif ($current_date_number == 28) {
+                                                $monthly_attendance->day_twenty_eight = "P";
+                                            } elseif ($current_date_number == 29) {
+                                                $monthly_attendance->day_twenty_nine = "P";
+                                            } elseif ($current_date_number == 30) {
+                                                $monthly_attendance->day_thirty = "P";
+                                            } elseif ($current_date_number == 31) {
+                                                $monthly_attendance->day_thirty_one = "P";
+                                            } else {
+                                                return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                            }
+
+                                            $monthly_attendance->save();
+                                        }
+                                    } else {
+
+                                        $monthly_attendance = new MonthlyAttendance();
+                                        $monthly_attendance->monthly_com_id = Auth::user()->com_id;
+                                        $monthly_attendance->monthly_employee_id = $request->employee_id;
+                                        $monthly_attendance->attendance_month = $current_date;
+                                        $monthly_attendance->attendance_year = $current_date;
+                                        if ($current_date_number == 1) {
+                                            $monthly_attendance->day_one = "P";
+                                        } elseif ($current_date_number == 2) {
+                                            $monthly_attendance->day_two = "P";
+                                        } elseif ($current_date_number == 3) {
+                                            $monthly_attendance->day_three = "P";
+                                        } elseif ($current_date_number == 4) {
+                                            $monthly_attendance->day_four = "P";
+                                        } elseif ($current_date_number == 5) {
+                                            $monthly_attendance->day_five = "P";
+                                        } elseif ($current_date_number == 6) {
+                                            $monthly_attendance->day_six = "P";
+                                        } elseif ($current_date_number == 7) {
+                                            $monthly_attendance->day_seven = "P";
+                                        } elseif ($current_date_number == 8) {
+                                            $monthly_attendance->day_eight = "P";
+                                        } elseif ($current_date_number == 9) {
+                                            $monthly_attendance->day_nine = "P";
+                                        } elseif ($current_date_number == 10) {
+                                            $monthly_attendance->day_ten = "P";
+                                        } elseif ($current_date_number == 11) {
+                                            $monthly_attendance->day_eleven = "P";
+                                        } elseif ($current_date_number == 12) {
+                                            $monthly_attendance->day_twelve = "P";
+                                        } elseif ($current_date_number == 13) {
+                                            $monthly_attendance->day_thirteen = "P";
+                                        } elseif ($current_date_number == 14) {
+                                            $monthly_attendance->day_fourteen = "P";
+                                        } elseif ($current_date_number == 15) {
+                                            $monthly_attendance->day_fifteen = "P";
+                                        } elseif ($current_date_number == 16) {
+                                            $monthly_attendance->day_sixteen = "P";
+                                        } elseif ($current_date_number == 17) {
+                                            $monthly_attendance->day_seventeen = "P";
+                                        } elseif ($current_date_number == 18) {
+                                            $monthly_attendance->day_eighteen = "P";
+                                        } elseif ($current_date_number == 19) {
+                                            $monthly_attendance->day_nineteen = "P";
+                                        } elseif ($current_date_number == 20) {
+                                            $monthly_attendance->day_twenty = "P";
+                                        } elseif ($current_date_number == 21) {
+                                            $monthly_attendance->day_twenty_one = "P";
+                                        } elseif ($current_date_number == 22) {
+                                            $monthly_attendance->day_twenty_two = "P";
+                                        } elseif ($current_date_number == 23) {
+                                            $monthly_attendance->day_twenty_three = "P";
+                                        } elseif ($current_date_number == 24) {
+                                            $monthly_attendance->day_twenty_four = "P";
+                                        } elseif ($current_date_number == 25) {
+                                            $monthly_attendance->day_twenty_five = "P";
+                                        } elseif ($current_date_number == 26) {
+                                            $monthly_attendance->day_twenty_six = "P";
+                                        } elseif ($current_date_number == 27) {
+                                            $monthly_attendance->day_twenty_seven = "P";
+                                        } elseif ($current_date_number == 28) {
+                                            $monthly_attendance->day_twenty_eight = "P";
+                                        } elseif ($current_date_number == 29) {
+                                            $monthly_attendance->day_twenty_nine = "P";
+                                        } elseif ($current_date_number == 30) {
+                                            $monthly_attendance->day_thirty = "P";
+                                        } elseif ($current_date_number == 31) {
+                                            $monthly_attendance->day_thirty_one = "P";
+                                        } else {
+                                            return back()->with('message', 'Monthly Attendance Date Not Working Properly, Please Check The Error.');
+                                        }
+
+                                        $monthly_attendance->save();
+                                    }
                                 }
                                 ######################################################### MONTHLY ATTENDANCE CODE ENDS ############################
 

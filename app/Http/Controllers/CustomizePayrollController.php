@@ -31,8 +31,9 @@ use PDF;
 
 class CustomizePayrollController extends Controller
 {
-      public function makeCustomizePayment(Request $request)
+    public function makeCustomizePayment(Request $request)
     {
+
 
         $validated = $request->validate([
             'pay_slip_com_id' => 'required',
@@ -120,6 +121,7 @@ class CustomizePayrollController extends Controller
             $otherHolidays = Holiday::where('holiday_com_id', Auth::user()->com_id)
                 ->where('holiday_type', 'Other-Holiday')
                 ->get();
+
             $probationStartDate = Carbon::parse($incrementData->start_date_of_month);
             $probationEndDate = Carbon::parse($incrementData->increment_date);
 
@@ -340,7 +342,7 @@ class CustomizePayrollController extends Controller
             }
 
             $gross_deductions = $request->pay_slip_provident_fund + $request->pay_slip_tax_deduction + $request->pay_slip_loans + $request->pay_slip_statutory_deduction + $request->pay_slip_late_day_salary_deduct + $request->pay_slip_late_day_salary_deduct + $request->pay_slip_deduction_for_unauthorised_leave;
-         $net_pay = ($totalSalary + $request->pay_slip_mobile_bill +  $request->pay_slip_transport_allowance) - $gross_deductions;
+            $net_pay = ($totalSalary + $request->pay_slip_mobile_bill +  $request->pay_slip_transport_allowance) - $gross_deductions;
 
             $pay_slip = new CustomizePaySlip();
             $pay_slip->customize_monthly_attendance_id = $request->monthly_attendance_row_id;
@@ -408,6 +410,7 @@ class CustomizePayrollController extends Controller
             $monthly_attendance = CustomizeMonthlyAttendance::find($request->monthly_attendance_row_id);
             $monthly_attendance->customize_monthly_payment_status = 1;
             $monthly_attendance->save();
+            return $monthly_attendance;
 
 
             if (Loan::where('loans_employee_id', $request->pay_slip_employee_id)->where('loans_remaining_installments', '>', 0)->exists()) {
@@ -1116,12 +1119,14 @@ class CustomizePayrollController extends Controller
 
             $pay_slip->save();
 
+
             $gross_earnings = $request->pay_slip_basic_salary + $request->pay_slip_house_rent + $request->pay_slip_medical_allowance + $request->pay_slip_conveyance_allowance + $request->pay_slip_festival_bonus + $request->pay_slip_commissions + $request->pay_slip_other_payments + $request->pay_slip_overtimes;
             $gross_deductions = $request->pay_slip_provident_fund + $request->pay_slip_tax_deduction + $request->pay_slip_loans + $request->pay_slip_statutory_deduction + $request->pay_slip_late_day_salary_deduct;
 
             $monthly_attendance = CustomizeMonthlyAttendance::find($request->monthly_attendance_row_id);
             $monthly_attendance->customize_monthly_payment_status = 1;
             $monthly_attendance->save();
+
 
 
             if (Loan::where('loans_employee_id', $request->pay_slip_employee_id)->where('loans_remaining_installments', '>', 0)->exists()) {
@@ -1148,6 +1153,7 @@ class CustomizePayrollController extends Controller
                     $employee_pf_contribution->provident_fund_employee_amount = $request->pay_slip_provident_fund;
                     $employee_pf_contribution->provident_fund_company_amount = ($request->pay_slip_gross_salary * $company_pf_configs_value->providentfund_config_amount_precentage) / 100;
                     $employee_pf_contribution->save();
+
 
                     if (ProvidentfundReport::where('providentfund_report_com_id', '=', $request->pay_slip_com_id)->where('providentfund_report_employee_id', '=', $request->pay_slip_employee_id)->exists()) {
 
@@ -1612,6 +1618,7 @@ class CustomizePayrollController extends Controller
             }
         } else {
 
+
             $pay_slip = new CustomizePaySlip();
             $pay_slip->customize_monthly_attendance_id = $request->monthly_attendance_row_id;
             $pay_slip->customize_pay_slip_bank_account_id = $request->pay_slip_bank_account_id;
@@ -1672,11 +1679,14 @@ class CustomizePayrollController extends Controller
 
             $pay_slip->save();
 
+
+
             $gross_earnings = $request->pay_slip_basic_salary + $request->pay_slip_house_rent + $request->pay_slip_medical_allowance + $request->pay_slip_conveyance_allowance + $request->pay_slip_festival_bonus + $request->pay_slip_commissions + $request->pay_slip_other_payments + $request->pay_slip_overtimes;
             $gross_deductions = $request->pay_slip_provident_fund + $request->pay_slip_tax_deduction + $request->pay_slip_loans + $request->pay_slip_statutory_deduction + $request->pay_slip_late_day_salary_deduct;
 
             $monthly_attendance = CustomizeMonthlyAttendance::find($request->monthly_attendance_row_id);
             $monthly_attendance->customize_monthly_payment_status = 1;
+
             $monthly_attendance->save();
 
             if (Loan::where('loans_employee_id', $request->pay_slip_employee_id)->where('loans_remaining_installments', '>', 0)->exists()) {
@@ -1703,6 +1713,7 @@ class CustomizePayrollController extends Controller
                     $employee_pf_contribution->provident_fund_employee_amount = $request->pay_slip_provident_fund;
                     $employee_pf_contribution->provident_fund_company_amount = ($request->pay_slip_gross_salary * $company_pf_configs_value->providentfund_config_amount_precentage) / 100;
                     $employee_pf_contribution->save();
+
 
                     if (ProvidentfundReport::where('providentfund_report_com_id', '=', $request->pay_slip_com_id)->where('providentfund_report_employee_id', '=', $request->pay_slip_employee_id)->exists()) {
 
@@ -2176,6 +2187,7 @@ class CustomizePayrollController extends Controller
 
     public function CustomizePaymentHistory(Request $request)
     {
+
         $customize_months = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->get();
 
         if (($request->payment_history_department_id == 0) && $request->month && $request->year) {
@@ -2187,17 +2199,16 @@ class CustomizePayrollController extends Controller
                 ->join('departments', 'users.department_id', '=', 'departments.id')
                 ->join('designations', 'users.designation_id', '=', 'designations.id')
                 ->join('companies', 'users.com_id', '=', 'companies.id')
-                ->join('regions', 'users.region_id', '=', 'regions.id')
-                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name','users.company_assigned_id','regions.region_name')
+                // ->join('regions', 'users.region_id', '=', 'regions.id')
+                // ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name', 'users.company_assigned_id', 'regions.region_name')
                 ->where('customize_pay_slip_com_id', Auth::user()->com_id)
                 ->where('customize_pay_slip_status', 1)
                 ->where('customize_pay_slip_payment_month', '=', $last_month)
                 ->where('customize_pay_slip_payment_year', '=', $previous_month_year)
                 ->get();
 
-            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments','customize_months'));
-
-        }elseif ($request->payment_history_department_id && $request->month && $request->year) {
+            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments', 'customize_months'));
+        } elseif ($request->payment_history_department_id && $request->month && $request->year) {
             $last_month = $request->month;
             $previous_month_year = $request->year;
 
@@ -2207,7 +2218,7 @@ class CustomizePayrollController extends Controller
                 ->join('designations', 'users.designation_id', '=', 'designations.id')
                 ->join('companies', 'users.com_id', '=', 'companies.id')
                 ->join('regions', 'users.region_id', '=', 'regions.id')
-                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name','users.company_assigned_id','regions.region_name')
+                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name', 'users.company_assigned_id', 'regions.region_name')
                 ->where('customize_pay_slip_com_id', Auth::user()->com_id)
                 ->where('customize_pay_slip_status', 1)
                 ->where('customize_pay_slip_department_id', $request->payment_history_department_id)
@@ -2215,8 +2226,7 @@ class CustomizePayrollController extends Controller
                 ->where('customize_pay_slip_payment_year', '=', $previous_month_year)
                 ->get();
 
-            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments','customize_months'));
-
+            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments', 'customize_months'));
         } else {
             $last_month = date('m');
             $previous_month_year = date('Y');
@@ -2227,14 +2237,14 @@ class CustomizePayrollController extends Controller
                 ->join('designations', 'users.designation_id', '=', 'designations.id')
                 ->join('companies', 'users.com_id', '=', 'companies.id')
                 ->join('regions', 'users.region_id', '=', 'regions.id')
-                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name','users.company_assigned_id','regions.region_name')
+                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name', 'users.company_assigned_id', 'regions.region_name')
                 ->where('customize_pay_slip_com_id', Auth::user()->com_id)
                 ->where('customize_pay_slip_status', 1)
                 ->where('customize_pay_slip_payment_month', '=', $last_month)
                 ->where('customize_pay_slip_payment_year', '=', $previous_month_year)
                 ->get();
 
-            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments','customize_months'));
+            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments', 'customize_months'));
         }
     }
 
@@ -2257,23 +2267,35 @@ class CustomizePayrollController extends Controller
 
     public function customizeMonthWiseSalarySheetGenerate(Request $request)
     {
+
         if ($request->download_pdf) {
             $company_names = Company::where('id', Auth::user()->com_id)->first(['company_name']);
 
             $last_month = date('m', strtotime($request->month_year));
             $previous_month_year = date('Y', strtotime($request->month_year));
 
-            $payment_histories = CustomizePaySlip::join('users', 'customize_pay_slips.customize_pay_slip_employee_id', '=', 'users.id')
+          return  $payment_histories = CustomizePaySlip::join('users', 'customize_pay_slips.customize_pay_slip_employee_id', '=', 'users.id')
                 ->join('departments', 'users.department_id', '=', 'departments.id')
                 ->join('designations', 'users.designation_id', '=', 'designations.id')
-                ->join('regions', 'users.region_id', '=', 'regions.id')
+                // ->join('regions', 'users.region_id', '=', 'regions.id')
                 ->join('companies', 'users.com_id', '=', 'companies.id')
-                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name','regions.region_name')
+                // ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name', 'regions.region_name')
                 ->where('customize_pay_slip_com_id', Auth::user()->com_id)
                 ->where('customize_pay_slip_status', 1)
-                ->whereMonth('pay_slip_month_year', '=', $last_month)
-                ->whereYear('pay_slip_month_year', '=', $previous_month_year)
+                // ->whereMonth('pay_slip_month_year', '=', $last_month)
+                // ->whereYear('pay_slip_month_year', '=', $previous_month_year)
                 ->get();
+        //   return  $payment_histories = CustomizePaySlip::join('users', 'customize_pay_slips.customize_pay_slip_employee_id', '=', 'users.id')
+        //         ->join('departments', 'users.department_id', '=', 'departments.id')
+        //         ->join('designations', 'users.designation_id', '=', 'designations.id')
+        //         // ->join('regions', 'users.region_id', '=', 'regions.id')
+        //         // ->join('companies', 'users.com_id', '=', 'companies.id')
+        //         // ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name', 'regions.region_name')
+        //         ->where('customize_pay_slip_com_id', Auth::user()->com_id)
+        //         ->where('customize_pay_slip_status', 1)
+        //         // ->whereMonth('pay_slip_month_year', '=', $last_month)
+        //         // ->whereYear('pay_slip_month_year', '=', $previous_month_year)
+        //         ->get();
 
 
             $fileName = "Salary-Sheet.pdf";
@@ -2326,17 +2348,17 @@ class CustomizePayrollController extends Controller
                 ->join('departments', 'users.department_id', '=', 'departments.id')
                 ->join('designations', 'users.designation_id', '=', 'designations.id')
                 ->join('regions', 'users.region_id', '=', 'regions.id')
-                ->join('companies', 'users.com_id', '=', 'companies.id')
-                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'users.company_assigned_id','departments.department_name', 'designations.designation_name', 'companies.company_name','regions.region_name')
+                // ->join('companies', 'users.com_id', '=', 'companies.id')
+                // ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'users.company_assigned_id', 'departments.department_name', 'designations.designation_name', 'companies.company_name', 'regions.region_name')
                 ->where('customize_pay_slip_com_id', Auth::user()->com_id)
                 ->where('customize_pay_slip_status', 1)
-                ->where('customize_pay_slip_payment_month', '=', $last_month)
-                ->where('customize_pay_slip_payment_year', '=', $previous_month_year)
+                // ->where('customize_pay_slip_payment_month', '=', $last_month)
+                // ->where('customize_pay_slip_payment_year', '=', $previous_month_year)
                 ->get();
 
 
             $fileName = "Salary-Sheet.pdf";
-            $month_year = $request->year.'-'.$request->year;
+            $month_year = $request->year . '-' . $request->year;
 
             $data['payment_histories'] = $payment_histories;
             $data['month_year'] = $month_year;
@@ -2347,7 +2369,7 @@ class CustomizePayrollController extends Controller
         }
     }
 
- public function customizePaymentHistorySearchIndex(Request $request)
+    public function customizePaymentHistorySearchIndex(Request $request)
     {
         $customize_months = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->get();
 
@@ -2361,14 +2383,14 @@ class CustomizePayrollController extends Controller
                 ->join('designations', 'users.designation_id', '=', 'designations.id')
                 ->join('companies', 'users.com_id', '=', 'companies.id')
                 ->join('regions', 'users.region_id', '=', 'regions.id')
-                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name','users.company_assigned_id','regions.region_name')
+                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name', 'users.company_assigned_id', 'regions.region_name')
                 ->where('customize_pay_slip_com_id', Auth::user()->com_id)
                 ->where('customize_pay_slip_status', 1)
                 ->where('customize_pay_slip_payment_month', '=', $last_month)
                 ->where('customize_pay_slip_payment_year', '=', $previous_month_year)
                 ->get();
 
-            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments','customize_months'));
+            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments', 'customize_months'));
         } else {
             $last_month = date('m', strtotime($request->payment_history_month_year));
             $previous_month_year = date('Y', strtotime($request->payment_history_month_year));
@@ -2379,15 +2401,14 @@ class CustomizePayrollController extends Controller
                 ->join('designations', 'users.designation_id', '=', 'designations.id')
                 ->join('companies', 'users.com_id', '=', 'companies.id')
                 ->join('regions', 'users.region_id', '=', 'regions.id')
-                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name','users.company_assigned_id','regions.region_name')
+                ->select('customize_pay_slips.*', 'users.first_name', 'users.last_name', 'users.joining_date', 'departments.department_name', 'designations.designation_name', 'companies.company_name', 'users.company_assigned_id', 'regions.region_name')
                 ->where('customize_pay_slip_com_id', Auth::user()->com_id)
                 ->where('customize_pay_slip_status', 1)
                 ->where('customize_pay_slip_payment_month', '=', $last_month)
                 ->where('customize_pay_slip_payment_year', '=', $previous_month_year)
                 ->get();
 
-            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments','customize_months'));
+            return view('back-end.premium.payroll.payment-history.customize-payment-history', compact('payment_histories', 'departments', 'customize_months'));
         }
     }
-
 }

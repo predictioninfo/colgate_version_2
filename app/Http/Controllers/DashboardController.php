@@ -164,7 +164,7 @@ class DashboardController extends Controller
             $project = Project::where('project_com_id', Auth::user()->com_id)->where('progress_progress', '=', 100)->count();
             $salary = PaySlip::where('pay_slip_com_id', Auth::user()->com_id)->where('pay_slip_status', 1)->sum('pay_slip_net_salary');
             $employees = User::where('com_id', '=', Auth::user()->com_id)->where('is_active', 1)->where('users_bulk_deleted', 'No')->whereNull('company_profile')->orderBy('id', 'DESC')->get(['id', 'company_assigned_id', 'first_name', 'last_name']);
-            
+
             $joining_date = User::where('id', Auth::user()->id)->first('joining_date');
             $days = floor((time() - strtotime($joining_date->joining_date)) / 86400) + 1;
 
@@ -313,7 +313,7 @@ class DashboardController extends Controller
                     $leave_types = LeaveType::where('leave_type_company_id', Auth::user()->com_id)
                     // ->where('activation_days', '<=', $days)
                     ->get();
-                    
+
                     $arrangement_types = VariableMethod::where('variable_method_com_id', '=', Auth::user()->com_id)->where('variable_method_category', '=', 'Arrangement')->get(['variable_method_name']);
                     $announcement = Announcement::where('announcement_com_id', Auth::user()->com_id)->where(function ($query) {
                         $query->where('announcement_department_id', Auth::user()->department_id)
