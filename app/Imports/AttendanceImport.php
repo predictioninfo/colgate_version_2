@@ -43,6 +43,22 @@ class AttendanceImport implements ToModel, WithStartRow
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
+
+    //  new code start
+     private $importedData = [];
+
+    
+ 
+     // Add a method to retrieve the imported data
+     public function getImportedData()
+     {
+         return $this->importedData;
+     }
+
+    //  new code end  
+
+
+
     public function model(array $row)
     {
 
@@ -409,7 +425,8 @@ class AttendanceImport implements ToModel, WithStartRow
                 $attendance->save();
             }
             if ($row['4']) {
-                $UNIX_DATE = ($row['4'] - 25569) * 86400;
+                // $UNIX_DATE = ($row['4'] - 25569) * 86400;
+                $UNIX_DATE = (int) ($row['4'] - 25569) * 86400;
                 $formatteddate = gmdate("Y-m-d", $UNIX_DATE);
                 $current_date = gmdate("Y-m-d", $UNIX_DATE);
                 $current_month = gmdate("m", $UNIX_DATE);

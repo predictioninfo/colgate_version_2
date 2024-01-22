@@ -2274,7 +2274,7 @@ class CustomizePayrollController extends Controller
             $last_month = date('m', strtotime($request->month_year));
             $previous_month_year = date('Y', strtotime($request->month_year));
 
-          return  $payment_histories = CustomizePaySlip::join('users', 'customize_pay_slips.customize_pay_slip_employee_id', '=', 'users.id')
+            $payment_histories = CustomizePaySlip::join('users', 'customize_pay_slips.customize_pay_slip_employee_id', '=', 'users.id')
                 ->join('departments', 'users.department_id', '=', 'departments.id')
                 ->join('designations', 'users.designation_id', '=', 'designations.id')
                 // ->join('regions', 'users.region_id', '=', 'regions.id')

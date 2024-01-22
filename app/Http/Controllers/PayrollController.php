@@ -76,8 +76,7 @@ class PayrollController extends Controller
                 ->whereYear('attendance_year', '=', $previous_month_year)
                 ->get();
             return view('back-end.premium.payroll.new-payment.new-payment-index2', get_defined_vars());
-        }
-        else {
+        } else {
             $minimum_tax_config = MinimumTaxConfigure::where('minimum_tax_config_com_id', Auth::user()->com_id)->first();
             $tax_configs = TaxConfig::where('tax_com_id', '=', Auth::user()->com_id)->get();
             $last_month = date('m');
@@ -100,8 +99,8 @@ class PayrollController extends Controller
     }
 
 
-
-  public function newCustomizePaymentIndex(Request $request)
+    // new  Payment start
+    public function newCustomizePaymentIndex(Request $request)
     {
         $permission = "3.28";
 
@@ -128,6 +127,7 @@ class PayrollController extends Controller
 
         if ($month == "01") {
             $customize_date = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->where('start_month', 12)->first();
+
             if ($customize_date->end_date >= $day) {
                 $previous_month_year = $previousYear;
                 $last_month = "12";
@@ -309,11 +309,11 @@ class PayrollController extends Controller
             }
         }
 
-            $start = Carbon::parse($startDate);
-            $end = Carbon::parse($endDate);
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
 
-            // Create the CarbonPeriod for the date range
-            $customRange = CarbonPeriod::create($start, $end);
+        // Create the CarbonPeriod for the date range
+        $customRange = CarbonPeriod::create($start, $end);
 
 
 
@@ -323,7 +323,7 @@ class PayrollController extends Controller
             $last_month_date_year = $request->year;
             $last_month = $request->month;
 
-            $date_month_find = $request->year.'-'.$request->month.'-'.date('d');
+            $date_month_find = $request->year . '-' . $request->month . '-' . date('d');
             $date_wise_day_name = date('D', strtotime($date_month_find));
             $previous_month_year = date('Y', strtotime($date_month_find));
 
@@ -335,21 +335,21 @@ class PayrollController extends Controller
 
             $customize_month_payments = CustomizeMonthlyAttendance::join('users', 'customize_monthly_attendances.customize_monthly_employee_id', '=', 'users.id')
                 ->join('departments', 'users.department_id', '=', 'departments.id')
-                ->join('salary_configs','customize_monthly_attendances.customize_monthly_com_id', '=', 'salary_configs.salary_config_com_id')
+                ->join('salary_configs', 'customize_monthly_attendances.customize_monthly_com_id', '=', 'salary_configs.salary_config_com_id')
                 ->select('customize_monthly_attendances.*', 'users.first_name', 'users.last_name', 'users.company_assigned_id', 'users.joining_date', 'users.department_id', 'users.per_hour_rate', 'users.profile_photo', 'users.gross_salary', 'users.salary_type', 'users.user_provident_fund', 'user_provident_fund_member', 'users.email', 'salary_configs.salary_config_basic_salary', 'salary_configs.salary_config_house_rent_allowance', 'salary_configs.salary_config_conveyance_allowance', 'salary_configs.salary_config_medical_allowance', 'salary_configs.salary_config_festival_bonus', 'mobile_bill', 'transport_allowance')
                 ->where('customize_monthly_com_id', '=', Auth::user()->com_id)
-                ->where('customize_monthly_payment_status',0)
+                ->where('customize_monthly_payment_status', 0)
                 ->where('department_id', '=', $request->department_id)
                 ->where('attendance_month', '=', $last_month)
                 ->where('attendance_year', '=', $previous_month_year)
                 ->get();
             return view('back-end.premium.payroll.new-payment.customize-month-payment', get_defined_vars());
-        }elseif (($request->department_id == 0) && $request->month && $request->year) {
+        } elseif (($request->department_id == 0) && $request->month && $request->year) {
 
             $last_month_date_year = $request->year;
             $last_month = $request->month;
 
-            $date_month_find = $request->year.'-'.$request->month.'-'.date('d');
+            $date_month_find = $request->year . '-' . $request->month . '-' . date('d');
             $date_wise_day_name = date('D', strtotime($date_month_find));
             $previous_month_year = date('Y', strtotime($date_month_find));
             $minimum_tax_config = MinimumTaxConfigure::where('minimum_tax_config_com_id', Auth::user()->com_id)->first();
@@ -357,20 +357,18 @@ class PayrollController extends Controller
             $tax_configs = TaxConfig::where('tax_com_id', '=', Auth::user()->com_id)->get();
             $festival_configs = FestivalConfig::where('festival_config_com_id', Auth::user()->com_id)->get(['festival_config_festival_bonus_time_duration', 'festival_config_salary_type', 'festival_config_festival_bonus_percentage']);
             $festivalBonus = FestivalBonus::where('festival_bonus_com_id', Auth::user()->com_id)->get();
-
-            $customize_month_payments = CustomizeMonthlyAttendance::join('users', 'customize_monthly_attendances.customize_monthly_employee_id', '=', 'users.id')
+            // return here
+                 $customize_month_payments = CustomizeMonthlyAttendance::join('users', 'customize_monthly_attendances.customize_monthly_employee_id', '=', 'users.id')
                 ->join('departments', 'users.department_id', '=', 'departments.id')
-                ->join('salary_configs','customize_monthly_attendances.customize_monthly_com_id', '=', 'salary_configs.salary_config_com_id')
+                ->join('salary_configs', 'customize_monthly_attendances.customize_monthly_com_id', '=', 'salary_configs.salary_config_com_id')
                 ->select('customize_monthly_attendances.*', 'users.first_name', 'users.last_name', 'users.company_assigned_id', 'users.joining_date', 'users.department_id', 'users.per_hour_rate', 'users.profile_photo', 'users.gross_salary', 'users.salary_type', 'users.user_provident_fund', 'user_provident_fund_member', 'users.email', 'salary_configs.salary_config_basic_salary', 'salary_configs.salary_config_house_rent_allowance', 'salary_configs.salary_config_conveyance_allowance', 'salary_configs.salary_config_medical_allowance', 'salary_configs.salary_config_festival_bonus', 'mobile_bill', 'transport_allowance')
                 ->where('customize_monthly_com_id', '=', Auth::user()->com_id)
-                ->where('customize_monthly_payment_status',0)
+                ->where('customize_monthly_payment_status', 0)
                 ->where('attendance_month', '=', $last_month)
                 ->where('attendance_year', '=', $previous_month_year)
                 ->get();
             return view('back-end.premium.payroll.new-payment.customize-month-payment', get_defined_vars());
-        }
-
-        else {
+        } else {
             $minimum_tax_config = MinimumTaxConfigure::where('minimum_tax_config_com_id', Auth::user()->com_id)->first();
 
             $departments = Department::where('department_com_id', Auth::user()->com_id)->get(['id', 'department_name']);
@@ -378,18 +376,18 @@ class PayrollController extends Controller
             $festival_configs = FestivalConfig::where('festival_config_com_id', Auth::user()->com_id)->get(['festival_config_festival_bonus_time_duration', 'festival_config_salary_type', 'festival_config_festival_bonus_percentage']);
             $festivalBonus = FestivalBonus::where('festival_bonus_com_id', Auth::user()->com_id)->get();
             $customize_month_payments = CustomizeMonthlyAttendance::join('users', 'customize_monthly_attendances.customize_monthly_employee_id', '=', 'users.id')
-            ->join('departments', 'users.department_id', '=', 'departments.id')
-            ->join('salary_configs', 'customize_monthly_attendances.customize_monthly_com_id', '=', 'salary_configs.salary_config_com_id')
-            ->select('customize_monthly_attendances.*', 'users.first_name', 'users.last_name', 'users.company_assigned_id', 'users.joining_date', 'users.department_id', 'users.per_hour_rate', 'users.profile_photo', 'users.gross_salary', 'users.salary_type', 'users.user_provident_fund', 'user_provident_fund_member', 'users.email', 'salary_configs.salary_config_basic_salary', 'salary_configs.salary_config_house_rent_allowance', 'salary_configs.salary_config_conveyance_allowance', 'salary_configs.salary_config_medical_allowance', 'salary_configs.salary_config_festival_bonus', 'mobile_bill', 'transport_allowance')
-            ->where('customize_monthly_com_id', '=', Auth::user()->com_id)
-            ->where('customize_monthly_payment_status',0)
-            ->where('attendance_month', '=', $last_month)
-            ->where('attendance_year', '=', $previous_month_year)
-            ->get();
+                ->join('departments', 'users.department_id', '=', 'departments.id')
+                ->join('salary_configs', 'customize_monthly_attendances.customize_monthly_com_id', '=', 'salary_configs.salary_config_com_id')
+                ->select('customize_monthly_attendances.*', 'users.first_name', 'users.last_name', 'users.company_assigned_id', 'users.joining_date', 'users.department_id', 'users.per_hour_rate', 'users.profile_photo', 'users.gross_salary', 'users.salary_type', 'users.user_provident_fund', 'user_provident_fund_member', 'users.email', 'salary_configs.salary_config_basic_salary', 'salary_configs.salary_config_house_rent_allowance', 'salary_configs.salary_config_conveyance_allowance', 'salary_configs.salary_config_medical_allowance', 'salary_configs.salary_config_festival_bonus', 'mobile_bill', 'transport_allowance')
+                ->where('customize_monthly_com_id', '=', Auth::user()->com_id)
+                ->where('customize_monthly_payment_status', 0)
+                ->where('attendance_month', '=', $last_month)
+                ->where('attendance_year', '=', $previous_month_year)
+                ->get();
             return view('back-end.premium.payroll.new-payment.customize-month-payment', get_defined_vars());
         }
     }
-
+    // new  Payment end
 
     public function salaryDetailsById(Request $request)
     {
@@ -2907,7 +2905,7 @@ class PayrollController extends Controller
     {
         $pay_slips = PaySlip::where('id', $request->id)->get();
         foreach ($pay_slips as $pay_slips_value) {
-        $user_details = User::where('id', $pay_slips_value->pay_slip_employee_id)->get();
+            $user_details = User::where('id', $pay_slips_value->pay_slip_employee_id)->get();
             if (BankAccount::where('bank_account_employee_id', $pay_slips_value->pay_slip_employee_id)->exists()) {
                 $employee_bank_details = BankAccount::where('bank_account_employee_id', $pay_slips_value->pay_slip_employee_id)->get();
                 foreach ($employee_bank_details as $employee_bank_details_value) {
@@ -3262,9 +3260,9 @@ class PayrollController extends Controller
     public function customizeEmployeePaySlipDownload(Request $request)
     {
 
-       $pay_slips = CustomizePaySlip::where('id', $request->id)->get();
+        $pay_slips = CustomizePaySlip::where('id', $request->id)->get();
         foreach ($pay_slips as $pay_slips_value) {
-        $user_details = User::where('id', $pay_slips_value->customize_pay_slip_employee_id)->get();
+            $user_details = User::where('id', $pay_slips_value->customize_pay_slip_employee_id)->get();
             if (BankAccount::where('bank_account_employee_id', $pay_slips_value->customize_pay_slip_employee_id)->exists()) {
                 $employee_bank_details = BankAccount::where('bank_account_employee_id', $pay_slips_value->customize_pay_slip_employee_id)->get();
                 foreach ($employee_bank_details as $employee_bank_details_value) {
@@ -3395,19 +3393,19 @@ class PayrollController extends Controller
                         );
 
 
-                      $gross_earning_total = $pay_slips_value->customize_pay_slip_gross_salary
-                        + $pay_slips_value->customize_pay_slip_festival_bonus
-                        + $pay_slips_value->customize_pay_slip_prorata
-                        + $pay_slips_value->customize_pay_slip_ot_arrear
-                        + $pay_slips_value->customize_pay_slip_incentive
-                        + $pay_slips_value->customize_pay_slip_over_time_allowance
-                        + $pay_slips_value->customize_pay_slip_snacks_allowance;
+                        $gross_earning_total = $pay_slips_value->customize_pay_slip_gross_salary
+                            + $pay_slips_value->customize_pay_slip_festival_bonus
+                            + $pay_slips_value->customize_pay_slip_prorata
+                            + $pay_slips_value->customize_pay_slip_ot_arrear
+                            + $pay_slips_value->customize_pay_slip_incentive
+                            + $pay_slips_value->customize_pay_slip_over_time_allowance
+                            + $pay_slips_value->customize_pay_slip_snacks_allowance;
 
                         $gross_deduction_total = $pay_slips_value->customize_pay_slip_tax_deduction
                             + $pay_slips_value->customize_pay_slip_loans
                             + $pay_slips_value->customize_pay_slip_other_deduction
                             + $pay_slips_value->customize_pay_slip_other_arrear_deduction;
-                            + $pay_slips_value->pay_slip_deduction_for_unauthorised_leave;
+                        +$pay_slips_value->pay_slip_deduction_for_unauthorised_leave;
 
                         $gross_earning = array(
                             'pay_slip_gross_earnings' => $gross_earning_total,
@@ -3477,124 +3475,124 @@ class PayrollController extends Controller
                     $user_full_name = $user_details_value->first_name . " " . $user_details_value->last_name;
                     $salary_month = DateTime::createFromFormat('m', $pay_slips_value->customize_pay_slip_payment_month)->format('F');
 
-                     $salary_month = array(
-                            'salary_month' => $salary_month,
-                        );
-                        $company_name = array(
-                            'pay_slip_company_name' => $company_details->company_name,
-                        );
-                        $employee_name = array(
-                            'pay_slip_employee_name' => $user_full_name,
-                        );
-                        $stuff_id = array(
-                            'pay_slip_stuff_id' => $user_details_value->company_assigned_id,
-                        );
-                        $bank_name = array(
-                            'pay_slip_bank_name' => "--",
-                        );
-                        $bank_account_number = array(
-                            'pay_slip_bank_account_number' => "--",
-                        );
-                        $bank_branch = array(
-                            'pay_slip_bank_branch' => "--",
-                        );
-                        $working_days = array(
-                            'pay_slip_working_days' => $pay_slips_value->customize_pay_slip_working_days,
-                        );
-                        $date_of_joining = array(
-                            'pay_slip_date_of_joining' => $user_details_value->joining_date,
-                        );
-                        $department_name = array(
-                            'pay_slip_department_name' => $department_details->department_name,
-                        );
-                        $designation_name = array(
-                            'pay_slip_designation_name' => $designation_details->designation_name,
-                        );
-                        $salary_type = array(
-                            'pay_slip_payment_type' => $pay_slips_value->customize_pay_slip_payment_type,
-                        );
-                        $pay_slip_month_year = array(
-                            'pay_slip_basic_salary' => $pay_slips_value->customize_pay_slip_month_year,
-                        );
-                        $basic = array(
-                            'pay_slip_basic_salary' => $pay_slips_value->customize_pay_slip_basic_salary,
-                        );
-                        $gross = array(
-                            'pay_slip_gross_salary' => $pay_slips_value->customize_pay_slip_gross_salary,
-                        );
-                        $total_working_hour = array(
-                            'pay_slip_total_working_hour' => $pay_slips_value->customize_total_working_hour,
-                        );
-                        $total_ot_hour = array(
-                            'pay_slip_ot_hour' => $pay_slips_value->customize_pay_slip_total_over_time_hour,
-                        );
-                        $working_hour = array(
-                            'pay_slip_working_hour' => $pay_slips_value->customize_pay_slip_working_hour,
-                        );
-                        $per_hour_rate = array(
-                            'pay_slip_per_hour_rate' => $pay_slips_value->customize_pay_slip_per_hour_rate,
-                        );
-                        $customize_ot_per_hour_rate = array(
-                            'pay_slip_ot_per_hour_rate' => $pay_slips_value->customize_pay_slip_over_time_hour_per_hour_rate,
-                        );
+                    $salary_month = array(
+                        'salary_month' => $salary_month,
+                    );
+                    $company_name = array(
+                        'pay_slip_company_name' => $company_details->company_name,
+                    );
+                    $employee_name = array(
+                        'pay_slip_employee_name' => $user_full_name,
+                    );
+                    $stuff_id = array(
+                        'pay_slip_stuff_id' => $user_details_value->company_assigned_id,
+                    );
+                    $bank_name = array(
+                        'pay_slip_bank_name' => "--",
+                    );
+                    $bank_account_number = array(
+                        'pay_slip_bank_account_number' => "--",
+                    );
+                    $bank_branch = array(
+                        'pay_slip_bank_branch' => "--",
+                    );
+                    $working_days = array(
+                        'pay_slip_working_days' => $pay_slips_value->customize_pay_slip_working_days,
+                    );
+                    $date_of_joining = array(
+                        'pay_slip_date_of_joining' => $user_details_value->joining_date,
+                    );
+                    $department_name = array(
+                        'pay_slip_department_name' => $department_details->department_name,
+                    );
+                    $designation_name = array(
+                        'pay_slip_designation_name' => $designation_details->designation_name,
+                    );
+                    $salary_type = array(
+                        'pay_slip_payment_type' => $pay_slips_value->customize_pay_slip_payment_type,
+                    );
+                    $pay_slip_month_year = array(
+                        'pay_slip_basic_salary' => $pay_slips_value->customize_pay_slip_month_year,
+                    );
+                    $basic = array(
+                        'pay_slip_basic_salary' => $pay_slips_value->customize_pay_slip_basic_salary,
+                    );
+                    $gross = array(
+                        'pay_slip_gross_salary' => $pay_slips_value->customize_pay_slip_gross_salary,
+                    );
+                    $total_working_hour = array(
+                        'pay_slip_total_working_hour' => $pay_slips_value->customize_total_working_hour,
+                    );
+                    $total_ot_hour = array(
+                        'pay_slip_ot_hour' => $pay_slips_value->customize_pay_slip_total_over_time_hour,
+                    );
+                    $working_hour = array(
+                        'pay_slip_working_hour' => $pay_slips_value->customize_pay_slip_working_hour,
+                    );
+                    $per_hour_rate = array(
+                        'pay_slip_per_hour_rate' => $pay_slips_value->customize_pay_slip_per_hour_rate,
+                    );
+                    $customize_ot_per_hour_rate = array(
+                        'pay_slip_ot_per_hour_rate' => $pay_slips_value->customize_pay_slip_over_time_hour_per_hour_rate,
+                    );
 
-                        $festival_bonus = array(
-                            'pay_slip_festival_bonus' => $pay_slips_value->customize_pay_slip_festival_bonus,
-                        );
-                        $commissions = array(
-                            'pay_slip_commissions' => $pay_slips_value->customize_pay_slip_commissions,
-                        );
-                        $other_payments = array(
-                            'pay_slip_other_payments' => $pay_slips_value->customize_pay_slip_other_payments,
-                        );
+                    $festival_bonus = array(
+                        'pay_slip_festival_bonus' => $pay_slips_value->customize_pay_slip_festival_bonus,
+                    );
+                    $commissions = array(
+                        'pay_slip_commissions' => $pay_slips_value->customize_pay_slip_commissions,
+                    );
+                    $other_payments = array(
+                        'pay_slip_other_payments' => $pay_slips_value->customize_pay_slip_other_payments,
+                    );
 
-                        $loans = array(
-                            'pay_slip_loans' => $pay_slips_value->customize_pay_slip_loans,
-                        );
-                        $over_time_allowance = array(
-                            'pay_slip_over_time_allowance' => $pay_slips_value->customize_pay_slip_over_time_allowance,
-                        );
-                        $pay_slip_lunch_allowance = array(
-                            'pay_slip_lunch_allowance' => $pay_slips_value->customize_pay_slip_lunch_allowance,
-                        );
+                    $loans = array(
+                        'pay_slip_loans' => $pay_slips_value->customize_pay_slip_loans,
+                    );
+                    $over_time_allowance = array(
+                        'pay_slip_over_time_allowance' => $pay_slips_value->customize_pay_slip_over_time_allowance,
+                    );
+                    $pay_slip_lunch_allowance = array(
+                        'pay_slip_lunch_allowance' => $pay_slips_value->customize_pay_slip_lunch_allowance,
+                    );
 
-                        $payment_date = array(
-                            'payment_date' => $pay_slips_value->customize_pay_slip_payment_date,
-                        );
-                        $pay_slip_late_day_salary_deduct = array(
-                            'pay_slip_late_day_salary_deduct' => $pay_slips_value->customize_pay_slip_late_day_salary_deduct,
-                        );
-                        $pay_slip_present_days = array(
-                            'pay_slip_present_days' => $pay_slips_value->customize_pay_slip_present_days,
-                        );
-                        $pay_slip_prorata = array(
-                            'pay_slip_prorata' => $pay_slips_value->customize_pay_slip_prorata,
-                        );
-                        $pay_slip_incentive = array(
-                            'pay_slip_incentive' => $pay_slips_value->customize_pay_slip_incentive,
-                        );
-                        $pay_slip_ot_variable = array(
-                            'pay_slip_ot_variable' => $pay_slips_value->customize_pay_slip_ot_variable,
-                        );
-                        $pay_slip_ot_arrear = array(
-                            'pay_slip_ot_arrear' => $pay_slips_value->customize_pay_slip_ot_arrear,
-                        );
-                        $pay_slip_snacks_allowance = array(
-                            'pay_slip_snacks_allowance' => $pay_slips_value->customize_pay_slip_snacks_allowance,
-                        );
-                        $pay_slip_other_deduction = array(
-                            'pay_slip_other_deduction' => $pay_slips_value->customize_pay_slip_other_deduction,
-                        );
-                        $pay_slip_other_arrear_deduction = array(
-                            'pay_slip_other_arrear_deduction' => $pay_slips_value->customize_pay_slip_other_arrear_deduction,
-                        );
-                        $pay_slip_deduction_for_unauthorised_leave = array(
-                            'pay_slip_deduction_for_unauthorised_leave' => $pay_slips_value->pay_slip_deduction_for_unauthorised_leave,
-                        );
-                        $gross_earning_total = $pay_slips_value->customize_pay_slip_gross_salary
+                    $payment_date = array(
+                        'payment_date' => $pay_slips_value->customize_pay_slip_payment_date,
+                    );
+                    $pay_slip_late_day_salary_deduct = array(
+                        'pay_slip_late_day_salary_deduct' => $pay_slips_value->customize_pay_slip_late_day_salary_deduct,
+                    );
+                    $pay_slip_present_days = array(
+                        'pay_slip_present_days' => $pay_slips_value->customize_pay_slip_present_days,
+                    );
+                    $pay_slip_prorata = array(
+                        'pay_slip_prorata' => $pay_slips_value->customize_pay_slip_prorata,
+                    );
+                    $pay_slip_incentive = array(
+                        'pay_slip_incentive' => $pay_slips_value->customize_pay_slip_incentive,
+                    );
+                    $pay_slip_ot_variable = array(
+                        'pay_slip_ot_variable' => $pay_slips_value->customize_pay_slip_ot_variable,
+                    );
+                    $pay_slip_ot_arrear = array(
+                        'pay_slip_ot_arrear' => $pay_slips_value->customize_pay_slip_ot_arrear,
+                    );
+                    $pay_slip_snacks_allowance = array(
+                        'pay_slip_snacks_allowance' => $pay_slips_value->customize_pay_slip_snacks_allowance,
+                    );
+                    $pay_slip_other_deduction = array(
+                        'pay_slip_other_deduction' => $pay_slips_value->customize_pay_slip_other_deduction,
+                    );
+                    $pay_slip_other_arrear_deduction = array(
+                        'pay_slip_other_arrear_deduction' => $pay_slips_value->customize_pay_slip_other_arrear_deduction,
+                    );
+                    $pay_slip_deduction_for_unauthorised_leave = array(
+                        'pay_slip_deduction_for_unauthorised_leave' => $pay_slips_value->pay_slip_deduction_for_unauthorised_leave,
+                    );
+                    $gross_earning_total = $pay_slips_value->customize_pay_slip_gross_salary
                         + $pay_slips_value->customize_pay_slip_festival_bonus
                         + $pay_slips_value->customize_pay_slip_prorata
-                       
+
                         + $pay_slips_value->customize_pay_slip_ot_arrear
                         + $pay_slips_value->customize_pay_slip_incentive
                         + $pay_slips_value->customize_pay_slip_over_time_allowance
@@ -3663,8 +3661,6 @@ class PayrollController extends Controller
             }
             //pdf generating and sending sending via email code ends here..
         }
-
-
     }
 
     public function paymentHistoryDelete(Request $request)
@@ -3679,7 +3675,7 @@ class PayrollController extends Controller
             return redirect()->route('department-wise-employee-payments')->with('message', 'Something Went Wrong');
         }
     }
-   public function paymentFestivalBounus(Request $request)
+    public function paymentFestivalBounus(Request $request)
     {
         try {
 
@@ -3863,7 +3859,6 @@ class PayrollController extends Controller
         $customize_months = CustomizeMonthName::where('customize_month_names_com_id', Auth::user()->com_id)->get();
 
         return view('back-end.premium.payroll.new-festival-payment.customize-festival-bounus-history', get_defined_vars());
-
     }
 
     public function paymentFestivalHistoryDelete(Request $request)
@@ -4013,13 +4008,13 @@ class PayrollController extends Controller
     }
 
 
-      public function CustomizeMonthWiseFestivalSalarySheetGenerate(Request $request)
+    public function CustomizeMonthWiseFestivalSalarySheetGenerate(Request $request)
     {
 
         $company_names = Company::where('id', Auth::user()->com_id)->first(['company_name']);
 
         $last_month = $request->month;
-        $month = $request->year.'-'.$request->month.'-'.date('d');
+        $month = $request->year . '-' . $request->month . '-' . date('d');
         $month_name = date('F', strtotime($month));
         $previous_month_year = $request->year;
 

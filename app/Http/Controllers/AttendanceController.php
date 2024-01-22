@@ -1524,10 +1524,28 @@ class AttendanceController extends Controller
     }
 
 
+    // public function fileImportAttendance(Request $request)
+    // {
+    //     try {
+    //         $import = new AttendanceImport;
+    //         Excel::import($import, request()->file('file'));
 
+    //         // Retrieve the imported data
+    //         $importedData = $import->getImportedData();
+
+    //         // Display the imported data
+    //         dd($importedData);
+
+    //         return back()->with('message', 'Imported Successfully');
+    //     } catch (\Exception $e) {
+    //         // Handle any exceptions that might occur during import
+    //         return back()->with('error', 'Error occurred during import: ' . $e->getMessage());
+    //     }
+    // }
     public function fileImportAttendance(Request $request)
     {
-        Excel::import(new AttendanceImport, request()->file('file'));
+       Excel::import(new AttendanceImport, request()->file('file'));
+
         return back()->with('message', 'Imported Successfully');
     }
 
